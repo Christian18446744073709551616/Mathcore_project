@@ -1,0 +1,17 @@
+{
+    "lessonTitle": "Teorema de Tales",
+    "fundamentals": "O Teorema de Tales estabelece uma relação de proporcionalidade entre segmentos de retas paralelas cortadas por transversais.",
+    "formulas": [
+      {
+        "name": "Proporcionalidade",
+        "formula": "AB / BC = A'B' / B'C'"
+      }
+    ],
+    "examples": [
+      {
+        "question": "Dado AB = 3, BC = 6, A'B' = 4, qual é o valor de B'C'?",
+        "solution": "B'C' = (BC * A'B') / AB = (6 * 4) / 3 = 8"
+      }
+    ]
+  }
+  

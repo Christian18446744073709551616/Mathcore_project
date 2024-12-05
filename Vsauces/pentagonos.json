@@ -1,0 +1,17 @@
+{
+    "lessonTitle": "Pentágonos",
+    "fundamentals": "Um pentágono é um polígono com cinco lados.",
+    "formulas": [
+      {
+        "name": "Soma dos ângulos internos",
+        "formula": "S = 3 * 180 = 540 graus"
+      }
+    ],
+    "examples": [
+      {
+        "question": "Qual é a soma dos ângulos internos de um pentágono?",
+        "solution": "540 graus"
+      }
+    ]
+  }
+  

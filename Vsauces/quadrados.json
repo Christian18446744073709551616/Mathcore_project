@@ -1,0 +1,25 @@
+{
+    "lessonTitle": "Quadrados",
+    "fundamentals": "Um quadrado é um polígono com quatro lados iguais e ângulos retos...",
+    "formulas": [
+      {
+        "name": "Área",
+        "formula": "A = lado²"
+      },
+      {
+        "name": "Perímetro",
+        "formula": "P = 4 * lado"
+      }
+    ],
+    "examples": [
+      {
+        "question": "Se o lado de um quadrado é 5, qual sua área?",
+        "solution": "A = 5² = 25"
+      },
+      {
+        "question": "Qual é o perímetro de um quadrado com lado 3?",
+        "solution": "P = 4 * 3 = 12"
+      }
+    ]
+  }
+  

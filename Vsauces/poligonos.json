@@ -1,0 +1,17 @@
+{
+    "lessonTitle": "Polígonos",
+    "fundamentals": "Um polígono é uma figura geométrica fechada com três ou mais lados.",
+    "formulas": [
+      {
+        "name": "Soma dos ângulos internos",
+        "formula": "S = (n - 2) * 180"
+      }
+    ],
+    "examples": [
+      {
+        "question": "Qual é a soma dos ângulos internos de um polígono com 10 lados?",
+        "solution": "S = (10 - 2) * 180 = 1440 graus"
+      }
+    ]
+  }
+  

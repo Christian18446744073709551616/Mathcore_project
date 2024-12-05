@@ -1,0 +1,21 @@
+{
+    "lessonTitle": "Círculos",
+    "fundamentals": "Um círculo é o conjunto de pontos em um plano equidistantes de um ponto central.",
+    "formulas": [
+      {
+        "name": "Área",
+        "formula": "A = π * raio²"
+      },
+      {
+        "name": "Circunferência",
+        "formula": "C = 2 * π * raio"
+      }
+    ],
+    "examples": [
+      {
+        "question": "Qual é a área de um círculo com raio 5?",
+        "solution": "A = π * 5² = 25π"
+      }
+    ]
+  }
+  

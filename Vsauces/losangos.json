@@ -1,0 +1,17 @@
+{
+    "lessonTitle": "Losangos",
+    "fundamentals": "Um losango é um polígono com quatro lados iguais e ângulos opostos iguais.",
+    "formulas": [
+      {
+        "name": "Área",
+        "formula": "A = (diagonal maior * diagonal menor) / 2"
+      }
+    ],
+    "examples": [
+      {
+        "question": "Qual é a área de um losango com diagonais de 6 e 4?",
+        "solution": "A = (6 * 4) / 2 = 12"
+      }
+    ]
+  }
+  

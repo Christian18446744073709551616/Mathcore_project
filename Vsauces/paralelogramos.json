@@ -1,0 +1,17 @@
+{
+    "lessonTitle": "Paralelogramos",
+    "fundamentals": "Um paralelogramo é um quadrilátero onde os lados opostos são paralelos.",
+    "formulas": [
+      {
+        "name": "Área",
+        "formula": "A = base * altura"
+      }
+    ],
+    "examples": [
+      {
+        "question": "Qual é a área de um paralelogramo com base 10 e altura 6?",
+        "solution": "A = 10 * 6 = 60"
+      }
+    ]
+  }
+  

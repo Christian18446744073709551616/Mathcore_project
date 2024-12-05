@@ -1,0 +1,21 @@
+{
+    "lessonTitle": "Ângulos",
+    "fundamentals": "Ângulos são a medida da abertura entre duas semirretas que partem de um mesmo ponto.",
+    "formulas": [
+      {
+        "name": "Soma dos Ângulos Internos de um Triângulo",
+        "formula": "S = 180 graus"
+      },
+      {
+        "name": "Soma dos Ângulos Internos de um Polígono",
+        "formula": "S = (n - 2) * 180"
+      }
+    ],
+    "examples": [
+      {
+        "question": "Qual é a soma dos ângulos internos de um polígono de 5 lados?",
+        "solution": "S = (5 - 2) * 180 = 540 graus"
+      }
+    ]
+  }
+  

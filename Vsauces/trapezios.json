@@ -1,0 +1,17 @@
+{
+    "lessonTitle": "Trapézios",
+    "fundamentals": "Um trapézio é um polígono com pelo menos dois lados paralelos.",
+    "formulas": [
+      {
+        "name": "Área",
+        "formula": "A = ((base maior + base menor) * altura) / 2"
+      }
+    ],
+    "examples": [
+      {
+        "question": "Qual é a área de um trapézio com bases de 8 e 4 e altura 5?",
+        "solution": "A = ((8 + 4) * 5) / 2 = 30"
+      }
+    ]
+  }
+  

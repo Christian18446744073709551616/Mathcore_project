@@ -1,0 +1,17 @@
+{
+    "lessonTitle": "Heptágonos",
+    "fundamentals": "Um heptágono é um polígono com sete lados.",
+    "formulas": [
+      {
+        "name": "Soma dos ângulos internos",
+        "formula": "S = 5 * 180 = 900 graus"
+      }
+    ],
+    "examples": [
+      {
+        "question": "Qual é a soma dos ângulos internos de um heptágono?",
+        "solution": "900 graus"
+      }
+    ]
+  }
+  

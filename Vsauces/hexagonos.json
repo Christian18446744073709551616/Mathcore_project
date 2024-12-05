@@ -1,0 +1,17 @@
+{
+    "lessonTitle": "Hexágonos",
+    "fundamentals": "Um hexágono é um polígono com seis lados.",
+    "formulas": [
+      {
+        "name": "Soma dos ângulos internos",
+        "formula": "S = 4 * 180 = 720 graus"
+      }
+    ],
+    "examples": [
+      {
+        "question": "Qual é a soma dos ângulos internos de um hexágono?",
+        "solution": "720 graus"
+      }
+    ]
+  }
+  

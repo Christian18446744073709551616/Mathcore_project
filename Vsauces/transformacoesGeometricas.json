@@ -1,0 +1,21 @@
+{
+    "lessonTitle": "Transformações Geométricas",
+    "fundamentals": "Transformações geométricas incluem translações, rotações, reflexões e dilatações de figuras no plano.",
+    "formulas": [
+      {
+        "name": "Reflexão no Eixo X",
+        "formula": "(x, y) -> (x, -y)"
+      },
+      {
+        "name": "Reflexão no Eixo Y",
+        "formula": "(x, y) -> (-x, y)"
+      }
+    ],
+    "examples": [
+      {
+        "question": "Refletir o ponto (3, 4) no eixo X.",
+        "solution": "Novo ponto: (3, -4)"
+      }
+    ]
+  }
+  

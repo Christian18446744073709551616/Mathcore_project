@@ -1,0 +1,21 @@
+{
+    "lessonTitle": "Retângulos",
+    "fundamentals": "Um retângulo possui quatro lados, sendo os opostos de igual comprimento, e ângulos retos.",
+    "formulas": [
+      {
+        "name": "Área",
+        "formula": "A = base * altura"
+      },
+      {
+        "name": "Perímetro",
+        "formula": "P = 2 * (base + altura)"
+      }
+    ],
+    "examples": [
+      {
+        "question": "Qual é a área de um retângulo com base 8 e altura 3?",
+        "solution": "A = 8 * 3 = 24"
+      }
+    ]
+  }
+  

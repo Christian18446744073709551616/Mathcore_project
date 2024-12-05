@@ -1,0 +1,17 @@
+{
+    "lessonTitle": "Congruência e Semelhança de Figuras",
+    "fundamentals": "Figuras congruentes possuem lados e ângulos iguais. Figuras semelhantes têm proporções iguais entre os lados correspondentes.",
+    "formulas": [
+      {
+        "name": "Proporção de Semelhança",
+        "formula": "A1 / A2 = B1 / B2 = C1 / C2"
+      }
+    ],
+    "examples": [
+      {
+        "question": "Se dois triângulos são semelhantes e os lados de um deles são 3, 4 e 5, quais são os lados do segundo triângulo que são proporcionais por 2?",
+        "solution": "Lados = 6, 8 e 10"
+      }
+    ]
+  }
+  

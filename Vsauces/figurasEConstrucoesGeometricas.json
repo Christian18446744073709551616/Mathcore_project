@@ -1,0 +1,12 @@
+{
+    "lessonTitle": "Figuras e Construções Geométricas",
+    "fundamentals": "Construções geométricas envolvem o uso de régua e compasso para criar figuras precisas, como triângulos e círculos.",
+    "formulas": [],
+    "examples": [
+      {
+        "question": "Construa um triângulo equilátero usando régua e compasso.",
+        "solution": "Trace um círculo, marque um ponto e use o compasso com o mesmo raio para marcar dois outros pontos na circunferência. Conecte os pontos para formar o triângulo."
+      }
+    ]
+  }
+  

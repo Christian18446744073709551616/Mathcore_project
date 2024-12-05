@@ -1,0 +1,17 @@
+{
+    "lessonTitle": "Octágonos",
+    "fundamentals": "Um octágono é um polígono com oito lados.",
+    "formulas": [
+      {
+        "name": "Soma dos ângulos internos",
+        "formula": "S = 6 * 180 = 1080 graus"
+      }
+    ],
+    "examples": [
+      {
+        "question": "Qual é a soma dos ângulos internos de um octágono?",
+        "solution": "1080 graus"
+      }
+    ]
+  }
+  
