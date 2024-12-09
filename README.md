@@ -168,7 +168,7 @@ ou digite a tecla "W" no terminal .
 - **Erro ao conectar ao servidor local:** Certifique-se de que o dispositivo e o computador estão na mesma rede Wi-Fi.
 - **Resetar o cache:** Sempre use `npm start -- --reset-cache` para evitar conflitos de cache.
 - **Se ainda tiver problemas ao abrir o app no celular, conecte um cabo usb entre o celular e o computador, habilite a "depuração por USB" e ative o modo desenvolvedor no dispositivo.
-
+- **Observação, aparentemente não é possivel colocar arquivos no github que contenham "API Keys", o mesmo vale para arquivos ".env" pois ocorre um erro de segurança, então é necessario colocar depois que clonar a pasta, e retirar ao atualizar no repositório. 
 ---
 
 ## Links Úteis
@@ -179,5 +179,8 @@ ou digite a tecla "W" no terminal .
 - [Node.js](https://nodejs.org)
 
 ---
+Alguma dúvida, além dos citados aqui, entre em contato comigo.
+Whatsapp : 11 966203499; 
+Gmail: christian.miranda.correia@gmail.com
+Agora você está pronto para explorar e contribuir com o **Mathcore**! 
 
-Agora você está pronto para explorar e contribuir com o **Mathcore**! 🚀
