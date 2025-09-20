@@ -95,11 +95,14 @@ export async function getFriends(userId: string) {
 
 // Verificar se há solicitações de amizade pendentes
 export async function getPendingFriendRequests(userId: string) {
+
+  console.log("olha");
   const { data, error } = await supabase
     .from('friendships')
     .select('friend_id')
     .eq('user_id', userId)
-    .eq('accepted', false);
+    .eq('accepted', 'false');
+  
 
   if (error) {
     console.error('Error fetching pending friend requests:', error.message);

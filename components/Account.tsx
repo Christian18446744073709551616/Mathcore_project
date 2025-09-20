@@ -105,7 +105,7 @@ const Account: React.FC<AccountProps> = ({ session, navigation }) => {
       .select('*', { count: 'exact' })
       .eq('user_id', session.user.id)
       .eq('accepted', true);
-  
+
     if (error) {
       console.error('Erro ao contar amigos:', error);
     } else {
@@ -137,79 +137,85 @@ const Account: React.FC<AccountProps> = ({ session, navigation }) => {
   }
 
 
-  
+
   return (
 
-    <ScrollView
-      contentContainerStyle={styles.scrollContainer}
-      style={styles.scrollView} // Adicionando o estilo diretamente no ScrollView
-    >
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Avatar
-          size={200}
-          url={avatarUrl}
-          onUpload={(url: string) => {
-            setAvatarUrl(url);
-            updateProfile({ username, avatar_url: url });
-          }}
-        />
-        <TouchableOpacity
-          onPress={() => setShowSettings(!showSettings)}
-        >
-          <Ionicons name="settings" size={24} color="black" style={styles.iconImage} />
-        </TouchableOpacity>
-      </View>
+   <ScrollView
+  contentContainerStyle={styles.scrollContainer}
+  style={styles.scrollView}
+  showsVerticalScrollIndicator={false}
+>
 
-      {showSettings && (
-        <View style={styles.settingsContainer}>
-          <Synth session={session} navigation={navigation} />
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <Avatar
+            size={200}
+            url={avatarUrl}
+            onUpload={(url: string) => {
+              setAvatarUrl(url);
+              updateProfile({ username, avatar_url: url });
+            }}
+          />
+          <TouchableOpacity
+            onPress={() => setShowSettings(!showSettings)}
+          >
+            <Ionicons name="settings" size={24} color="black" style={styles.iconImage} />
+          </TouchableOpacity>
         </View>
-      )}
 
-      <View style={[styles.verticallySpaced, styles.mt20]}>
-        <Input label="Email" value={session?.user?.email} disabled />
-      </View>
-      <View style={styles.verticallySpaced}>
-        <Input
-          label="Username"
-          value={username || ''}
-          onChangeText={(text) => setUsername(text)}
-        />
-      </View>
-
-      <View style={[styles.verticallySpaced, styles.mt20]}>
-        <Button
-          title={loading ? 'Loading ...' : 'Update'}
-          onPress={() => updateProfile({ username, avatar_url: avatarUrl })}
-          disabled={loading}
-        />
-      </View>
-      <View style={styles.verticallySpaced}>
-        <Button title="Sign Out" onPress={() => supabase.auth.signOut()} />
-      </View>
-      <View style={styles.verticallySpaced}>
-        <Text style={styles.text}>Amigos: {friendCount}</Text>
-      </View>
- 
-      {progressData.map((item, index) => (
-        <View key={index} style={styles.progressItem}>
-          <Text style={styles.lessonTitle}>{item.lessonTitle}</Text>
-          <View style={styles.progressBar}>
-            <View
-              style={[
-                styles.progress,
-                {
-                  width: `${item.progressPercentage}%`,
-                  backgroundColor: item.progressPercentage >= 80 ? 'green' : item.progressPercentage >= 50 ? 'orange' : 'red',
-                },
-              ]}
-            />
+        {showSettings && (
+          <View style={styles.settingsContainer}>
+            <Synth session={session} navigation={navigation} />
           </View>
-          <Text style={styles.progressText}>hello{item.progressPercentage}%</Text>
+        )}
+
+        <View style={[styles.verticallySpaced, styles.mt20]}>
+          <Input label="Email"
+            value={session?.user?.email}
+            disabled
+            style={{ color: 'white' }} />
         </View>
-      ))}
-    </View></ScrollView>
+        <View style={styles.verticallySpaced}>
+          <Input
+            label="Username"
+            value={username || ''}
+            onChangeText={(text) => setUsername(text)}
+            inputStyle={{ color: 'white' }}
+          />
+        </View>
+
+        <View style={[styles.verticallySpaced, styles.mt20]}>
+          <Button
+            title={loading ? 'Loading ...' : 'Update'}
+            onPress={() => updateProfile({ username, avatar_url: avatarUrl })}
+            disabled={loading}
+          />
+        </View>
+        <View style={styles.verticallySpaced}>
+          <Button title="Sign Out" onPress={() => supabase.auth.signOut()} />
+        </View>
+        <View style={styles.verticallySpaced}>
+          <Text style={styles.text}>Amigos: {friendCount}</Text>
+        </View>
+
+        {progressData.map((item, index) => (
+          <View key={index} style={styles.progressItem}>
+            <Text style={styles.lessonTitle}>{item.lessonTitle}</Text>
+            <View style={styles.progressBar}>
+              <View
+                style={[
+                  styles.progress,
+                  {
+                    width: `${item.progressPercentage}%`,
+                    backgroundColor: item.progressPercentage >= 80 ? 'green' : item.progressPercentage >= 50 ? 'orange' : 'red',
+                  },
+                ]}
+              />
+            </View>
+            <Text style={styles.progressText}>{item.progressPercentage}%</Text>
+          </View>
+        ))}
+      </View></ScrollView>
   );
 };
 
@@ -218,7 +224,12 @@ const styles = StyleSheet.create({
   container: {
     marginTop: 40,
     padding: 12,
-  },scrollView: {
+  },
+  Username: {
+    color: 'white',
+  },
+
+  scrollView: {
     backgroundColor: '#0d0f14', // Defina o fundo para evitar o branco ao redor
   }, scrollContainer: {
     flexGrow: 1, // Garante que o ScrollView ocupe todo o espaço disponível
@@ -253,7 +264,7 @@ const styles = StyleSheet.create({
   lessonTitle: {
     fontSize: 16,
     fontWeight: 'bold',
-    color:'white',
+    color: 'white',
   },
   progressBar: {
     height: 20,
@@ -269,12 +280,12 @@ const styles = StyleSheet.create({
   progressText: {
     textAlign: 'center',
     fontSize: 14,
-    color:'white',
+    color: 'white',
   },
   text: {
     textAlign: 'center',
     fontSize: 14,
-    color:'white',
+    color: 'white',
   },
 });
 

@@ -77,7 +77,7 @@ const Friends = () => {
 
     const { data, error } = await supabase
       .from('friendships')
-      .select(`friend_username, profiles:friend_id (id, username, avatar_url)`)
+      .select(`profiles:friend_id (id, username, avatar_url)`)
       .eq('user_id', session.user.id)
       .eq('accepted', true);
 

@@ -47,6 +47,7 @@ export default function Avatar({ url, size = 150, onUpload }: Props) {
         allowsMultipleSelection: false, // Can only select one image
         allowsEditing: true, // Allows the user to crop / rotate their photo before uploading it
         quality: 1,
+        base64: true, // Adiciona isso para garantir base64, se precisar
         exif: false, // We don't want nor need that data.
       })
 

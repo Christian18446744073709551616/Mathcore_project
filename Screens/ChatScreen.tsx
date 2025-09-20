@@ -49,6 +49,7 @@ const OnlineChat = () => {
 
   const handleSendMessage = async () => {
     if (!newMessage.trim() || !session) return;
+    setNewMessage(''); // Limpa o campo de entrada
 
     const messageData = {
       sender_id: session.user.id,
@@ -197,61 +198,76 @@ const OnlineChat = () => {
   
 
   return (
-    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-      <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={80}
-      >
-        <View style={styles.container}>
-          <FlatList
-            ref={flatListRef}
-            data={messages}
-            keyExtractor={(item) => item.id}
-            contentContainerStyle={styles.flatListContent}
-            renderItem={({ item }) => {
-              if (item.message_type === 'invitation') {
-                return (
-                  <View style={styles.invitationMessage}>
-                    <Text style={styles.invitationText}>{item.message_text}</Text>
-                    <View style={styles.invitationActions}>
-                      <TouchableOpacity
-                        style={styles.acceptButton}
-                        onPress={() => handleInviteResponse(item.id, item.lobby_id, 'accept')}>
-                        <Text style={styles.inviteButtonText}>Aceitar</Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        style={styles.inviteButton}
-                        onPress={() => handleInviteResponse(item.id, item.lobby_id, 'reject')}>
-                        <Text style={styles.declineButton}>Rejeitar</Text>
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                );
-              }
-  
-              return (
-                <View style={item.sender_id === session?.user.id ? styles.sentMessage : styles.receivedMessage}>
-                  <Text style={styles.messageText}>{item.message_text}</Text>
-                </View>
-              );
-            }}
-          />
-          <View style={styles.inputContainer}>
-            <TextInput
-              style={styles.input}
-              placeholder="Digite sua mensagem..."
-              value={newMessage}
-              onChangeText={setNewMessage}
-              onBlur={() => Keyboard.dismiss()} // Tenta esconder o teclado ao sair do input
-            />
-            <TouchableOpacity onPress={handleSendMessage} style={styles.sendButton}>
-              <Ionicons name="send" size={20} color="#fff" />
-            </TouchableOpacity>
+<KeyboardAvoidingView
+  style={{ flex: 1 }}
+  behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+  keyboardVerticalOffset={80}
+>
+  <View style={styles.container}>
+    <FlatList
+      ref={flatListRef}
+      data={messages}
+      keyExtractor={(item) => item.id}
+      contentContainerStyle={styles.flatListContent}
+      renderItem={({ item }) => {
+        if (item.message_type === 'invitation') {
+          return (
+            <View style={styles.invitationMessage}>
+              <Text style={styles.invitationText}>{item.message_text}</Text>
+              <View style={styles.invitationActions}>
+                <TouchableOpacity
+                  style={styles.acceptButton}
+                  onPress={() =>
+                    handleInviteResponse(item.id, item.lobby_id, 'accept')
+                  }
+                >
+                  <Text style={styles.inviteButtonText}>Aceitar</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.inviteButton}
+                  onPress={() =>
+                    handleInviteResponse(item.id, item.lobby_id, 'reject')
+                    
+                  }
+                >
+                  <Text style={styles.declineButton}>Rejeitar</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          )
+        }
+
+        return (
+          <View
+            style={
+              item.sender_id === session?.user.id
+                ? styles.sentMessage
+                : styles.receivedMessage
+            }
+          >
+            <Text style={styles.messageText}>{item.message_text}</Text>
           </View>
-        </View>
-      </KeyboardAvoidingView>
-    </TouchableWithoutFeedback>
+        )
+      }}
+    />
+
+    {/* 🚀 Input corrigido */}
+    <View style={styles.inputContainer}>
+      <TextInput
+        style={styles.input}
+        placeholder="Digite sua mensagem..."
+        placeholderTextColor="#aaa"
+        value={newMessage}
+        onChangeText={setNewMessage}
+        autoFocus
+        blurOnSubmit={false}
+      />
+      <TouchableOpacity onPress={handleSendMessage} style={styles.sendButton}>
+        <Ionicons name="send" size={20} color="#fff" />
+      </TouchableOpacity>
+    </View>
+  </View>
+</KeyboardAvoidingView>
   );
 };
 const styles = StyleSheet.create({
