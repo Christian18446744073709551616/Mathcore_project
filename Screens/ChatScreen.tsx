@@ -76,7 +76,7 @@ const OnlineChat = () => {
         .channel(`chat:${friendId}`)
         .on('postgres_changes', {
           event: 'INSERT',
-          schema: 'public',
+          schema: 'public', // Starting mty app with Expo
           table: 'messages',
         }, (payload) => {
           const newMessage = payload.new as Message;
