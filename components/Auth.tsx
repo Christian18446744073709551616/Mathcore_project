@@ -191,7 +191,7 @@ const styles = StyleSheet.create({
   },
   inputLabel: {
     fontSize: 14,
-    color: '#666',
+    color: '#000000ff',
     marginBottom: 8,
     marginLeft: 5,
   },
