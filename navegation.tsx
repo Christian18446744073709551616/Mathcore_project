@@ -2,6 +2,7 @@ import React from 'react';
 import { NavigationContainer, ParamListBase } from '@react-navigation/native';
 import { BottomTabNavigationProp, createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import Home2Screen from './Screens/home.2';// Certifique-se de que o caminho está correto
 import HomeScreen from './Screens/home'; // Certifique-se de que o caminho está correto
 import LessonScreen from './Screens/LessonScreen'; // Certifique-se de que o caminho está correto
 import SettingsScreen from './Screens/Settings';
@@ -30,9 +31,15 @@ interface CornhubProps {
 const HomeStack: React.FC<{ session: Session }> = ({ session }) => {
   return (
 
-    <Stack.Navigator initialRouteName="Home">
+    <Stack.Navigator initialRouteName="Home2">
 
-      <Stack.Screen name="Home" component={HomeScreen}  
+      <Stack.Screen name="Home2" component={Home2Screen}  
+      options={{
+        
+          headerShown: false, 
+          
+        }}  />
+        <Stack.Screen name="Home" component={HomeScreen}  
       options={{
         
           headerShown: false, 
@@ -110,15 +117,15 @@ const Cornhub: React.FC<CornhubProps> = ({ session }) => {
   return (
     <NavigationContainer>
       <Tab.Navigator
-        initialRouteName="Home"  
+        initialRouteName="Home2"  
         tabBar={(props) => <CustomTabBar {...props} />}
         screenOptions={({ route  }) => ({
           
           tabBarIcon: ({ color, size }) => {
             let iconName;
 
-            if (route.name === 'Home') {
-              iconName = 'home';
+            if (route.name === 'Home2') {
+              iconName = 'home2';
             } else if (route.name === 'Settings') {
               iconName = 'person';
             } else if (route.name === 'Friends') {
@@ -140,7 +147,7 @@ const Cornhub: React.FC<CornhubProps> = ({ session }) => {
           children={() => <FriendsStack session={session} />}
         />
         <Tab.Screen
-          name="Home"
+          name="Home2"
           children={() => <HomeStack session={session} />}
         />
         <Tab.Screen
