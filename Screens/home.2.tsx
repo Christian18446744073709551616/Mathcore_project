@@ -125,6 +125,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: 20,
+    paddingBottom: 90,
     alignItems: 'center',
   },
   title: {
