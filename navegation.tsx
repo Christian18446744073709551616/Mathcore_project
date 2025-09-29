@@ -1,29 +1,27 @@
 import React from 'react';
-import { View, Text } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { Ionicons } from '@expo/vector-icons';
+import { Session } from '@supabase/supabase-js';
 
-import Home2Screen from './Screens/home.2';// Certifique-se de que o caminho está correto
-import HomeScreen from './Screens/home'; // Certifique-se de que o caminho está correto
-import LessonScreen from './Screens/LessonScreen'; // Certifique-se de que o caminho está correto
-
+import Home2Screen from './Screens/home.2';
+import HomeScreen from './Screens/home';
+import LessonScreen from './Screens/LessonScreen';
 import SettingsScreen from './Screens/Settings';
-import GameScreen from './Screens/GameScreen'; 
+import GameScreen from './Screens/GameScreen';
 import FriendsScreen from './Screens/Friends';
 import UltramenuScreen from './Screens/UltramenuScreen';
 import FriendDripRoast from './Screens/FriendDripRoast';
-import { Session } from '@supabase/supabase-js';
-import { RootStackParamList } from './types';
 import LobbyScreen from './Screens/Lobby';
 import ChatScreen from './Screens/ChatScreen';
-import CustomTabBar from './components/3d/CustomTabBar';
-
-// Telas em desenvolvimento
 import ExerciciosScreen from './Screens/ExerciciosScreen';
 import DesempenhoScreen from './Screens/DesempenhoScreen';
 import FlashcardsScreen from './Screens/FlashcardsScreen';
 import ConfiguracoesScreen from './Screens/ConfiguracoesScreen';
+
+import CustomTabBar from './components/3d/CustomTabBar';
+import { RootStackParamList } from './types';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -33,126 +31,62 @@ interface CornhubProps {
 }
 
 // Stack para Home
-const HomeStack: React.FC<{ session: Session }> = ({ session }) => {
-  return (
-
-    <Stack.Navigator initialRouteName="Home">
-      <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
-      <Stack.Screen name="Ultramenu" component={UltramenuScreen} options={{ headerShown: false }} />
-      <Stack.Screen name="Lesson" component={LessonScreen} options={{ presentation: 'modal', headerShown: false }} />
-      <Stack.Screen name="Lobby" component={LobbyScreen} options={{ presentation: 'modal', headerShown: false }} initialParams={{ session }} />
-      <Stack.Screen name="GameScreen" component={GameScreen} options={{ presentation: 'modal', headerShown: false }} />
-    </Stack.Navigator>
-  );
-};
+const HomeStack: React.FC<{ session: Session }> = ({ session }) => (
+  <Stack.Navigator initialRouteName="Home2" screenOptions={{ headerShown: false }}>
+    <Stack.Screen name="Home2" component={Home2Screen} />
+    <Stack.Screen name="Home" component={HomeScreen} />
+    <Stack.Screen name="Ultramenu" component={UltramenuScreen} />
+    <Stack.Screen name="Lesson" component={LessonScreen} options={{ presentation: 'modal' }} />
+    <Stack.Screen name="Lobby" component={LobbyScreen} initialParams={{ session }} options={{ presentation: 'modal' }} />
+    <Stack.Screen name="GameScreen" component={GameScreen} options={{ presentation: 'modal' }} />
+  </Stack.Navigator>
+);
 
 // Stack para Friends
-const FriendsStack: React.FC<{ session: Session }> = ({ session }) => {
-  return (
-    <Stack.Navigator initialRouteName="FriendsScreen">
-      <Stack.Screen name="FriendsScreen" component={FriendsScreen} initialParams={{ session }} options={{ headerShown: false }} />
-      <Stack.Screen name="FriendDripRoast" component={FriendDripRoast} initialParams={{ session }} options={{ headerShown: false }} />
-      <Stack.Screen name="ChatScreen" component={ChatScreen} initialParams={{ session }} options={{ headerShown: false }} />
-      <Stack.Screen name="Lobby" component={LobbyScreen} initialParams={{ session }} options={{ presentation: 'modal', headerShown: false }} />
+const FriendsStack: React.FC<{ session: Session }> = ({ session }) => (
+  <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Screen name="FriendsScreen" component={FriendsScreen} initialParams={{ session }} />
+    <Stack.Screen name="FriendDripRoast" component={FriendDripRoast} initialParams={{ session }} />
+    <Stack.Screen name="ChatScreen" component={ChatScreen} initialParams={{ session }} />
+    <Stack.Screen name="Lobby" component={LobbyScreen} initialParams={{ session }} options={{ presentation: 'modal' }} />
+  </Stack.Navigator>
+);
 
-    </Stack.Navigator>
-  );
-};
-
-// Stacks simples para as futuras telas
-const ExerciciosStack: React.FC<{ session: Session }> = ({ session }) => {
-  return (
-    <Stack.Navigator>
-      <Stack.Screen name="ExerciciosScreen" component={ExerciciosScreen} options={{ headerShown: false }} />
-    </Stack.Navigator>
-  );
-};
-
-const DesempenhoStack: React.FC<{ session: Session }> = ({ session }) => {
-  return (
-    <Stack.Navigator>
-      <Stack.Screen name="DesempenhoScreen" component={DesempenhoScreen} options={{ headerShown: false }} />
-    </Stack.Navigator>
-  );
-};
-
-const FlashcardsStack: React.FC<{ session: Session }> = ({ session }) => {
-  return (
-    <Stack.Navigator>
-      <Stack.Screen name="FlashcardsScreen" component={FlashcardsScreen} options={{ headerShown: false }} />
-    </Stack.Navigator>
-  );
-};
-
-const ConfiguracoesStack: React.FC<{ session: Session }> = ({ session }) => {
-  return (
-    <Stack.Navigator>
-      <Stack.Screen name="ConfiguracoesScreen" component={ConfiguracoesScreen} options={{ headerShown: false }} />
-    </Stack.Navigator>
-  );
-};
+// Stacks simples para outras telas
+const SimpleStack = (ScreenComponent: React.FC<any>, session?: Session) => () => (
+  <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Screen name={ScreenComponent.name} component={ScreenComponent} initialParams={session ? { session } : undefined} />
+  </Stack.Navigator>
+);
 
 // Navegação por Tabs
-const Cornhub: React.FC<CornhubProps> = ({ session }) => {
-  return (
-    <NavigationContainer>
-      <Tab.Navigator
-        initialRouteName="Home2"  
-        tabBar={(props) => <CustomTabBar {...props} />}
+const Cornhub: React.FC<CornhubProps> = ({ session }) => (
+  <NavigationContainer>
+    <Tab.Navigator
+      initialRouteName="Home"
+      tabBar={(props) => <CustomTabBar {...props} />}
+      screenOptions={({ route }) => ({
+        headerShown: false,
+        tabBarIcon: ({ color, size }) => {
+          let iconName: string = 'home';
 
-        screenOptions={{ headerShown: false }}
+          if (route.name === 'Home') iconName = 'home';
+          else if (route.name === 'Friends') iconName = 'people';
+          else if (route.name === 'Settings') iconName = 'person';
 
-        screenOptions={({ route  }) => ({
-          
-          tabBarIcon: ({ color, size }) => {
-            let iconName;
-
-            if (route.name === 'Home2') {
-              iconName = 'home2';
-            } else if (route.name === 'Settings') {
-              iconName = 'person';
-            } else if (route.name === 'Friends') {
-              iconName = 'people';
-            }
-
-            return <Ionicons name={iconName as any} size={size} color={color} />;
-          },
-
-          headerShown: false,  // Oculta o cabeçalho
-       // Adiciona animação de transição apenas nas telas Home, Friends e Settings
-       
-    })}
-      
-
-      >
-        {/* Rotas principais */}
-        <Tab.Screen name="Friends" children={() => <FriendsStack session={session} />} />
-        <Tab.Screen name="Home" children={() => <HomeStack session={session} />} />
-        <Tab.Screen name="Exercicios" children={() => <ExerciciosStack session={session} />} />
-        <Tab.Screen name="Desempenho" children={() => <DesempenhoStack session={session} />} />
-        
-
-        {/* Rotas do menu */}
-        <Tab.Screen name="Settings" component={SettingsScreen} />
-        <Tab.Screen name="Flashcards" children={() => <FlashcardsStack session={session} />} />
-        <Tab.Screen name="Configuracoes" children={() => <ConfiguracoesStack session={session} />} />
-
-        <Tab.Screen
-          name="Friends"
-          children={() => <FriendsStack session={session} />}
-        />
-        <Tab.Screen
-          name="Home2"
-          children={() => <HomeStack session={session} />}
-        />
-        <Tab.Screen
-          name="Settings"
-          children={() => <SettingsScreen session={session} />}
-        />
-
-      </Tab.Navigator>
-    </NavigationContainer>
-  );
-};
+          return <Ionicons name={iconName as any} size={size} color={color} />;
+        },
+      })}
+    >
+      <Tab.Screen name="Home" children={() => <HomeStack session={session} />} />
+      <Tab.Screen name="Friends" children={() => <FriendsStack session={session} />} />
+      <Tab.Screen name="Exercicios" children={SimpleStack(ExerciciosScreen, session)} />
+      <Tab.Screen name="Desempenho" children={SimpleStack(DesempenhoScreen, session)} />
+      <Tab.Screen name="Flashcards" children={SimpleStack(FlashcardsScreen, session)} />
+      <Tab.Screen name="Configuracoes" children={SimpleStack(ConfiguracoesScreen, session)} />
+      <Tab.Screen name="Settings" children={() => <SettingsScreen />} />
+    </Tab.Navigator>
+  </NavigationContainer>
+);
 
 export default Cornhub;
