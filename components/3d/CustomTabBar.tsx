@@ -1,71 +1,163 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Modal } from 'react-native';
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
-import { LinearGradient } from 'expo-linear-gradient';
+
+// Ícones SVG customizados
+import HomeIcon from './icons/HomeIcon';
+import ExerciciosIcon from './icons/ExerciciosIcon';
+import DesempenhoIcon from './icons/DesempenhoIcon';
+import PeopleIcon from './icons/PeopleIcon';
+import PersonIcon from './icons/PersonIcon';
+import MenuIcon from './icons/MenuIcon';
+import FlashcardsIcon from './icons/FlashcardsIcon';
+import ConfiguracoesIcon from './icons/ConfiguracoesIcon';
+import SairIcon from './icons/SairIcon';
 
 const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigation }) => {
+  const [menuVisible, setMenuVisible] = useState(false);
+
+  // Função para abrir/fechar o menu
+  const toggleMenu = () => {
+    setMenuVisible(!menuVisible);
+  };
+
+  // Função para navegar a partir do menu
+  const handleMenuNavigation = (routeName: string) => {
+    setMenuVisible(false);
+    
+    // Verifica se a rota existe antes de navegar
+    const routeExists = state.routes.some(route => route.name === routeName);
+    
+    if (routeExists) {
+      navigation.navigate(routeName);
+    } else {
+      console.warn(`Rota "${routeName}" não encontrada.`);
+    }
+  };
+
+  // Função auxiliar para verificar se a rota está ativa
+  const isRouteActive = (routeName: string) => {
+    return state.routes.some((route, index) => 
+      route.name === routeName && state.index === index
+    );
+  };
+
   return (
     <View style={styles.container}>
-      {/* Gradient for the curved top */}
-      <LinearGradient
-        colors={['#2a2d4b', '#141a35']}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={styles.curvedTop}
-      />
-
-      <View style={styles.tabBar}>
-        {state.routes.map((route, index) => {
-          const { options } = descriptors[route.key];
-          const isFocused = state.index === index;
-
-          // Determine the icon for each route
-          const iconName =
-            route.name === 'Home'
-              ? 'home-outline'
-              : route.name === 'Settings'
-              ? 'person-outline'
-              : 'people-outline';
-
-          // Function to handle tab press
-          const onPress = () => {
-            const event = navigation.emit({
-              type: 'tabPress',
-              target: route.key,
-              canPreventDefault: true,
-            });
-          
-            if (!isFocused && !event.defaultPrevented) {
-              navigation.navigate(route.name); // Navegar para a rota clicada
-            }
-          };
-          
-
-          return (
+      {/* Modal do Menu (a telinha com opções secundárias) */}
+      <Modal
+        visible={menuVisible}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setMenuVisible(false)}
+      >
+        <TouchableOpacity 
+          style={styles.menuOverlay}
+          activeOpacity={1}
+          onPress={() => setMenuVisible(false)}
+        >
+          <View style={styles.menuContainer}>
+            {/* Opções do menu */}
             <TouchableOpacity
-              key={route.key}
-              onPress={onPress}
-              style={[styles.tab, isFocused ? styles.selectedTab : null]}
+              style={styles.menuItem}
+              onPress={() => handleMenuNavigation('Exercicios')}
             >
-              <View
-                style={[
-                  styles.iconCircle,
-                  isFocused ? styles.iconCircleSelected : null,
-                ]}
-              >
-                <Ionicons
-                  name={iconName}
-                  size={28}
-                  color="#cfd8dc"
-                />
-              </View>
-              <Text style={{ color: isFocused ? '#bb86fc' : '#cfd8dc' }}>
-                {route.name}
-              </Text>
+              <ExerciciosIcon size={24} color="#1f1f1fff" />
+              <Text style={styles.menuText}>Exercícios</Text>
+            </TouchableOpacity>   
+
+            <TouchableOpacity
+              style={styles.menuItem}
+              onPress={() => handleMenuNavigation('Desempenho')}
+            >
+              <DesempenhoIcon size={24} color="#1f1f1fff" />
+              <Text style={styles.menuText}>Desempenho</Text>
             </TouchableOpacity>
-          );
-        })}
+
+            <TouchableOpacity 
+              style={styles.menuItem}
+              onPress={() => handleMenuNavigation('Settings')}
+            >
+              <PersonIcon size={24} color="#1f1f1fff" />
+              <Text style={styles.menuText}>Perfil</Text>
+            </TouchableOpacity>            
+            
+            <TouchableOpacity 
+              style={styles.menuItem}
+              onPress={() => handleMenuNavigation('Flashcards')}
+            >
+              <FlashcardsIcon size={24} color="#1f1f1fff" />
+              <Text style={styles.menuText}>Flashcards</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={styles.menuItem}
+              onPress={() => handleMenuNavigation('Friends')}
+            >
+              <PeopleIcon size={24} color="#1f1f1fff" />
+              <Text style={styles.menuText}>Social</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+              style={styles.menuItem}
+              onPress={() => handleMenuNavigation('Configuracoes')}
+            >
+              <ConfiguracoesIcon size={24} color="#1f1f1fff" />
+              <Text style={styles.menuText}>Configurações</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+              style={styles.menuItem}
+              onPress={() => handleMenuNavigation('Sair')}
+            >
+              <SairIcon size={24} color="#1f1f1fff" />
+              <Text style={styles.menuText}>Sair</Text>
+            </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
+      </Modal>
+
+      {/* Retângulo flutuante com bordas arredondadas */}
+      <View style={styles.floatingRectangle}>
+        <View style={styles.tabBar}>
+          {/* Botão Home */}
+          <TouchableOpacity
+            style={styles.tab}
+            onPress={() => navigation.navigate('Home')}
+          >
+            <HomeIcon 
+              size={34} 
+              color={isRouteActive('Home') ? '#1f1f1fff' : '#cfd8dc'}
+            />
+          </TouchableOpacity>
+
+          {/* Botão Exercícios */}
+          <TouchableOpacity
+            style={styles.tab}
+            onPress={() => navigation.navigate('Exercicios')}
+          >
+            <ExerciciosIcon 
+              size={34} 
+              color={isRouteActive('Exercicios') ? '#1f1f1fff' : '#cfd8dc'}
+            />
+          </TouchableOpacity>
+
+          {/* Botão Desempenho */}
+          <TouchableOpacity
+            style={styles.tab}
+            onPress={() => navigation.navigate('Desempenho')}
+          >
+            <DesempenhoIcon 
+              size={34} 
+              color={isRouteActive('Desempenho') ? '#1f1f1fff' : '#cfd8dc'}
+            />
+          </TouchableOpacity>
+
+          {/* Botão Menu */}
+          <TouchableOpacity style={styles.tab} onPress={toggleMenu}>
+            <MenuIcon size={34} color={menuVisible ? '#1f1f1fff' : '#cfd8dc'} />
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );
@@ -73,57 +165,72 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigat
 
 const styles = StyleSheet.create({
   container: {
-    position: 'relative',
-    height: 90,
-    backgroundColor: '#121212',
-  },
-  curvedTop: {
+    backgroundColor: 'transparent',
     position: 'absolute',
-    top: 0,
+    bottom: 0,
     left: 0,
     right: 0,
-    height: 50,
-    borderBottomLeftRadius: 30,
-    borderBottomRightRadius: 30,
-    zIndex: -1,
+    height: 90,
+    zIndex: 0,
+  },
+  floatingRectangle: {
+    backgroundColor: '#404564ff',
+    marginHorizontal: 20,
+    marginBottom: 10,
+    borderRadius: 25,
+    borderWidth: 1,
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+    overflow: 'hidden',
   },
   tabBar: {
     flexDirection: 'row',
     height: 70,
-    width: '100%',
     justifyContent: 'space-around',
     alignItems: 'center',
-    position: 'absolute',
-    bottom: 0,
-    borderTopWidth: 2,
-    borderTopColor: '#3d5afe',
   },
   tab: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 10,
-    paddingTop: 15,
+    paddingVertical: 8,
   },
-  iconCircle: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    justifyContent: 'center',
+
+  // Estilos para o Menu Modal
+  menuOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'flex-end',
+    paddingBottom: 100,
+    zIndex: 1000,
+  },
+  menuContainer: {
+    backgroundColor: '#404564ff',
+    marginHorizontal: 100,
+    borderRadius: 15,
+    padding: 15,
+    borderWidth: 1,
+    borderColor: '#333',
+    alignSelf: 'center',
+    minWidth: 400,
+    zIndex: 1001,
+  },
+  menuItem: {
+    flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#283593',
-    shadowColor: '#1e88e5',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.5,
-    shadowRadius: 6,
-    elevation: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 10,
   },
-  iconCircleSelected: {
-    backgroundColor: '#3d5afe',
-    transform: [{ translateY: -5 }],
-  },
-  selectedTab: {
-    transform: [{ scale: 1.1 }],
+  menuText: {
+    color: '#000000ff',
+    fontSize: 16,
+    marginLeft: 10,
+    fontWeight: '700',
   },
 });
 
