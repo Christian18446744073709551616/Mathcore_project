@@ -1,12 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, ScrollView } from 'react-native';
-import { Button, Input } from '@rneui/themed';
-import { Ionicons } from '@expo/vector-icons';
-import { FlashList } from "@shopify/flash-list";
+import {
+  StyleSheet,
+  View,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+  TextInput,
+  Keyboard,
+} from 'react-native';
 import Avatar from './Avatar';
 import { supabase } from '../lib/supabase';
 import { Session } from '@supabase/supabase-js';
-import Synth from './Synthetizider';
+import { MaterialIcons } from '@expo/vector-icons';
 
 interface AccountProps {
   session: Session;
@@ -18,16 +23,20 @@ const Account: React.FC<AccountProps> = ({ session, navigation }) => {
   const [username, setUsername] = useState('');
   const [avatarUrl, setAvatarUrl] = useState('');
   const [users, setUsers] = useState<{ id: string }[]>([]);
-  const [progressData, setProgressData] = useState<{ lessonTitle: string; progressPercentage: number }[]>([]);
+  const [progressData, setProgressData] = useState<
+    { lessonTitle: string; progressPercentage: number }[]
+  >([]);
   const [friendCount, setFriendCount] = useState(0);
-  const [showSettings, setShowSettings] = useState(false);
+
+  // controla se está editando o username
+  const [editingUsername, setEditingUsername] = useState(false);
 
   useEffect(() => {
     if (session) {
       getProfile();
       getAllUsers();
       getFriendCount();
-      getProgress(); // Chama a função para obter progresso
+      getProgress();
     }
   }, [session]);
 
@@ -126,10 +135,12 @@ const Account: React.FC<AccountProps> = ({ session, navigation }) => {
       }
 
       if (data) {
-        setProgressData(data.map((item) => ({
-          lessonTitle: item.lesson_title,
-          progressPercentage: item.progress_percentage,
-        })));
+        setProgressData(
+          data.map((item) => ({
+            lessonTitle: item.lesson_title,
+            progressPercentage: item.progress_percentage,
+          }))
+        );
       }
     } catch (error) {
       console.error(error);
@@ -137,66 +148,90 @@ const Account: React.FC<AccountProps> = ({ session, navigation }) => {
   }
 
 
-
   return (
-
-   <ScrollView
-  contentContainerStyle={styles.scrollContainer}
-  style={styles.scrollView}
-  showsVerticalScrollIndicator={false}
->
-
-      <View style={styles.container}>
+    <ScrollView
+      contentContainerStyle={styles.scrollContainer}
+      style={styles.scrollView}
+      showsVerticalScrollIndicator={false}
+    >
+      {/* CARD AZUL CLARO */}
+      <View style={styles.card}>
+        {/* Header com Avatar */}
         <View style={styles.header}>
-          <Avatar
-            size={200}
-            url={avatarUrl}
-            onUpload={(url: string) => {
-              setAvatarUrl(url);
-              updateProfile({ username, avatar_url: url });
-            }}
-          />
+          <View style={styles.profileSection}>
+            <Avatar
+              size={150}
+              url={avatarUrl}
+              onUpload={(url: string) => {
+                setAvatarUrl(url);
+                updateProfile({ username, avatar_url: url });
+              }}
+            />
+          </View>
+        </View>
+
+        {/* EMAIL */}
+        <View style={styles.inputGroup}>
+          <Text style={styles.label}>Email</Text>
+          <View style={styles.inputContainer}>
+            <Text style={styles.inputText}>{session?.user?.email}</Text>
+            
+          </View>
+        </View>
+
+        {/* USERNAME */}
+        <View style={styles.inputGroup}>
+          <Text style={styles.label}>Username</Text>
+          <View style={styles.usernameRow}>
+            {editingUsername ? (
+              <TextInput
+                style={[styles.inputContainer, styles.usernameInput]}
+                value={username}
+                onChangeText={setUsername}
+                autoFocus
+                onBlur={() => setEditingUsername(false)}
+                placeholder="Digite seu nome"
+              />
+            ) : (
+              <View style={[styles.inputContainer, styles.usernameInput]}>
+                <Text style={styles.inputText}>{username || 'Seu Nome'}</Text>
+              </View>
+            )}
+            <TouchableOpacity
+              style={styles.usernameEditButton}
+              onPress={() => setEditingUsername(true)} // sempre entra em edição
+            >
+              <MaterialIcons name="edit" size={22} color="#666" />
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {/* Botões */}
+        <View style={styles.buttonContainer}>
           <TouchableOpacity
-            onPress={() => setShowSettings(!showSettings)}
+            style={styles.updateButton}
+            onPress={() => updateProfile({ username, avatar_url: avatarUrl })}
+            disabled={loading}
           >
-            <Ionicons name="settings" size={24} color="black" style={styles.iconImage} />
+            <Text style={styles.buttonText}>
+              {loading ? 'Loading...' : 'Update'}
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.signOutButton}
+            onPress={() => supabase.auth.signOut()}
+          >
+            <Text style={styles.buttonText}>Sign Out</Text>
           </TouchableOpacity>
         </View>
 
-        {showSettings && (
-          <View style={styles.settingsContainer}>
-            <Synth session={session} navigation={navigation} />
-          </View>
-        )}
+        {/* Contador de amigos */}
+        <Text style={styles.friendsCount}>Amigos: {friendCount}</Text>
 
-        <View style={[styles.verticallySpaced, styles.mt20]}>
-          <Input label="Email"
-            value={session?.user?.email}
-            disabled
-            style={{ color: 'white' }} />
-        </View>
-        <View style={styles.verticallySpaced}>
-          <Input
-            label="Username"
-            value={username || ''}
-            onChangeText={(text) => setUsername(text)}
-            inputStyle={{ color: 'white' }}
-          />
-        </View>
+        {/* Progress Data */}
 
-        <View style={[styles.verticallySpaced, styles.mt20]}>
-          <Button
-            title={loading ? 'Loading ...' : 'Update'}
-            onPress={() => updateProfile({ username, avatar_url: avatarUrl })}
-            disabled={loading}
-          />
-        </View>
-        <View style={styles.verticallySpaced}>
-          <Button title="Sign Out" onPress={() => supabase.auth.signOut()} />
-        </View>
-        <View style={styles.verticallySpaced}>
-          <Text style={styles.text}>Amigos: {friendCount}</Text>
-        </View>
+
 
         {progressData.map((item, index) => (
           <View key={index} style={styles.progressItem}>
@@ -207,59 +242,143 @@ const Account: React.FC<AccountProps> = ({ session, navigation }) => {
                   styles.progress,
                   {
                     width: `${item.progressPercentage}%`,
-                    backgroundColor: item.progressPercentage >= 80 ? 'green' : item.progressPercentage >= 50 ? 'orange' : 'red',
+
+                    backgroundColor:
+                      item.progressPercentage >= 80
+                        ? 'green'
+                        : item.progressPercentage >= 50
+                        ? 'orange'
+                        : 'red',
+
+
                   },
                 ]}
               />
             </View>
-            <Text style={styles.progressText}>{item.progressPercentage}%</Text>
+
+            <Text style={styles.progressText}>
+              {item.progressPercentage}%
+            </Text>
           </View>
         ))}
-      </View></ScrollView>
+      </View>
+    </ScrollView>
+
   );
 };
 
-
 const styles = StyleSheet.create({
-  container: {
-    marginTop: 40,
-    padding: 12,
-  },
-  Username: {
-    color: 'white',
-  },
 
   scrollView: {
-    backgroundColor: '#0d0f14', // Defina o fundo para evitar o branco ao redor
-  }, scrollContainer: {
-    flexGrow: 1, // Garante que o ScrollView ocupe todo o espaço disponível
-    padding: 20, // Espaçamento ao redor de todos os itens
+    flex: 1,
+  },
+  scrollContainer: {
+    alignItems: 'center',
+    paddingVertical: 20,
+  },
+  card: {
+    backgroundColor: '#858dbbff',
+    borderRadius: 25,
+    padding: 50,
+    width: '100%',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    elevation: 6,
+    alignItems: 'center',
+
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    width: '100%',
+    alignItems: 'center',
+    marginBottom: 30,
+  },
+  profileSection: {
     alignItems: 'center',
   },
-  iconImage: {
-    width: 24,
-    height: 24,
+  inputGroup: {
+    marginBottom: 20,
+    width: '100%',
   },
-  settingsContainer: {
-    marginTop: 20,
-    padding: 10,
-    backgroundColor: '#f0f0f0',
+  label: {
+    color: 'rgba(0, 0, 0, 0.9)',
+    fontSize: 14,
+    fontWeight: '500',
+    marginBottom: 8,
+    marginLeft: 5,
   },
-  verticallySpaced: {
-    paddingTop: 4,
-    paddingBottom: 4,
-    alignSelf: 'stretch',
+  inputContainer: {
+    backgroundColor: 'white',
+    borderRadius: 25,
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
-  mt20: {
-    marginTop: 20,
+  inputText: {
+    fontSize: 16,
+    color: '#2D3748',
   },
-
+  usernameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    position: 'relative',
+  },
+  usernameInput: {
+    flex: 1,
+    paddingRight: 40, // espaço para o lápis
+  },
+  usernameEditButton: {
+    position: 'absolute',
+    right: 15,
+    backgroundColor: 'transparent', // sem fundo cinza
+  },
+  buttonContainer: {
+    width: '100%',
+    gap: 15,
+    marginTop: 10,
+    marginBottom: 20,
+  },
+  updateButton: {
+    backgroundColor: '#48BB78',
+    borderRadius: 25,
+    paddingVertical: 15,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  signOutButton: {
+    backgroundColor: '#4A5568',
+    borderRadius: 25,
+    paddingVertical: 15,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  friendsCount: {
+    color: 'rgba(255, 255, 255, 0.9)',
+    fontSize: 14,
+    textAlign: 'center',
+    marginBottom: 20,
+  },
   progressItem: {
     marginVertical: 10,
+    width: '100%',
   },
   lessonTitle: {
     fontSize: 16,
@@ -281,11 +400,8 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 14,
     color: 'white',
-  },
-  text: {
-    textAlign: 'center',
-    fontSize: 14,
-    color: 'white',
+
+
   },
 });
 
