@@ -3,7 +3,9 @@ import { supabase } from '../lib/supabase'
 import { StyleSheet, View, Alert, Image, TouchableOpacity } from 'react-native'
 import * as ImagePicker from 'expo-image-picker'
 import * as ImageManipulator from 'expo-image-manipulator'
+
 import { MaterialIcons } from '@expo/vector-icons'
+
 
 interface Props {
   size: number
@@ -51,6 +53,7 @@ export default function Avatar({ url, size = 150, onUpload }: Props) {
       const image = result.assets[0]
       if (!image.uri) throw new Error('No image uri!')
 
+
       const resizedImage = await ImageManipulator.manipulateAsync(
         image.uri,
         [{ resize: { width: size, height: size } }],
@@ -64,6 +67,7 @@ export default function Avatar({ url, size = 150, onUpload }: Props) {
       const { data, error: uploadError } = await supabase.storage
         .from('avatars')
         .upload(path, arraybuffer, { contentType: 'image/jpeg' })
+
 
       if (uploadError) throw uploadError
       onUpload(data.path)

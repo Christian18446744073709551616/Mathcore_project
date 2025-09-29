@@ -38,7 +38,7 @@ const FriendInvitePopup: React.FC<FriendInvitePopupProps> = ({ isVisible, onClos
       if (!session?.user?.id) return;
     const { data, error } = await supabase
       .from('friendships')
-      .select(`friend_username, profiles:friend_id (id, username, avatar_url)`)
+      .select(`profiles:friend_id (id, username, avatar_url)`)
         
 
       if (error) {

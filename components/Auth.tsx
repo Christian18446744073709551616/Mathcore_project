@@ -69,6 +69,7 @@ export default function Auth() {
             {/* Inputs */}
             <View style={styles.inputContainer}>
               <Text style={styles.inputLabel}>Email</Text>
+
               <Input
                 onChangeText={(text) => setEmail(text)}
                 value={email}
@@ -79,11 +80,14 @@ export default function Auth() {
                 inputStyle={styles.inputStyle}
                 placeholderTextColor="#999"
               />
+
             </View>
 
             <View style={styles.inputContainer}>
               <Text style={styles.inputLabel}>Senha</Text>
+
               <Input
+
                 onChangeText={(text) => setPassword(text)}
                 value={password}
                 secureTextEntry={!showPassword}
@@ -191,7 +195,9 @@ const styles = StyleSheet.create({
   },
   inputLabel: {
     fontSize: 14,
+
     color: '#000000ff',
+
     marginBottom: 8,
     marginLeft: 5,
   },
@@ -204,12 +210,14 @@ const styles = StyleSheet.create({
   borderRadius: 25,
   paddingHorizontal: 20,
   height: 50,
+
   
 },
   
   inputStyle: {
     fontSize: 16,
     color: '#333',
+
   },
   
   buttonContainer: {
@@ -226,6 +234,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     color: 'white',
+
   },
   createButtonStyle: {
     backgroundColor: '#333', // Preto do botão Criar conta
@@ -233,6 +242,7 @@ const styles = StyleSheet.create({
     height: 50,
     width: '100%',
   },
+
   createButtonTitleStyle: {
     fontSize: 16,
     fontWeight: 'bold',

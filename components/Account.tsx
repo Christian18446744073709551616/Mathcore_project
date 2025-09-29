@@ -147,6 +147,7 @@ const Account: React.FC<AccountProps> = ({ session, navigation }) => {
     }
   }
 
+
   return (
     <ScrollView
       contentContainerStyle={styles.scrollContainer}
@@ -229,6 +230,9 @@ const Account: React.FC<AccountProps> = ({ session, navigation }) => {
         <Text style={styles.friendsCount}>Amigos: {friendCount}</Text>
 
         {/* Progress Data */}
+
+
+
         {progressData.map((item, index) => (
           <View key={index} style={styles.progressItem}>
             <Text style={styles.lessonTitle}>{item.lessonTitle}</Text>
@@ -238,16 +242,20 @@ const Account: React.FC<AccountProps> = ({ session, navigation }) => {
                   styles.progress,
                   {
                     width: `${item.progressPercentage}%`,
+
                     backgroundColor:
                       item.progressPercentage >= 80
                         ? 'green'
                         : item.progressPercentage >= 50
                         ? 'orange'
                         : 'red',
+
+
                   },
                 ]}
               />
             </View>
+
             <Text style={styles.progressText}>
               {item.progressPercentage}%
             </Text>
@@ -255,10 +263,12 @@ const Account: React.FC<AccountProps> = ({ session, navigation }) => {
         ))}
       </View>
     </ScrollView>
+
   );
 };
 
 const styles = StyleSheet.create({
+
   scrollView: {
     flex: 1,
   },
@@ -277,6 +287,7 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 6,
     alignItems: 'center',
+
   },
   header: {
     width: '100%',
@@ -389,6 +400,8 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 14,
     color: 'white',
+
+
   },
 });
 
