@@ -1,8 +1,9 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { createClient } from '@supabase/supabase-js'
 import { PostgrestResponse } from '@supabase/postgrest-js';
-const supabaseUrl = 'https://vraiuldcpusrhhabqgaq.supabase.co';
-const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZyYWl1bGRjcHVzcmhoYWJxZ2FxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjI0MjA3NDAsImV4cCI6MjAzNzk5Njc0MH0.fdoHoz1W_uvf8H2J9kGpGXFIc_rDc-6Z-vG_Czjl8LY';
+
+const supabaseUrl = 'https://vraiuldcpusrhhabqgaq.supabase.co'
+const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZyYWl1bGRjcHVzcmhoYWJxZ2FxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjI0MjA3NDAsImV4cCI6MjAzNzk5Njc0MH0.fdoHoz1W_uvf8H2J9kGpGXFIc_rDc-6Z-vG_Czjl8LY'
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
