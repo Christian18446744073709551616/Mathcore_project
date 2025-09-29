@@ -119,7 +119,7 @@ Certifique-se de ter os seguintes softwares instalados no seu sistema:
    eas build --profile development --platform android
    ```
 
-2. Aguarde o processo ser concluído. Após o término, você receberá um link para baixar o APK.
+2. Aguarde o processo ser concluído. Após o término, você receberá o link para baixar o APK.
 
 ---
 

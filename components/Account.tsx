@@ -168,13 +168,21 @@ const Account: React.FC<AccountProps> = ({ session, navigation }) => {
       )}
 
       <View style={[styles.verticallySpaced, styles.mt20]}>
-        <Input label="Email" value={session?.user?.email} disabled />
+        <Input 
+          label="Email" 
+          value={session?.user?.email} 
+          disabled 
+          inputStyle={{ color: 'white' }}
+          labelStyle={{ color: 'white' }}
+        />
       </View>
       <View style={styles.verticallySpaced}>
         <Input
           label="Username"
           value={username || ''}
           onChangeText={(text) => setUsername(text)}
+          inputStyle={{ color: 'white' }}
+          labelStyle={{ color: 'white' }}
         />
       </View>
 
@@ -219,7 +227,7 @@ const styles = StyleSheet.create({
     marginTop: 40,
     padding: 12,
   },scrollView: {
-    backgroundColor: '#0d0f14', // Defina o fundo para evitar o branco ao redor
+    backgroundColor: '#000000ff', // Defina o fundo para evitar o branco ao redor
   }, scrollContainer: {
     flexGrow: 1, // Garante que o ScrollView ocupe todo o espaço disponível
     padding: 20, // Espaçamento ao redor de todos os itens

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import { StyleSheet, View, Alert, Image, Button } from 'react-native'
 import * as ImagePicker from 'expo-image-picker'
+import * as ImageManipulator from 'expo-image-manipulator'
 
 interface Props {
   size: number
@@ -43,11 +44,11 @@ export default function Avatar({ url, size = 150, onUpload }: Props) {
       setUploading(true)
 
       const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images, // Restrict to only images
-        allowsMultipleSelection: false, // Can only select one image
-        allowsEditing: true, // Allows the user to crop / rotate their photo before uploading it
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsMultipleSelection: false,
+        allowsEditing: true,
         quality: 1,
-        exif: false, // We don't want nor need that data.
+        exif: false,
       })
 
       if (result.canceled || !result.assets || result.assets.length === 0) {
@@ -59,17 +60,36 @@ export default function Avatar({ url, size = 150, onUpload }: Props) {
       console.log('Got image', image)
 
       if (!image.uri) {
-        throw new Error('No image uri!') // Realistically, this should never happen, but just in case...
+        throw new Error('No image uri!')
       }
 
-      const arraybuffer = await fetch(image.uri).then((res) => res.arrayBuffer())
+      // Redimensionar a imagem para o tamanho desejado
+      const resizedImage = await ImageManipulator.manipulateAsync(
+        image.uri,
+        [
+          {
+            resize: {
+              width: size,
+              height: size,
+            }
+          }
+        ],
+        {
+          compress: 0.8, // Compressão para reduzir o tamanho do arquivo
+          format: ImageManipulator.SaveFormat.JPEG,
+        }
+      )
 
-      const fileExt = image.uri?.split('.').pop()?.toLowerCase() ?? 'jpeg'
+      console.log('Resized image', resizedImage)
+
+      const arraybuffer = await fetch(resizedImage.uri).then((res) => res.arrayBuffer())
+
+      const fileExt = 'jpeg' // Sempre JPEG após o redimensionamento
       const path = `${Date.now()}.${fileExt}`
       const { data, error: uploadError } = await supabase.storage
         .from('avatars')
         .upload(path, arraybuffer, {
-          contentType: image.mimeType ?? 'image/jpeg',
+          contentType: 'image/jpeg',
         })
 
       if (uploadError) {
