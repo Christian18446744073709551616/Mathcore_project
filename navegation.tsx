@@ -46,8 +46,8 @@ const HomeStack: React.FC<{ session: Session }> = ({ session }) => (
 const FriendsStack: React.FC<{ session: Session }> = ({ session }) => (
   <Stack.Navigator screenOptions={{ headerShown: false }}>
     <Stack.Screen name="FriendsScreen" component={FriendsScreen} initialParams={{ session }} />
-    <Stack.Screen name="FriendDripRoast" component={FriendDripRoast} initialParams={{ session }} />
-    <Stack.Screen name="ChatScreen" component={ChatScreen} initialParams={{ session }} />
+    <Stack.Screen name="FriendDripRoast" component={FriendDripRoast}  initialParams={{ session }} />
+    <Stack.Screen name="ChatScreen"  component={ChatScreen} initialParams={{ session }} />
     <Stack.Screen name="Lobby" component={LobbyScreen} initialParams={{ session }} options={{ presentation: 'modal' }} />
   </Stack.Navigator>
 );
@@ -58,6 +58,7 @@ const SimpleStack = (ScreenComponent: React.FC<any>, session?: Session) => () =>
     <Stack.Screen name={ScreenComponent.name} component={ScreenComponent} initialParams={session ? { session } : undefined} />
   </Stack.Navigator>
 );
+
 
 // Navegação por Tabs
 const Cornhub: React.FC<CornhubProps> = ({ session }) => (

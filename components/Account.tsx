@@ -29,7 +29,7 @@ const Account: React.FC<AccountProps> = ({ session, navigation }) => {
   const [friendCount, setFriendCount] = useState(0);
 
   // controla se está editando o username
-  const [editingUsername, setEditingUsername] = useState(false);
+  const [editingUsername, setEditingUsername] = useState(true);
 
   useEffect(() => {
     if (session) {
@@ -39,6 +39,7 @@ const Account: React.FC<AccountProps> = ({ session, navigation }) => {
       getProgress();
     }
   }, [session]);
+  
 
   async function getAllUsers() {
     const { data, error } = await supabase.from('profiles').select('id');
@@ -50,12 +51,12 @@ const Account: React.FC<AccountProps> = ({ session, navigation }) => {
 
   async function getProfile() {
     try {
-      setLoading(true);
+      setLoading(false);
       if (!session?.user) throw new Error('No user on the session!');
 
       const { data, error, status } = await supabase
         .from('profiles')
-        .select(`username, avatar_url`)
+        .select(`username, avatar_url, email`)
         .eq('id', session?.user.id)
         .single();
 
@@ -72,7 +73,7 @@ const Account: React.FC<AccountProps> = ({ session, navigation }) => {
         console.log(error.message);
       }
     } finally {
-      setLoading(false);
+      setLoading(true);
     }
   }
 
@@ -84,7 +85,7 @@ const Account: React.FC<AccountProps> = ({ session, navigation }) => {
     avatar_url: string;
   }) {
     try {
-      setLoading(true);
+      setLoading(false);
       if (!session?.user) throw new Error('No user on the session!');
 
       const updates = {
@@ -171,60 +172,61 @@ const Account: React.FC<AccountProps> = ({ session, navigation }) => {
         </View>
 
         {/* EMAIL */}
-        <View style={styles.inputGroup}>
-          <Text style={styles.label}>Email</Text>
-          <View style={styles.inputContainer}>
-            <Text style={styles.inputText}>{session?.user?.email}</Text>
-            
-          </View>
-        </View>
+<View style={styles.inputGroup}>
+  <Text style={styles.label}>Email</Text>
+  <TextInput
+    style={[styles.inputContainer,
+      { outlineStyle: 'none' }
+    ]}
+    value={session?.user?.email || 'Email não disponível'}
+    editable={false} // apenas leitura
+  />
+</View>
 
-        {/* USERNAME */}
-        <View style={styles.inputGroup}>
-          <Text style={styles.label}>Username</Text>
-          <View style={styles.usernameRow}>
-            {editingUsername ? (
-              <TextInput
-                style={[styles.inputContainer, styles.usernameInput]}
-                value={username}
-                onChangeText={setUsername}
-                autoFocus
-                onBlur={() => setEditingUsername(false)}
-                placeholder="Digite seu nome"
-              />
-            ) : (
-              <View style={[styles.inputContainer, styles.usernameInput]}>
-                <Text style={styles.inputText}>{username || 'Seu Nome'}</Text>
-              </View>
-            )}
-            <TouchableOpacity
-              style={styles.usernameEditButton}
-              onPress={() => setEditingUsername(true)} // sempre entra em edição
-            >
-              <MaterialIcons name="edit" size={22} color="#666" />
-            </TouchableOpacity>
-          </View>
-        </View>
+{/* USERNAME */}
+<View style={styles.inputGroup}>
+  <Text style={styles.label}>Username</Text>
+  <View style={styles.usernameRow}>
+    <TextInput
+      style={[styles.inputContainer, 
+        styles.usernameInput,
+      { outlineStyle: 'none' }]}
+      value={username}
+      onChangeText={setUsername}
+      placeholder="Digite seu nome"
+      editable={editingUsername} // só permite editar quando em edição
+      onBlur={() => setEditingUsername(false)}
+      autoFocus={editingUsername}
+    />
+    <TouchableOpacity
+      style={styles.usernameEditButton}
+      onPress={() => setEditingUsername(true)}
+    >
+      <MaterialIcons name="edit" size={22} color="#666" />
+    </TouchableOpacity>
+  </View>
+</View>
 
-        {/* Botões */}
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            style={styles.updateButton}
-            onPress={() => updateProfile({ username, avatar_url: avatarUrl })}
-            disabled={loading}
-          >
-            <Text style={styles.buttonText}>
-              {loading ? 'Loading...' : 'Update'}
-            </Text>
-          </TouchableOpacity>
+{/* BOTÕES */}
+<View style={styles.buttonContainer}>
+  <TouchableOpacity
+    style={styles.updateButton}
+    onPress={() => updateProfile({ username, avatar_url: avatarUrl })}
+    disabled={loading}
+  >
+    <Text style={styles.buttonText}>
+      {loading ? 'Loading...' : 'Update'}
+    </Text>
+  </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.signOutButton}
-            onPress={() => supabase.auth.signOut()}
-          >
-            <Text style={styles.buttonText}>Sign Out</Text>
-          </TouchableOpacity>
-        </View>
+  <TouchableOpacity
+    style={styles.signOutButton}
+    onPress={() => supabase.auth.signOut()}
+  >
+    <Text style={styles.buttonText}>Sign Out</Text>
+  </TouchableOpacity>
+</View>
+
 
         {/* Contador de amigos */}
         <Text style={styles.friendsCount}>Amigos: {friendCount}</Text>

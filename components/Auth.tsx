@@ -71,6 +71,7 @@ export default function Auth() {
               <Text style={styles.inputLabel}>Email</Text>
 
               <Input
+                style={{ outlineStyle: 'none' }}
                 onChangeText={(text) => setEmail(text)}
                 value={email}
                 placeholder="Digite seu e-mail"
@@ -87,7 +88,8 @@ export default function Auth() {
               <Text style={styles.inputLabel}>Senha</Text>
 
               <Input
-
+           
+               style={{ outlineStyle: 'none' }}
                 onChangeText={(text) => setPassword(text)}
                 value={password}
                 secureTextEntry={!showPassword}

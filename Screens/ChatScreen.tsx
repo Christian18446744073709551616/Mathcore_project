@@ -274,6 +274,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#1a1a2e', // Azul escuro com um tom frio e profundo
+    paddingBottom: 100, // Espaço para o input
   },
   flatListContent: {
     padding: 10,

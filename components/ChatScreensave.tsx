@@ -130,6 +130,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f2f2f2',
+    paddingBottom: 100, // Espaço para o input
   },
   flatListContent: {
     padding: 10,
