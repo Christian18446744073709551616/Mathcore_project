@@ -46,8 +46,7 @@ const HomeStack: React.FC<{ session: Session }> = ({ session }) => (
 const FriendsStack: React.FC<{ session: Session }> = ({ session }) => (
   <Stack.Navigator screenOptions={{ headerShown: false }}>
     <Stack.Screen name="FriendsScreen" component={FriendsScreen} initialParams={{ session }} />
-    <Stack.Screen name="FriendDripRoast" component={FriendDripRoast}  initialParams={{ session }} />
-    <Stack.Screen name="ChatScreen"  component={ChatScreen} initialParams={{ session }} />
+    <Stack.Screen name="FriendDripRoast" component={FriendDripRoast} initialParams={{ session }} />
     <Stack.Screen name="Lobby" component={LobbyScreen} initialParams={{ session }} options={{ presentation: 'modal' }} />
   </Stack.Navigator>
 );
@@ -59,34 +58,46 @@ const SimpleStack = (ScreenComponent: React.FC<any>, session?: Session) => () =>
   </Stack.Navigator>
 );
 
-
 // Navegação por Tabs
+const Tabs: React.FC<{ session: Session }> = ({ session }) => (
+  <Tab.Navigator
+    initialRouteName="Home"
+    tabBar={(props) => <CustomTabBar {...props} />}
+    screenOptions={({ route }) => ({
+      headerShown: false,
+      tabBarIcon: ({ color, size }) => {
+        let iconName = 'home';
+        if (route.name === 'Home') iconName = 'home';
+        else if (route.name === 'Friends') iconName = 'people';
+        else if (route.name === 'Settings') iconName = 'person';
+        return <Ionicons name={iconName as any} size={size} color={color} />;
+      },
+    })}
+  >
+    <Tab.Screen name="Home" children={() => <HomeStack session={session} />} />
+    <Tab.Screen name="Friends" children={() => <FriendsStack session={session} />} />
+    <Tab.Screen name="Exercicios" children={SimpleStack(ExerciciosScreen, session)} />
+    <Tab.Screen name="Desempenho" children={SimpleStack(DesempenhoScreen, session)} />
+    <Tab.Screen name="Flashcards" children={SimpleStack(FlashcardsScreen, session)} />
+    <Tab.Screen name="Configuracoes" children={SimpleStack(ConfiguracoesScreen, session)} />
+    <Tab.Screen name="Settings" children={() => <SettingsScreen />} />
+  </Tab.Navigator>
+);
+
+const RootStack = createNativeStackNavigator();
+
 const Cornhub: React.FC<CornhubProps> = ({ session }) => (
   <NavigationContainer>
-    <Tab.Navigator
-      initialRouteName="Home"
-      tabBar={(props) => <CustomTabBar {...props} />}
-      screenOptions={({ route }) => ({
-        headerShown: false,
-        tabBarIcon: ({ color, size }) => {
-          let iconName: string = 'home';
-
-          if (route.name === 'Home') iconName = 'home';
-          else if (route.name === 'Friends') iconName = 'people';
-          else if (route.name === 'Settings') iconName = 'person';
-
-          return <Ionicons name={iconName as any} size={size} color={color} />;
-        },
-      })}
-    >
-      <Tab.Screen name="Home" children={() => <HomeStack session={session} />} />
-      <Tab.Screen name="Friends" children={() => <FriendsStack session={session} />} />
-      <Tab.Screen name="Exercicios" children={SimpleStack(ExerciciosScreen, session)} />
-      <Tab.Screen name="Desempenho" children={SimpleStack(DesempenhoScreen, session)} />
-      <Tab.Screen name="Flashcards" children={SimpleStack(FlashcardsScreen, session)} />
-      <Tab.Screen name="Configuracoes" children={SimpleStack(ConfiguracoesScreen, session)} />
-      <Tab.Screen name="Settings" children={() => <SettingsScreen />} />
-    </Tab.Navigator>
+    <RootStack.Navigator screenOptions={{ headerShown: false }}>
+      {/* Tela de navegação das Tabs */}
+      <RootStack.Screen name="Tabs" children={() => <Tabs session={session} />} />
+      {/* A tela ChatScreen está fora da tabBar, então deve ser na navegação raiz */}
+      <RootStack.Screen 
+        name="ChatScreen" 
+        component={ChatScreen} 
+        options={{ tabBarStyle: { display: 'none' } }} // Escondendo a tabBar quando estiver na tela de Chat
+      />
+    </RootStack.Navigator>
   </NavigationContainer>
 );
 

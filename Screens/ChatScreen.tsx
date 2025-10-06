@@ -4,7 +4,7 @@ import { supabase } from '../lib/supabase';
 import { NavigationProp, useNavigation, useRoute } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { RootStackParamList } from '../types';
-
+import { useIsFocused } from '@react-navigation/native';
 interface Message {
   id: string;
   sender_id: string;
@@ -14,6 +14,7 @@ interface Message {
   message_type: string; // Adicionado o campo message_type
   lobby_id: string; // Adicionado o campo lobby_id
 }
+
 
 const OnlineChat = () => {
   const route = useRoute();
@@ -32,6 +33,22 @@ const OnlineChat = () => {
 
     fetchSessionAndMessages();
   }, []);
+
+
+
+const OnlineChat = () => {
+  const navigation = useNavigation();
+  const isFocused = useIsFocused();
+
+  useEffect(() => {
+    navigation.getParent()?.setOptions({
+      tabBarStyle: { display: isFocused ? 'none' : 'flex' }
+    });
+  }, [isFocused]);
+
+  // ... resto do seu código
+}
+
 
   const fetchMessages = async (userId: string) => {
     const { data, error } = await supabase
@@ -251,8 +268,15 @@ const OnlineChat = () => {
       }}
     />
 
+<View>    <TouchableOpacity
+              style={styles.returnButton}
+              onPress={() => navigation.navigate('Home2')}
+            >
+              <Ionicons name="arrow-back-circle-outline" size={80} color="black" style={{ fontWeight:'bold'}} />
+            </TouchableOpacity></View>
     {/* 🚀 Input corrigido */}
     <View style={styles.inputContainer}>
+
       <TextInput
         style={styles.input}
         placeholder="Digite sua mensagem..."
@@ -279,6 +303,14 @@ const styles = StyleSheet.create({
   flatListContent: {
     padding: 10,
     paddingBottom: 100,
+  },
+  returnButton: {
+    width: 80,
+    height: 80,
+    borderRadius: 100,
+    backgroundColor: '#D9D9D9',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   sentMessage: {
     alignSelf: 'flex-end',
