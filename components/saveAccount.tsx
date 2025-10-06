@@ -30,6 +30,7 @@ export default function Account({ session }: { session: Session }) {
 
   async function getProfile() {
     try {
+      console.log('Chamando getProfile()');
       setLoading(true);
       if (!session?.user) throw new Error('No user on the session!');
 

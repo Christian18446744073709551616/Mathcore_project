@@ -13,12 +13,9 @@ import { supabase } from '../lib/supabase';
 import { Session } from '@supabase/supabase-js';
 import { MaterialIcons } from '@expo/vector-icons';
 
-interface AccountProps {
-  session: Session;
-  navigation: any;
-}
+const Account: React.FC<{ navigation: any }> = ({ navigation }) => {
+  const [session, setSession] = useState<Session | null>(null);
 
-const Account: React.FC<AccountProps> = ({ session, navigation }) => {
   const [loading, setLoading] = useState(true);
   const [username, setUsername] = useState('');
   const [avatarUrl, setAvatarUrl] = useState('');
@@ -32,13 +29,43 @@ const Account: React.FC<AccountProps> = ({ session, navigation }) => {
   const [editingUsername, setEditingUsername] = useState(true);
 
   useEffect(() => {
+    const fetchSession = async () => {
+      const { data, error } = await supabase.auth.getSession();
+      if (error) {
+        console.error('Erro ao buscar sessão:', error.message);
+      } else {
+        setSession(data.session);
+        console.log('Sessão carregada:', data.session);
+      }
+    };
+  
+    fetchSession();
+  
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setSession(session);
+        console.log('Sessão atualizada:', session);
+      }
+    );
+  
+    return () => {
+      authListener?.subscription?.unsubscribe();
+    };
+  }, []);
+  
+
+  useEffect(() => {
+    console.log('Session carregada no useEffect:', session);
+  
     if (session) {
+      console.log('User ID:', session.user.id);
       getProfile();
       getAllUsers();
       getFriendCount();
       getProgress();
     }
   }, [session]);
+  
   
 
   async function getAllUsers() {
@@ -51,12 +78,12 @@ const Account: React.FC<AccountProps> = ({ session, navigation }) => {
 
   async function getProfile() {
     try {
-      setLoading(false);
+      setLoading(true);
       if (!session?.user) throw new Error('No user on the session!');
 
       const { data, error, status } = await supabase
         .from('profiles')
-        .select(`username, avatar_url, email`)
+        .select(`username, avatar_url`)
         .eq('id', session?.user.id)
         .single();
 
@@ -73,7 +100,7 @@ const Account: React.FC<AccountProps> = ({ session, navigation }) => {
         console.log(error.message);
       }
     } finally {
-      setLoading(true);
+      setLoading(false);
     }
   }
 
@@ -85,7 +112,7 @@ const Account: React.FC<AccountProps> = ({ session, navigation }) => {
     avatar_url: string;
   }) {
     try {
-      setLoading(false);
+      setLoading(true);
       if (!session?.user) throw new Error('No user on the session!');
 
       const updates = {
