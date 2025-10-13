@@ -5,6 +5,7 @@ import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 // Ícones SVG customizados
 import HomeIcon from './icons/HomeIcon';
 import ExerciciosIcon from './icons/ExerciciosIcon';
+import QuizIcon from './icons/QuizIcon';
 import DesempenhoIcon from './icons/DesempenhoIcon';
 import PeopleIcon from './icons/PeopleIcon';
 import PersonIcon from './icons/PersonIcon';
@@ -66,12 +67,22 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigat
               <Text style={styles.menuText}>Exercícios</Text>
             </TouchableOpacity>   
 
+            {/* DESEMPENHO AGORA COM ÍCONE DO QUIZ */}
             <TouchableOpacity
               style={styles.menuItem}
               onPress={() => handleMenuNavigation('Desempenho')}
             >
-              <DesempenhoIcon size={24} color="#1f1f1fff" />
+              <QuizIcon size={24} color="#1f1f1fff" />
               <Text style={styles.menuText}>Desempenho</Text>
+            </TouchableOpacity>
+
+            {/* QUIZ AGORA COM ÍCONE DO DESEMPENHO */}
+            <TouchableOpacity
+              style={styles.menuItem}
+              onPress={() => handleMenuNavigation('Quiz')}
+            >
+              <DesempenhoIcon size={24} color="#1f1f1fff" />
+              <Text style={styles.menuText}>Quiz</Text>
             </TouchableOpacity>
 
             <TouchableOpacity 
@@ -139,6 +150,17 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigat
             <ExerciciosIcon 
               size={34} 
               color={isRouteActive('Exercicios') ? '#1f1f1fff' : '#cfd8dc'}
+            />
+          </TouchableOpacity>
+
+          {/* Botão Quiz */}
+          <TouchableOpacity
+            style={styles.tab}
+            onPress={() => navigation.navigate('Quiz')}
+          >
+            <QuizIcon 
+              size={34} 
+              color={isRouteActive('Quiz') ? '#1f1f1fff' : '#cfd8dc'}
             />
           </TouchableOpacity>
 
@@ -234,4 +256,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CustomTabBar;
+export default CustomTabBar;  

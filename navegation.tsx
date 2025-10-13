@@ -19,6 +19,7 @@ import ExerciciosScreen from './Screens/ExerciciosScreen';
 import DesempenhoScreen from './Screens/DesempenhoScreen';
 import FlashcardsScreen from './Screens/FlashcardsScreen';
 import ConfiguracoesScreen from './Screens/ConfiguracoesScreen';
+import QuizScreen from './Screens/QuizScreen';
 
 import CustomTabBar from './components/3d/CustomTabBar';
 import { RootStackParamList } from './types';
@@ -78,6 +79,7 @@ const Tabs: React.FC<{ session: Session }> = ({ session }) => (
     <Tab.Screen name="Friends" children={() => <FriendsStack session={session} />} />
     <Tab.Screen name="Exercicios" children={SimpleStack(ExerciciosScreen, session)} />
     <Tab.Screen name="Desempenho" children={SimpleStack(DesempenhoScreen, session)} />
+    <Tab.Screen name="Quiz" children={SimpleStack(QuizScreen, session)} />
     <Tab.Screen name="Flashcards" children={SimpleStack(FlashcardsScreen, session)} />
     <Tab.Screen name="Configuracoes" children={SimpleStack(ConfiguracoesScreen, session)} />
     <Tab.Screen name="Settings" children={() => <SettingsScreen />} />
