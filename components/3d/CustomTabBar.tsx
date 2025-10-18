@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Modal } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Modal, Image } from 'react-native';
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 
 // Ícones SVG customizados
 import HomeIcon from './icons/HomeIcon';
 import ExerciciosIcon from './icons/ExerciciosIcon';
-import QuizIcon from './icons/QuizIcon';
 import DesempenhoIcon from './icons/DesempenhoIcon';
+import QuizIconSecundario from './icons/QuizIconSecundario.js';
 import PeopleIcon from './icons/PeopleIcon';
 import PersonIcon from './icons/PersonIcon';
 import MenuIcon from './icons/MenuIcon';
@@ -59,6 +59,16 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigat
         >
           <View style={styles.menuContainer}>
             {/* Opções do menu */}
+            <TouchableOpacity 
+              style={styles.menuItem}
+              onPress={() => handleMenuNavigation('Settings')}
+            >
+              <PersonIcon size={24} color="#1f1f1fff" />
+              <Text style={styles.menuText}>Perfil</Text>
+            </TouchableOpacity> 
+
+            <View style={styles.separator} />
+
             <TouchableOpacity
               style={styles.menuItem}
               onPress={() => handleMenuNavigation('Exercicios')}
@@ -67,32 +77,26 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigat
               <Text style={styles.menuText}>Exercícios</Text>
             </TouchableOpacity>   
 
-            {/* DESEMPENHO AGORA COM ÍCONE DO QUIZ */}
-            <TouchableOpacity
-              style={styles.menuItem}
-              onPress={() => handleMenuNavigation('Desempenho')}
-            >
-              <QuizIcon size={24} color="#1f1f1fff" />
-              <Text style={styles.menuText}>Desempenho</Text>
-            </TouchableOpacity>
 
-            {/* QUIZ AGORA COM ÍCONE DO DESEMPENHO */}
+
             <TouchableOpacity
               style={styles.menuItem}
               onPress={() => handleMenuNavigation('Quiz')}
             >
-              <DesempenhoIcon size={24} color="#1f1f1fff" />
+              <QuizIconSecundario size={24} color="#1f1f1fff" />
               <Text style={styles.menuText}>Quiz</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity 
+            <TouchableOpacity
               style={styles.menuItem}
-              onPress={() => handleMenuNavigation('Settings')}
+              onPress={() => handleMenuNavigation('Desempenho')}
             >
-              <PersonIcon size={24} color="#1f1f1fff" />
-              <Text style={styles.menuText}>Perfil</Text>
-            </TouchableOpacity>            
+              <DesempenhoIcon size={24} color="#1f1f1fff" />
+              <Text style={styles.menuText}>Desempenho</Text>
+            </TouchableOpacity>           
             
+            <View style={styles.separator} />
+
             <TouchableOpacity 
               style={styles.menuItem}
               onPress={() => handleMenuNavigation('Flashcards')}
@@ -116,6 +120,8 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigat
               <ConfiguracoesIcon size={24} color="#1f1f1fff" />
               <Text style={styles.menuText}>Configurações</Text>
             </TouchableOpacity>
+
+            <View style={styles.separator} />
 
             <TouchableOpacity 
               style={styles.menuItem}
@@ -153,15 +159,21 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigat
             />
           </TouchableOpacity>
 
-          {/* Botão Quiz */}
+          {/* Botão Quiz - COM CAMINHO CORRETO */}
           <TouchableOpacity
             style={styles.tab}
             onPress={() => navigation.navigate('Quiz')}
           >
-            <QuizIcon 
-              size={34} 
-              color={isRouteActive('Quiz') ? '#1f1f1fff' : '#cfd8dc'}
-            />
+            <View style={[
+              styles.quizImageContainer,
+              isRouteActive('Quiz') ? styles.quizImageActive : styles.quizImageInactive
+            ]}>
+              <Image
+                source={require('../../assets/quiz-icon.png')}
+                style={styles.quizImage}
+                resizeMode="cover"
+              />
+            </View>
           </TouchableOpacity>
 
           {/* Botão Desempenho */}
@@ -222,6 +234,26 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingVertical: 8,
   },
+  // Estilos para a imagem do Quiz
+  quizImageContainer: {
+    width: 60,
+    height: 60,
+    borderRadius: 32.5,
+    overflow: 'hidden',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  quizImageActive: {
+    backgroundColor: '#1f1f1fff',
+  },
+  quizImageInactive: {
+    backgroundColor: '#cfd8dc',
+  },
+  quizImage: {
+    width: '85%',
+    height: '85%',
+    borderRadius: 72,
+  },
 
   // Estilos para o Menu Modal
   menuOverlay: {
@@ -254,6 +286,21 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     fontWeight: '700',
   },
+  separator: {
+    height: 8,
+    backgroundColor: '#23273dff',
+    marginVertical: 3,
+    marginHorizontal: 5,
+    borderRadius: 9,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
 });
 
-export default CustomTabBar;  
+export default CustomTabBar;

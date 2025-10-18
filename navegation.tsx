@@ -4,7 +4,6 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
 import { Session } from '@supabase/supabase-js';
-
 import Home2Screen from './Screens/home.2';
 import HomeScreen from './Screens/home';
 import LessonScreen from './Screens/LessonScreen';
@@ -13,13 +12,14 @@ import GameScreen from './Screens/GameScreen';
 import FriendsScreen from './Screens/Friends';
 import UltramenuScreen from './Screens/UltramenuScreen';
 import FriendDripRoast from './Screens/FriendDripRoast';
-import LobbyScreen from './Screens/Lobby';
+import Lobby from './Screens/Lobby';
 import ChatScreen from './Screens/ChatScreen';
 import ExerciciosScreen from './Screens/ExerciciosScreen';
 import DesempenhoScreen from './Screens/DesempenhoScreen';
 import FlashcardsScreen from './Screens/FlashcardsScreen';
 import ConfiguracoesScreen from './Screens/ConfiguracoesScreen';
-import QuizScreen from './Screens/QuizScreen';
+import QuizScreen from './Screens/Quiz/QuizScreen';
+import NovoQuizScreen from './Screens/Quiz/NovoQuizScreen';
 
 import CustomTabBar from './components/3d/CustomTabBar';
 import { RootStackParamList } from './types';
@@ -38,7 +38,7 @@ const HomeStack: React.FC<{ session: Session }> = ({ session }) => (
     <Stack.Screen name="Home" component={HomeScreen} />
     <Stack.Screen name="Ultramenu" component={UltramenuScreen} />
     <Stack.Screen name="Lesson" component={LessonScreen} options={{ presentation: 'modal' }} />
-    <Stack.Screen name="Lobby" component={LobbyScreen} initialParams={{ session }} options={{ presentation: 'modal' }} />
+   
     <Stack.Screen name="GameScreen" component={GameScreen} options={{ presentation: 'modal' }} />
   </Stack.Navigator>
 );
@@ -48,7 +48,7 @@ const FriendsStack: React.FC<{ session: Session }> = ({ session }) => (
   <Stack.Navigator screenOptions={{ headerShown: false }}>
     <Stack.Screen name="FriendsScreen" component={FriendsScreen} initialParams={{ session }} />
     <Stack.Screen name="FriendDripRoast" component={FriendDripRoast} initialParams={{ session }} />
-    <Stack.Screen name="Lobby" component={LobbyScreen} initialParams={{ session }} options={{ presentation: 'modal' }} />
+   
   </Stack.Navigator>
 );
 
@@ -97,8 +97,12 @@ const Cornhub: React.FC<CornhubProps> = ({ session }) => (
       <RootStack.Screen 
         name="ChatScreen" 
         component={ChatScreen} 
-        options={{ tabBarStyle: { display: 'none' } }} // Escondendo a tabBar quando estiver na tela de Chat
+        options={{ tabBarStyle: { display: 'none' } }}
+         // Escondendo a tabBar quando estiver na tela de Chat
       />
+      <RootStack.Screen name="Lobby" component={Lobby} initialParams={{ session }} options={{ presentation: 'modal' }} />
+
+      <RootStack.Screen name="NovoQuizScreen" component={NovoQuizScreen} />
     </RootStack.Navigator>
   </NavigationContainer>
 );
