@@ -1,15 +1,71 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, FlatList } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
+
+// --- ESTRUTURA DE DADOS ---
+interface QuizOption {
+  id: string;
+  text: string;
+}
+
+interface QuizQuestion {
+  id: number;
+  questionText: string;
+  options: QuizOption[];
+  correctOptionId: string;
+}
+
+interface Quiz {
+  id: string;
+  title: string;
+  questions: QuizQuestion[];
+}
 
 const QuizScreen = () => {
   const navigation = useNavigation();
+  const route = useRoute();
+
+  const [quizzes, setQuizzes] = useState<Quiz[]>([]);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      if (route.params?.type === 'quizDeleted' && route.params?.quizId) {
+        const quizIdToDelete = route.params.quizId as string;
+        setQuizzes(prevQuizzes => {
+          const newQuizzesList = prevQuizzes.filter(q => q.id !== quizIdToDelete);
+          return [...newQuizzesList]; // Retorna uma nova referência de array
+        });
+        navigation.setParams({ type: undefined, quizId: undefined });
+      } 
+      else if (route.params?.type === 'quizSaved' && route.params?.quiz) {
+        const savedQuiz = route.params.quiz as Quiz;
+        setQuizzes(prevQuizzes => {
+          const existingQuizIndex = prevQuizzes.findIndex(q => q.id === savedQuiz.id);
+          if (existingQuizIndex > -1) {
+            // Edição: Cria um novo array com o quiz atualizado
+            const updatedQuizzes = [...prevQuizzes];
+            updatedQuizzes[existingQuizIndex] = savedQuiz;
+            return updatedQuizzes;
+          } else {
+            // Criação: Retorna um novo array com o novo quiz adicionado
+            return [...prevQuizzes, savedQuiz];
+          }
+        });
+        navigation.setParams({ type: undefined, quiz: undefined });
+      }
+    }, [route.params])
+  );
 
   const handleNewQuiz = () => {
-    navigation.navigate('NovoQuizScreen');
+    navigation.navigate('NovoQuizScreen', { quizToEdit: null });
   };
 
+  const handleEditQuiz = (quiz: Quiz) => {
+    navigation.navigate('NovoQuizScreen', { quizToEdit: quiz });
+  };
+
+  // JSX (parte visual)
   return (
     <View style={{ flex: 1 }}>
       <LinearGradient
@@ -27,26 +83,39 @@ const QuizScreen = () => {
           <View style={styles.headerRow}>
             <Text style={styles.title}>Quiz</Text>
           </View>
-
-          {/* Container que empurra o retângulo para baixo */}
           <View style={styles.bottomContainer}>
-            {/* Retângulo que cresce para cima */}
             <View style={styles.expandingRectangle}>
-              
-              {/* Container para o botão no canto superior esquerdo */}
-              <View style={styles.buttonContainer}>
-                <TouchableOpacity 
-                  style={styles.newQuizButton}
-                  onPress={handleNewQuiz}
-                >
-                  <View style={styles.buttonContent}>
-                    <Text style={styles.novoText}>Novo</Text>
-                    <Text style={styles.quizText}>Quiz</Text>
-                    <Text style={styles.plusSymbol}>+</Text>
-                  </View>
-                </TouchableOpacity>
-              </View>
-
+              <FlatList
+                data={[{ id: 'new_quiz_button' }, ...quizzes]}
+                numColumns={2}
+                keyExtractor={(item) => item.id}
+                extraData={quizzes}
+                renderItem={({ item }) => {
+                  if (item.id === 'new_quiz_button') {
+                    return (
+                      <TouchableOpacity 
+                        style={styles.newQuizButton}
+                        onPress={handleNewQuiz}
+                      >
+                        <View style={styles.buttonContent}>
+                          <Text style={styles.novoText}>Novo</Text>
+                          <Text style={styles.quizText}>Quiz</Text>
+                          <Text style={styles.plusSymbol}>+</Text>
+                        </View>
+                      </TouchableOpacity>
+                    );
+                  }
+                  return (
+                    <TouchableOpacity
+                      style={styles.savedQuizButton}
+                      onPress={() => handleEditQuiz(item as Quiz)}
+                    >
+                      <Text style={styles.savedQuizTitle}>{(item as Quiz).title}</Text>
+                    </TouchableOpacity>
+                  );
+                }}
+                contentContainerStyle={styles.quizListContainer}
+              />
             </View>
           </View>
         </ScrollView>
@@ -55,6 +124,7 @@ const QuizScreen = () => {
   );
 };
 
+// --- ESTILOS ---
 const styles = StyleSheet.create({
   container: {
     padding: 20,
@@ -78,25 +148,23 @@ const styles = StyleSheet.create({
   expandingRectangle: {
     backgroundColor: '#707DCB',
     borderRadius: 12,
-    padding: 40,
+    padding: 20,
     minHeight: 700,
     flexGrow: 1,
   },
-  buttonContainer: {
-    position: 'absolute',
-    top: 20,
-    left: 20,
+  quizListContainer: {
+    alignItems: 'flex-start',
   },
   newQuizButton: {
-    backgroundColor: '#707DCB',
+    backgroundColor: '#FFF9E0',
     borderWidth: 2,
     borderColor: '#000000',
     borderRadius: 8,
-    paddingVertical: 70,
-    paddingHorizontal: 30,
+    width: 150,
+    height: 200,
     alignItems: 'center',
     justifyContent: 'center',
-    minWidth: 100,
+    margin: 10,
   },
   buttonContent: {
     alignItems: 'center',
@@ -104,19 +172,36 @@ const styles = StyleSheet.create({
   },
   novoText: {
     color: '#000000',
-    fontSize: 44,
+    fontSize: 24,
     fontWeight: 'bold',
   },
   quizText: {
     color: '#000000',
-    fontSize: 44,
+    fontSize: 24,
     fontWeight: 'bold',
   },
   plusSymbol: {
     color: '#000000',
-    fontSize: 84,
+    fontSize: 48,
     fontWeight: 'bold',
-    marginTop: 2,
+  },
+  savedQuizButton: {
+    backgroundColor: '#FFF9E0',
+    borderWidth: 2,
+    borderColor: '#000000',
+    borderRadius: 8,
+    width: 150,
+    height: 200,
+    alignItems: 'center',
+    justifyContent: 'center',
+    margin: 10,
+    padding: 10,
+  },
+  savedQuizTitle: {
+    color: '#000000',
+    fontSize: 20,
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
 });
 
