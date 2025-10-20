@@ -6,6 +6,9 @@ import { RootStackParamList } from '../types';
 import { supabase } from '../lib/supabase';
 import AvatarView from '../components/AvatarView';
 
+console.log("GameScreen foi montado!");
+
+
 type GameScreenProps = NativeStackScreenProps<RootStackParamList, 'GameScreen'>;
 
 const GameScreen: React.FC<GameScreenProps> = ({ navigation, route }) => {

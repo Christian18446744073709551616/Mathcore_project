@@ -33,7 +33,9 @@ const Home2Screen = () => {
   const boxWidth = width > 500 ? 400 : width * 0.9; // max width 400, otherwise 90% of screen
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
+    <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}
+          showsHorizontalScrollIndicator={false}>
+      
       <Text style={styles.title}>MathCore</Text>
       <Text style={styles.prompt}>O que vamos aprender hoje, {username}?</Text>
 
