@@ -84,8 +84,7 @@ export const setupQuizInviteChannel = (
       },
       (payload) => {
         // Filtra apenas convites de quiz
-        if (payload.new.message_type === 'quiz_invitation') {
-          onInviteReceived(payload.new);
+        if (payload.new.message_type === 'invitation' && payload.new.message_text.includes('match_id')) {
         }
       }
     )

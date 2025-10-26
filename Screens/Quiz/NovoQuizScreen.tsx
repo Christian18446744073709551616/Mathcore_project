@@ -82,68 +82,68 @@ const QuizCreatorScreen = () => {
     setActiveQuestionId(newQuestion.id);
   }, [questions]);
 
-const handleSaveQuiz = async () => {
-  if (!session?.user?.id) {
-    if (Platform.OS === 'web') {
-      alert('Você precisa estar logado para salvar quizzes.');
-    } else {
-      Alert.alert('Erro', 'Você precisa estar logado para salvar quizzes.');
-    }
-    return;
-  }
-
-  if (!quizTitle.trim()) {
-    if (Platform.OS === 'web') {
-      alert('Por favor, dê um nome ao seu quiz.');
-    } else {
-      Alert.alert('Atenção', 'Por favor, dê um nome ao seu quiz.');
-    }
-    return;
-  }
-
-  try {
-    if (isEditMode && quizId) {
-      const updatedQuiz = await updateQuiz(quizId, quizTitle, questions);
-      if (updatedQuiz) {
-        if (Platform.OS === 'web') {
-          alert('Quiz atualizado!');
-        } else {
-          Alert.alert('Sucesso', 'Quiz atualizado!');
-        }
-        navigation.goBack();
+  const handleSaveQuiz = async () => {
+    if (!session?.user?.id) {
+      if (Platform.OS === 'web') {
+        alert('Você precisa estar logado para salvar quizzes.');
       } else {
-        if (Platform.OS === 'web') {
-          alert('Não foi possível atualizar o quiz.');
+        Alert.alert('Erro', 'Você precisa estar logado para salvar quizzes.');
+      }
+      return;
+    }
+
+    if (!quizTitle.trim()) {
+      if (Platform.OS === 'web') {
+        alert('Por favor, dê um nome ao seu quiz.');
+      } else {
+        Alert.alert('Atenção', 'Por favor, dê um nome ao seu quiz.');
+      }
+      return;
+    }
+
+    try {
+      if (isEditMode && quizId) {
+        const updatedQuiz = await updateQuiz(quizId, quizTitle, questions);
+        if (updatedQuiz) {
+          if (Platform.OS === 'web') {
+            alert('Quiz atualizado!');
+          } else {
+            Alert.alert('Sucesso', 'Quiz atualizado!');
+          }
+          navigation.goBack();
         } else {
-          Alert.alert('Erro', 'Não foi possível atualizar o quiz.');
+          if (Platform.OS === 'web') {
+            alert('Não foi possível atualizar o quiz.');
+          } else {
+            Alert.alert('Erro', 'Não foi possível atualizar o quiz.');
+          }
+        }
+      } else {
+        const newQuiz = await createQuiz(session.user.id, quizTitle, questions);
+        if (newQuiz) {
+          if (Platform.OS === 'web') {
+            alert('Quiz criado!');
+          } else {
+            Alert.alert('Sucesso', 'Quiz criado!');
+          }
+          navigation.goBack();
+        } else {
+          if (Platform.OS === 'web') {
+            alert('Não foi possível criar o quiz.');
+          } else {
+            Alert.alert('Erro', 'Não foi possível criar o quiz.');
+          }
         }
       }
-    } else {
-      const newQuiz = await createQuiz(session.user.id, quizTitle, questions);
-      if (newQuiz) {
-        if (Platform.OS === 'web') {
-          alert('Quiz criado!');
-        } else {
-          Alert.alert('Sucesso', 'Quiz criado!');
-        }
-        navigation.goBack();
+    } catch (error) {
+      console.error('Erro ao salvar quiz:', error);
+      if (Platform.OS === 'web') {
+        alert('Ocorreu um erro ao salvar o quiz.');
       } else {
-        if (Platform.OS === 'web') {
-          alert('Não foi possível criar o quiz.');
-        } else {
-          Alert.alert('Erro', 'Não foi possível criar o quiz.');
-        }
+        Alert.alert('Erro', 'Ocorreu um erro ao salvar o quiz.');
       }
     }
-  } catch (error) {
-    console.error('Erro ao salvar quiz:', error);
-    if (Platform.OS === 'web') {
-      alert('Ocorreu um erro ao salvar o quiz.');
-    } else {
-      Alert.alert('Erro', 'Ocorreu um erro ao salvar o quiz.');
-    }
-  }
-};
+  };
 
   // ✅ CORRIGIDO - Funciona na web
   const handleDeleteQuestion = () => {
@@ -278,59 +278,82 @@ const handleSaveQuiz = async () => {
     }
   };
 
-const handleUpdateQuestion = useCallback((questionId: number, field: 'questionText' | `option_${string}`, value: string) => {
-  setQuestions(prev => {
-    return prev.map(q => {
-      if (q.id !== questionId) {
+  const handleUpdateQuestion = useCallback((questionId: number, field: 'questionText' | `option_${string}`, value: string) => {
+    setQuestions(prev => {
+      return prev.map(q => {
+        if (q.id !== questionId) {
+          return q;
+        }
+
+        if (field === 'questionText') {
+          return { ...q, questionText: value };
+        }
+
+        if (field.startsWith('option_')) {
+          const optionId = field.split('_')[1];
+          return {
+            ...q,
+            options: q.options.map(opt => 
+              opt.id === optionId ? { ...opt, text: value } : opt
+            ),
+          };
+        }
+
         return q;
-      }
-
-      if (field === 'questionText') {
-        return { ...q, questionText: value };
-      }
-
-      if (field.startsWith('option_')) {
-        const optionId = field.split('_')[1];
-        return {
-          ...q,
-          options: q.options.map(opt => 
-            opt.id === optionId ? { ...opt, text: value } : opt
-          ),
-        };
-      }
-
-      return q;
+      });
     });
-  });
-}, []);
+  }, []);
 
   const handleSelectCorrectOption = (questionId: number, correctId: string) => {
     setQuestions(prev => prev.map(q => q.id === questionId ? { ...q, correctOptionId: correctId } : q));
   };
 
+  // ✅ CORRIGIDO COM LOGS DETALHADOS
   const handleInviteFriend = async (friendId: string) => {
+    console.log('👥 handleInviteFriend chamado para friendId:', friendId);
+
     if (!session?.user?.id) {
-      Alert.alert('Erro', 'Você precisa estar logado para enviar convites.');
+      if (Platform.OS === 'web') {
+        alert('Você precisa estar logado para enviar convites.');
+      } else {
+        Alert.alert('Erro', 'Você precisa estar logado para enviar convites.');
+      }
       return;
     }
 
     if (!quizTitle.trim()) {
-      Alert.alert('Atenção', 'Por favor, dê um nome ao seu quiz antes de convidar amigos.');
+      if (Platform.OS === 'web') {
+        alert('Por favor, dê um nome ao seu quiz antes de convidar amigos.');
+      } else {
+        Alert.alert('Atenção', 'Por favor, dê um nome ao seu quiz antes de convidar amigos.');
+      }
       return;
     }
 
     let currentQuizId = quizId;
+    
+    // Se o quiz ainda não foi salvo, salva primeiro
     if (!currentQuizId) {
+      console.log('💾 Quiz não salvo, salvando primeiro...');
       const newQuiz = await createQuiz(session.user.id, quizTitle, questions);
       if (!newQuiz) {
-        Alert.alert('Erro', 'Não foi possível salvar o quiz.');
+        if (Platform.OS === 'web') {
+          alert('Não foi possível salvar o quiz.');
+        } else {
+          Alert.alert('Erro', 'Não foi possível salvar o quiz.');
+        }
         return;
       }
       currentQuizId = newQuiz.id;
       setQuizId(currentQuizId);
+      setIsEditMode(true);
+      console.log('✅ Quiz salvo com ID:', currentQuizId);
     }
 
     try {
+      console.log('📤 Criando quiz_match...');
+      
+      // Criar partida de quiz
       const { data: matchData, error: matchError } = await supabase
         .from('quiz_matches')
         .insert({
@@ -342,30 +365,69 @@ const handleUpdateQuestion = useCallback((questionId: number, field: 'questionTe
         .select()
         .single();
 
-      if (matchError) throw matchError;
+      if (matchError) {
+        console.error('❌ Erro ao criar match:', matchError);
+        throw matchError;
+      }
 
-      await supabase.from('quiz_participants').insert({
-        match_id: matchData.id,
-        user_id: session.user.id,
-        is_ready: false,
-      });
+      console.log('✅ Match criado:', matchData);
 
+      // Adicionar host como participante
+      console.log('📤 Adicionando host como participante...');
+      const { error: participantError } = await supabase
+        .from('quiz_participants')
+        .insert({
+          match_id: matchData.id,
+          user_id: session.user.id,
+          is_ready: false,
+        });
+
+      if (participantError) {
+        console.error('❌ Erro ao adicionar participante:', participantError);
+        throw participantError;
+      }
+
+      console.log('✅ Host adicionado como participante');
+
+      // Preparar dados do convite
       const inviteData = {
         quiz_id: currentQuizId,
         quiz_title: quizTitle,
         match_id: matchData.id,
       };
 
-      await supabase.from('messages').insert({
-        sender_id: session.user.id,
-        receiver_id: friendId,
-        message_text: JSON.stringify(inviteData),
-        message_type: 'quiz_invitation',
-      });
+      console.log('📤 Enviando convite via messages...');
+      console.log('   sender_id:', session.user.id);
+      console.log('   receiver_id:', friendId);
+      console.log('   inviteData:', inviteData);
 
-      Alert.alert('Sucesso', 'Convite enviado!');
+      // Enviar convite via messages
+      const { data: messageData, error: messageError } = await supabase
+        .from('messages')
+        .insert({
+          sender_id: session.user.id,
+          receiver_id: friendId,
+          message_text: JSON.stringify(inviteData),
+          message_type: 'invitation',
+        })
+        .select();
+
+      if (messageError) {
+        console.error('❌ Erro ao enviar convite:', messageError);
+        throw messageError;
+      }
+
+      console.log('✅ Convite enviado com sucesso!', messageData);
+
+      if (Platform.OS === 'web') {
+        alert('Convite enviado!');
+      } else {
+        Alert.alert('Sucesso', 'Convite enviado!');
+      }
+      
       setIsInvitePopupVisible(false);
       
+      // Navegar para sala de espera
       (navigation as any).navigate('QuizWaitingRoom', {
         matchId: matchData.id,
         quizId: currentQuizId,
@@ -373,14 +435,22 @@ const handleUpdateQuestion = useCallback((questionId: number, field: 'questionTe
         quizData: { id: currentQuizId, title: quizTitle, questions },
       });
     } catch (error) {
-      console.error('Erro ao enviar convite:', error);
-      Alert.alert('Erro', 'Não foi possível enviar o convite.');
+      console.error('❌ Erro geral ao enviar convite:', error);
+      if (Platform.OS === 'web') {
+        alert('Não foi possível enviar o convite.');
+      } else {
+        Alert.alert('Erro', 'Não foi possível enviar o convite.');
+      }
     }
   };
 
   const handleStartGame = async () => {
     if (!quizTitle.trim()) {
-      Alert.alert('Atenção', 'Por favor, dê um nome ao seu quiz antes de jogar.');
+      if (Platform.OS === 'web') {
+        alert('Por favor, dê um nome ao seu quiz antes de jogar.');
+      } else {
+        Alert.alert('Atenção', 'Por favor, dê um nome ao seu quiz antes de jogar.');
+      }
       return;
     }
 
@@ -390,6 +460,7 @@ const handleUpdateQuestion = useCallback((questionId: number, field: 'questionTe
       if (newQuiz) {
         currentQuizId = newQuiz.id;
         setQuizId(currentQuizId);
+        setIsEditMode(true);
       }
     }
 
