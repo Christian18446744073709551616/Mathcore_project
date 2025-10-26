@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, FlatList } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, FlatList, Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
+import { supabase } from '../../lib/supabase';
 
 // --- ESTRUTURA DE DADOS ---
 interface QuizOption {
@@ -27,31 +28,61 @@ const QuizScreen = () => {
   const route = useRoute();
 
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
+  const [loading, setLoading] = useState(true);
 
+  // ✅ FUNÇÃO PARA BUSCAR QUIZZES DO SUPABASE
+  const fetchQuizzes = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session?.user?.id) {
+        console.log('Usuário não autenticado');
+        setLoading(false);
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from('quizzes')
+        .select('*')
+        .eq('user_id', session.user.id)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      const formattedQuizzes: Quiz[] = data.map(quiz => ({
+        id: quiz.id,
+        title: quiz.title,
+        questions: quiz.questions as QuizQuestion[],
+      }));
+
+      setQuizzes(formattedQuizzes);
+    } catch (error) {
+      console.error('Erro ao buscar quizzes:', error);
+      Alert.alert('Erro', 'Não foi possível carregar seus quizzes.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // ✅ BUSCAR QUIZZES AO MONTAR O COMPONENTE
+  useEffect(() => {
+    fetchQuizzes();
+  }, []);
+
+  // ✅ ATUALIZAR QUANDO VOLTAR PARA A TELA
   useFocusEffect(
     React.useCallback(() => {
       if (route.params?.type === 'quizDeleted' && route.params?.quizId) {
         const quizIdToDelete = route.params.quizId as string;
         setQuizzes(prevQuizzes => {
           const newQuizzesList = prevQuizzes.filter(q => q.id !== quizIdToDelete);
-          return [...newQuizzesList]; // Retorna uma nova referência de array
+          return [...newQuizzesList];
         });
         navigation.setParams({ type: undefined, quizId: undefined });
       } 
-      else if (route.params?.type === 'quizSaved' && route.params?.quiz) {
-        const savedQuiz = route.params.quiz as Quiz;
-        setQuizzes(prevQuizzes => {
-          const existingQuizIndex = prevQuizzes.findIndex(q => q.id === savedQuiz.id);
-          if (existingQuizIndex > -1) {
-            // Edição: Cria um novo array com o quiz atualizado
-            const updatedQuizzes = [...prevQuizzes];
-            updatedQuizzes[existingQuizIndex] = savedQuiz;
-            return updatedQuizzes;
-          } else {
-            // Criação: Retorna um novo array com o novo quiz adicionado
-            return [...prevQuizzes, savedQuiz];
-          }
-        });
+      else if (route.params?.type === 'quizSaved') {
+        // Recarrega do banco em vez de usar parâmetros
+        fetchQuizzes();
         navigation.setParams({ type: undefined, quiz: undefined });
       }
     }, [route.params])
@@ -64,6 +95,23 @@ const QuizScreen = () => {
   const handleEditQuiz = (quiz: Quiz) => {
     navigation.navigate('NovoQuizScreen', { quizToEdit: quiz });
   };
+
+  // ✅ INDICADOR DE CARREGAMENTO
+  if (loading) {
+    return (
+      <View style={{ flex: 1 }}>
+        <LinearGradient
+          colors={['#242948', '#5C6494']}
+          locations={[0.65, 0.30]} 
+          start={{ x: 1, y: 1 }}
+          end={{ x: 0.85, y: 0.4 }}
+          style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
+        >
+          <Text style={{ color: 'white', fontSize: 18 }}>Carregando quizzes...</Text>
+        </LinearGradient>
+      </View>
+    );
+  }
 
   // JSX (parte visual)
   return (

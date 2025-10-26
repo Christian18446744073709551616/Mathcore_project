@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -13,7 +13,12 @@ const GameQuizScreen = () => {
   const route = useRoute();
   const navigation = useNavigation();
   
+  console.log('1. GameScreen montada');
+  console.log('2. Parâmetros recebidos:', route.params);
+  
   const { quizData } = route.params as { quizData: Quiz };
+
+  console.log('3. quizData extraído:', quizData);
 
   // --- ESTADOS PARA CONTROLAR O JOGO ---
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -25,10 +30,20 @@ const GameQuizScreen = () => {
 
   const currentQuestion = quizData?.questions[currentQuestionIndex];
 
+  useEffect(() => {
+    console.log('4. useEffect executado');
+    console.log('5. quizData disponível:', !!quizData);
+    console.log('6. Número de perguntas:', quizData?.questions?.length);
+    console.log('7. Pergunta atual:', currentQuestion);
+  }, []);
+
   const handleNextQuestion = () => {
+    console.log('8. handleNextQuestion chamado');
     if (currentQuestionIndex >= quizData.questions.length - 1) {
+      console.log('9. Quiz finalizado');
       setIsQuizFinished(true);
     } else {
+      console.log('10. Avançando para próxima pergunta');
       setCurrentQuestionIndex(currentQuestionIndex + 1);
       setSelectedOptionId(null);
       setIsAnswered(false);
@@ -37,6 +52,7 @@ const GameQuizScreen = () => {
   };
 
   const handleOptionPress = (optionId: string) => {
+    console.log('11. Opção pressionada:', optionId);
     if (isAnswered) return;
 
     setSelectedOptionId(optionId);
@@ -54,7 +70,9 @@ const GameQuizScreen = () => {
       handleNextQuestion();
     }, 2000);
   };
+
   if (isQuizFinished) {
+    console.log('12. Renderizando tela de finalização');
     return (
       <LinearGradient colors={['#4CAF50', '#81C784']} style={styles.container}>
         <View style={styles.finishedContainer}>
@@ -70,12 +88,18 @@ const GameQuizScreen = () => {
   }
 
   if (!currentQuestion) {
+    console.log('13. PROBLEMA: currentQuestion é undefined/null - TELA DE CARREGAMENTO');
+    console.log('14. quizData:', quizData);
+    console.log('15. quizData.questions:', quizData?.questions);
+    console.log('16. currentQuestionIndex:', currentQuestionIndex);
     return (
       <LinearGradient colors={['#242948', '#5C6494']} style={styles.container}>
         <Text style={styles.quizTitle}>Carregando Quiz...</Text>
       </LinearGradient>
     );
   }
+
+  console.log('17. Renderizando tela do jogo normalmente');
 
   return (
     <LinearGradient

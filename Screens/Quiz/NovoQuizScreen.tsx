@@ -45,7 +45,7 @@ const QuizCreatorScreen = () => {
       setQuestions(quizToEdit.questions);
     } else {
       setIsEditMode(false);
-      setQuizId(`quiz_${Date.now()}`);
+      setQuizId(null);
       setQuestions([{
         id: 1, questionText: '',
         options: [{ id: 'A', text: '' }, { id: 'B', text: '' }, { id: 'C', text: '' }, { id: 'D', text: '' }, { id: 'E', text: '' }],
@@ -66,13 +66,61 @@ const QuizCreatorScreen = () => {
     setActiveQuestionId(newQuestion.id);
   }, [questions]);
 
-  const handleSaveQuiz = () => {
+  // ✅ FUNÇÃO CORRIGIDA - SALVA NO SUPABASE
+  const handleSaveQuiz = async () => {
     if (!quizTitle.trim()) {
       Alert.alert('Atenção', 'Por favor, dê um nome ao seu quiz.');
       return;
     }
-    const finalQuiz: Quiz = { id: quizId!, title: quizTitle, questions: questions };
-    navigation.navigate('QuizScreen', { type: 'quizSaved', quiz: finalQuiz });
+
+    if (!session?.user?.id) {
+      Alert.alert('Erro', 'Você precisa estar logado para salvar quizzes.');
+      return;
+    }
+
+    try {
+      const quizData = {
+        user_id: session.user.id,
+        title: quizTitle,
+        questions: questions,
+        updated_at: new Date().toISOString(),
+      };
+
+      if (isEditMode && quizId) {
+        // Atualizar quiz existente
+        const { error } = await supabase
+          .from('quizzes')
+          .update(quizData)
+          .eq('id', quizId);
+
+        if (error) throw error;
+
+        Alert.alert('Sucesso', 'Quiz atualizado!');
+        navigation.navigate('QuizScreen', { 
+          type: 'quizSaved', 
+          quiz: { id: quizId, title: quizTitle, questions } 
+        });
+      } else {
+        // Criar novo quiz
+        const { data, error } = await supabase
+          .from('quizzes')
+          .insert([quizData])
+          .select()
+          .single();
+
+        if (error) throw error;
+
+        setQuizId(data.id);
+        Alert.alert('Sucesso', 'Quiz salvo!');
+        navigation.navigate('QuizScreen', { 
+          type: 'quizSaved', 
+          quiz: { id: data.id, title: quizTitle, questions } 
+        });
+      }
+    } catch (error) {
+      console.error('Erro ao salvar quiz:', error);
+      Alert.alert('Erro', 'Não foi possível salvar o quiz. Verifique sua conexão.');
+    }
   };
 
   const handleDeleteQuestion = () => {
@@ -94,11 +142,40 @@ const QuizCreatorScreen = () => {
     ]);
   };
 
+  // ✅ FUNÇÃO CORRIGIDA - DELETA DO SUPABASE
   const handleDeleteQuiz = () => {
-    Alert.alert('Excluir Quiz', `Tem certeza de que deseja excluir o quiz "${quizTitle}" permanentemente?`, [
-      { text: 'Cancelar', style: 'cancel' },
-      { text: 'Excluir', style: 'destructive', onPress: () => { navigation.navigate('QuizScreen', { type: 'quizDeleted', quizId: quizId }); }, },
-    ]);
+    Alert.alert(
+      'Excluir Quiz', 
+      `Tem certeza de que deseja excluir o quiz "${quizTitle}" permanentemente?`, 
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        { 
+          text: 'Excluir', 
+          style: 'destructive', 
+          onPress: async () => {
+            try {
+              if (!quizId) {
+                navigation.goBack();
+                return;
+              }
+
+              const { error } = await supabase
+                .from('quizzes')
+                .delete()
+                .eq('id', quizId);
+
+              if (error) throw error;
+
+              Alert.alert('Sucesso', 'Quiz excluído!');
+              navigation.navigate('QuizScreen', { type: 'quizDeleted', quizId: quizId });
+            } catch (error) {
+              console.error('Erro ao excluir quiz:', error);
+              Alert.alert('Erro', 'Não foi possível excluir o quiz.');
+            }
+          }
+        },
+      ]
+    );
   };
 
   const handleUpdateQuestion = (questionId: number, field: 'questionText' | `option_${string}`, value: string) => {
@@ -384,7 +461,7 @@ const QuizCreatorScreen = () => {
   );
 };
 
-// --- ESTILOS (Sem alterações) ---
+// --- ESTILOS ---
 const styles = StyleSheet.create({
   gradient: { flex: 1, padding: 20 },
   headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20, paddingHorizontal: 10 },
