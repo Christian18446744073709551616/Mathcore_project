@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Modal, View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { Modal, View, Text, TouchableOpacity, StyleSheet, Alert, Platform } from 'react-native';
 import { supabase, setupQuizInviteChannel } from '../lib/supabase';
 import { useNavigation } from '@react-navigation/native';
 import AvatarView from './AvatarView';
@@ -24,9 +24,11 @@ const QuizInviteNotification: React.FC<QuizInviteNotificationProps> = ({ userId 
   const navigation = useNavigation();
 
   useEffect(() => {
+    console.log('🔔 Sistema de notificações iniciado para userId:', userId);
+
     // Configurar canal para receber convites
     const channel = setupQuizInviteChannel(userId, async (newInvite) => {
-      console.log('Convite de quiz recebido:', newInvite);
+      console.log('📩 Convite de quiz recebido:', newInvite);
 
       // Buscar dados do remetente
       const { data: senderData } = await supabase
@@ -40,7 +42,7 @@ const QuizInviteNotification: React.FC<QuizInviteNotificationProps> = ({ userId 
       try {
         inviteData = JSON.parse(newInvite.message_text);
       } catch (error) {
-        console.error('Erro ao parsear convite:', error);
+        console.error('❌ Erro ao parsear convite:', error);
         return;
       }
 
@@ -50,11 +52,13 @@ const QuizInviteNotification: React.FC<QuizInviteNotificationProps> = ({ userId 
         quiz_id: inviteData.quiz_id,
         quiz_title: inviteData.quiz_title,
         match_id: inviteData.match_id,
+        sender_avatar: senderData?.avatar_url,
       });
       setIsVisible(true);
     });
 
     return () => {
+      console.log('🔕 Sistema de notificações desativado');
       channel.unsubscribe();
     };
   }, [userId]);
@@ -63,6 +67,8 @@ const QuizInviteNotification: React.FC<QuizInviteNotificationProps> = ({ userId 
     if (!invite) return;
 
     try {
+      console.log('✅ Aceitando convite para match:', invite.match_id);
+
       // Adicionar usuário como participante
       const { error } = await supabase
         .from('quiz_participants')
@@ -78,26 +84,55 @@ const QuizInviteNotification: React.FC<QuizInviteNotificationProps> = ({ userId 
       await supabase.from('messages').delete().eq('id', invite.id);
 
       setIsVisible(false);
+      setInvite(null);
 
       // Navegar para a tela de espera do quiz
-      navigation.navigate('QuizWaitingRoom', {
+      (navigation as any).navigate('QuizWaitingRoom', {
         matchId: invite.match_id,
         quizId: invite.quiz_id,
         quizTitle: invite.quiz_title,
       });
     } catch (error) {
-      console.error('Erro ao aceitar convite:', error);
-      Alert.alert('Erro', 'Não foi possível aceitar o convite.');
+      console.error('❌ Erro ao aceitar convite:', error);
+      if (Platform.OS === 'web') {
+        alert('Não foi possível aceitar o convite.');
+      } else {
+        Alert.alert('Erro', 'Não foi possível aceitar o convite.');
+      }
     }
   };
 
   const handleDecline = async () => {
     if (!invite) return;
 
-    // Deletar mensagem de convite
-    await supabase.from('messages').delete().eq('id', invite.id);
-    setIsVisible(false);
-    setInvite(null);
+    console.log('❌ Recusando convite');
+
+    try {
+      // ✅ Notificar o host que o convite foi recusado
+      await supabase.from('messages').insert({
+        sender_id: userId,
+        receiver_id: invite.sender_id,
+        message_text: JSON.stringify({
+          type: 'quiz_invite_declined',
+          quiz_title: invite.quiz_title,
+        }),
+        message_type: 'quiz_invite_declined',
+      });
+
+      // Deletar mensagem de convite
+      await supabase.from('messages').delete().eq('id', invite.id);
+
+      setIsVisible(false);
+      setInvite(null);
+
+      if (Platform.OS === 'web') {
+        alert('Convite recusado.');
+      } else {
+        Alert.alert('Convite recusado', 'Você recusou o convite para o quiz.');
+      }
+    } catch (error) {
+      console.error('❌ Erro ao recusar convite:', error);
+    }
   };
 
   if (!invite) return null;

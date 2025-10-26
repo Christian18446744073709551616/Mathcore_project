@@ -278,23 +278,31 @@ const handleSaveQuiz = async () => {
     }
   };
 
-  const handleUpdateQuestion = (questionId: number, field: 'questionText' | `option_${string}`, value: string) => {
-    setQuestions(prev => prev.map(q => {
-      if (q.id === questionId) {
-        if (field === 'questionText') { 
-          return { ...q, questionText: value }; 
-        }
-        if (field.startsWith('option_')) {
-          const optionId = field.split('_')[1];
-          return { 
-            ...q, 
-            options: q.options.map(opt => opt.id === optionId ? { ...opt, text: value } : opt) 
-          };
-        }
+const handleUpdateQuestion = useCallback((questionId: number, field: 'questionText' | `option_${string}`, value: string) => {
+  setQuestions(prev => {
+    return prev.map(q => {
+      if (q.id !== questionId) {
+        return q;
       }
+
+      if (field === 'questionText') {
+        return { ...q, questionText: value };
+      }
+
+      if (field.startsWith('option_')) {
+        const optionId = field.split('_')[1];
+        return {
+          ...q,
+          options: q.options.map(opt => 
+            opt.id === optionId ? { ...opt, text: value } : opt
+          ),
+        };
+      }
+
       return q;
-    }));
-  };
+    });
+  });
+}, []);
 
   const handleSelectCorrectOption = (questionId: number, correctId: string) => {
     setQuestions(prev => prev.map(q => q.id === questionId ? { ...q, correctOptionId: correctId } : q));

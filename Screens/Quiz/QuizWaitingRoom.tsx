@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert, Platform } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
@@ -29,7 +29,7 @@ const QuizWaitingRoom = () => {
   const [isReady, setIsReady] = useState(false);
   const [session, setSession] = useState<any | null>(null);
   const [isHost, setIsHost] = useState(false);
-  const [timer, setTimer] = useState<number | null>(null);
+  const [hostId, setHostId] = useState<string | null>(null);
 
   // Buscar sessão do usuário
   useEffect(() => {
@@ -44,13 +44,15 @@ const QuizWaitingRoom = () => {
   const fetchParticipants = async () => {
     if (!matchId) return;
 
+    console.log('🔄 Buscando participantes do match:', matchId);
+
     const { data: participantData, error: participantError } = await supabase
       .from('quiz_participants')
       .select('user_id, is_ready')
       .eq('match_id', matchId);
 
     if (participantError) {
-      console.error('Erro ao buscar participantes:', participantError);
+      console.error('❌ Erro ao buscar participantes:', participantError);
       return;
     }
 
@@ -61,17 +63,18 @@ const QuizWaitingRoom = () => {
       .eq('id', matchId)
       .single();
 
-    const hostId = matchData?.host_id;
+    const currentHostId = matchData?.host_id;
 
     const userIds = participantData.map((p) => p.user_id);
 
+    // ✅ CORRIGIDO: Buscar perfis dos participantes
     const { data: profileData, error: profileError } = await supabase
       .from('profiles')
       .select('id, username, avatar_url')
       .in('id', userIds);
 
     if (profileError) {
-      console.error('Erro ao buscar perfis:', profileError);
+      console.error('❌ Erro ao buscar perfis:', profileError);
       return;
     }
 
@@ -80,25 +83,25 @@ const QuizWaitingRoom = () => {
       return {
         id: p.user_id,
         is_ready: p.is_ready,
-        is_host: p.user_id === hostId,
+        is_host: p.user_id === currentHostId,
       };
     });
 
+    console.log('✅ Participantes carregados:', participantList);
     setParticipants(participantList);
 
     // Verificar se o usuário atual é o host
-    if (session?.user?.id === hostId) {
+    if (session?.user?.id === currentHostId) {
       setIsHost(true);
     }
   };
 
   // Configurar canal de realtime
   useEffect(() => {
-
     fetchParticipants();
 
     const channel = setupQuizMatchChannel(matchId, (payload) => {
-      console.log('Atualização de participante:', payload);
+      console.log('🔔 Atualização de participante:', payload);
       fetchParticipants();
     });
 
@@ -121,43 +124,29 @@ const QuizWaitingRoom = () => {
       .eq('user_id', session.user.id);
 
     if (error) {
-      console.error('Erro ao atualizar status de pronto:', error);
+      console.error('❌ Erro ao atualizar status de pronto:', error);
     }
   };
 
-  // Verificar se todos estão prontos
-  const checkAllReady = () => {
-    return participants.length > 1 && participants.every((p) => p.is_ready);
-  };
-
-  // Iniciar contagem regressiva quando todos estiverem prontos
-  useEffect(() => {
-    if (checkAllReady() && timer === null) {
-      setTimer(5);
-    } else if (!checkAllReady()) {
-      setTimer(null);
+  // ✅ HOST PODE INICIAR MANUALMENTE
+  const handleStartGame = async () => {
+    if (!isHost) {
+      if (Platform.OS === 'web') {
+        alert('Apenas o host pode iniciar o jogo!');
+      } else {
+        Alert.alert('Atenção', 'Apenas o host pode iniciar o jogo!');
+      }
+      return;
     }
-  }, [participants]);
 
-  // Contagem regressiva
-  useEffect(() => {
-
-    const countdown = setInterval(() => {
-      setTimer((prev) => {
-        if (prev === 1) {
-          clearInterval(countdown);
-          startGame();
-        }
-        return prev !== null ? prev - 1 : null;
-      });
-    }, 1000);
-
-    return () => clearInterval(countdown);
-  }, [timer]);
-
-  // Iniciar o jogo
-  const startGame = async () => {
-    if (!isHost) return;
+    if (participants.length < 2) {
+      if (Platform.OS === 'web') {
+        alert('É necessário pelo menos 2 jogadores para iniciar!');
+      } else {
+        Alert.alert('Atenção', 'É necessário pelo menos 2 jogadores para iniciar!');
+      }
+      return;
+    }
 
     const { error } = await supabase
       .from('quiz_matches')
@@ -165,50 +154,54 @@ const QuizWaitingRoom = () => {
       .eq('id', matchId);
 
     if (error) {
-      console.error('Erro ao iniciar o jogo:', error);
+      console.error('❌ Erro ao iniciar o jogo:', error);
       return;
     }
 
-    handleStartGame();
-  };
-
-  const handleStartGame = () => {
     navigation.navigate('GameQuizScreen', {
+      quizData: quizData,
       mode: 'multiplayer',
       matchId: matchId,
     });
   };
 
   // Sair da sala
-  const handleLeaveRoom = async () => {
+  const handleLeaveRoom = () => {
     if (!session?.user?.id) return;
 
-    Alert.alert(
-      'Sair da Sala',
-      'Tem certeza que deseja sair?',
-      [
-        { text: 'Cancelar', style: 'cancel' },
-        {
-          text: 'Sair',
-          style: 'destructive',
-          onPress: async () => {
-            // Remover participante
-            await supabase
-              .from('quiz_participants')
-              .delete()
-              .eq('match_id', matchId)
-              .eq('user_id', session.user.id);
+    if (Platform.OS === 'web') {
+      const confirmar = window.confirm('Tem certeza que deseja sair?');
+      if (confirmar) {
+        executarSaida();
+      }
+    } else {
+      Alert.alert(
+        'Sair da Sala',
+        'Tem certeza que deseja sair?',
+        [
+          { text: 'Cancelar', style: 'cancel' },
+          { text: 'Sair', style: 'destructive', onPress: executarSaida },
+        ]
+      );
+    }
+  };
 
-            // Se for o host, deletar a partida
-            if (isHost) {
-              await supabase.from('quiz_matches').delete().eq('id', matchId);
-            }
+  const executarSaida = async () => {
+    if (!session?.user?.id) return;
 
-            navigation.goBack();
-          },
-        },
-      ]
-    );
+    // Remover participante
+    await supabase
+      .from('quiz_participants')
+      .delete()
+      .eq('match_id', matchId)
+      .eq('user_id', session.user.id);
+
+    // Se for o host, deletar a partida
+    if (isHost) {
+      await supabase.from('quiz_matches').delete().eq('id', matchId);
+    }
+
+    navigation.goBack();
   };
 
   return (
@@ -221,7 +214,9 @@ const QuizWaitingRoom = () => {
       </View>
 
       <View style={styles.content}>
-        <Text style={styles.subtitle}>Aguardando jogadores...</Text>
+        <Text style={styles.subtitle}>
+          Aguardando jogadores... ({participants.length} {participants.length === 1 ? 'jogador' : 'jogadores'})
+        </Text>
 
         <FlatList
           data={participants}
@@ -243,20 +238,25 @@ const QuizWaitingRoom = () => {
           contentContainerStyle={styles.participantList}
         />
 
-        {timer !== null && (
-          <View style={styles.timerContainer}>
-            <Text style={styles.timerText}>Iniciando em: {timer}</Text>
-          </View>
+        {!isHost && (
+          <TouchableOpacity
+            style={[styles.readyButton, isReady && styles.readyButtonActive]}
+            onPress={toggleReadyStatus}
+          >
+            <Text style={styles.readyButtonText}>
+              {isReady ? 'Cancelar Pronto' : 'Estou Pronto'}
+            </Text>
+          </TouchableOpacity>
         )}
 
-        <TouchableOpacity
-          style={[styles.readyButton, isReady && styles.readyButtonActive]}
-          onPress={toggleReadyStatus}
-        >
-          <Text style={styles.readyButtonText}>
-            {isReady ? 'Cancelar Pronto' : 'Estou Pronto'}
-          </Text>
-        </TouchableOpacity>
+        {isHost && (
+          <TouchableOpacity
+            style={styles.startButton}
+            onPress={handleStartGame}
+          >
+            <Text style={styles.startButtonText}>Iniciar Jogo</Text>
+          </TouchableOpacity>
+        )}
       </View>
     </LinearGradient>
   );
@@ -323,18 +323,6 @@ const styles = StyleSheet.create({
     color: '#666',
     marginTop: 5,
   },
-  timerContainer: {
-    backgroundColor: '#f44336',
-    padding: 15,
-    borderRadius: 10,
-    marginVertical: 20,
-    alignItems: 'center',
-  },
-  timerText: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: 'white',
-  },
   readyButton: {
     backgroundColor: '#4CAF50',
     padding: 18,
@@ -346,6 +334,18 @@ const styles = StyleSheet.create({
     backgroundColor: '#f44336',
   },
   readyButtonText: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  startButton: {
+    backgroundColor: '#707DCB',
+    padding: 18,
+    borderRadius: 15,
+    alignItems: 'center',
+    marginTop: 'auto',
+  },
+  startButtonText: {
     color: 'white',
     fontSize: 18,
     fontWeight: 'bold',

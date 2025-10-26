@@ -57,8 +57,6 @@ const QuizStack: React.FC<{ session: Session }> = ({ session }) => (
   <Stack.Navigator screenOptions={{ headerShown: false }}>
     <Stack.Screen name="QuizScreen" component={QuizScreen} initialParams={{ session }} />
     <Stack.Screen name="NovoQuizScreen" component={NovoQuizScreen} initialParams={{ session }} />
-    <Stack.Screen name="GameQuizScreen" component={GameQuizScreen} />
-    <Stack.Screen name="QuizWaitingRoom" component={QuizWaitingRoom} />
   </Stack.Navigator>
 );
 
@@ -110,8 +108,12 @@ const Cornhub: React.FC<CornhubProps> = ({ session }) => (
         options={{ tabBarStyle: { display: 'none' } }}
       />
       <RootStack.Screen name="Lobby" component={Lobby} initialParams={{ session }} options={{ presentation: 'modal' }} />
+      {/* ✅ TELAS DE QUIZ MOVIDAS PARA ROOTSTACK (SEM TABBAR) */}
+      <RootStack.Screen name="GameQuizScreen" component={GameQuizScreen} />
+      <RootStack.Screen name="QuizWaitingRoom" component={QuizWaitingRoom} />
     </RootStack.Navigator>
     
+    {/* ✅ NOTIFICAÇÃO DENTRO DO NavigationContainer */}
     <QuizInviteNotification userId={session.user.id} />
   </NavigationContainer>
 );
