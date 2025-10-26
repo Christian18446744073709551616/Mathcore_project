@@ -69,23 +69,12 @@ const QuizScreen = () => {
     fetchQuizzes();
   }, []);
 
-  // ✅ ATUALIZAR QUANDO VOLTAR PARA A TELA
+  // ✅ CORRIGIDO - RECARREGA SEMPRE QUE VOLTAR PARA A TELA
   useFocusEffect(
     React.useCallback(() => {
-      if (route.params?.type === 'quizDeleted' && route.params?.quizId) {
-        const quizIdToDelete = route.params.quizId as string;
-        setQuizzes(prevQuizzes => {
-          const newQuizzesList = prevQuizzes.filter(q => q.id !== quizIdToDelete);
-          return [...newQuizzesList];
-        });
-        navigation.setParams({ type: undefined, quizId: undefined });
-      } 
-      else if (route.params?.type === 'quizSaved') {
-        // Recarrega do banco em vez de usar parâmetros
-        fetchQuizzes();
-        navigation.setParams({ type: undefined, quiz: undefined });
-      }
-    }, [route.params])
+      console.log('🔄 QuizScreen focado - recarregando quizzes');
+      fetchQuizzes();
+    }, [])
   );
 
   const handleNewQuiz = () => {

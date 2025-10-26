@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, FlatList, Alert, Modal } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, FlatList, Alert, Modal, Platform } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -82,101 +82,200 @@ const QuizCreatorScreen = () => {
     setActiveQuestionId(newQuestion.id);
   }, [questions]);
 
-  const handleSaveQuiz = async () => {
-    if (!session?.user?.id) {
+const handleSaveQuiz = async () => {
+  if (!session?.user?.id) {
+    if (Platform.OS === 'web') {
+      alert('Você precisa estar logado para salvar quizzes.');
+    } else {
       Alert.alert('Erro', 'Você precisa estar logado para salvar quizzes.');
-      return;
     }
+    return;
+  }
 
-    if (!quizTitle.trim()) {
+  if (!quizTitle.trim()) {
+    if (Platform.OS === 'web') {
+      alert('Por favor, dê um nome ao seu quiz.');
+    } else {
       Alert.alert('Atenção', 'Por favor, dê um nome ao seu quiz.');
-      return;
     }
+    return;
+  }
 
-    try {
-      if (isEditMode && quizId) {
-        const updatedQuiz = await updateQuiz(quizId, quizTitle, questions);
-        if (updatedQuiz) {
+  try {
+    if (isEditMode && quizId) {
+      const updatedQuiz = await updateQuiz(quizId, quizTitle, questions);
+      if (updatedQuiz) {
+        if (Platform.OS === 'web') {
+          alert('Quiz atualizado!');
+        } else {
           Alert.alert('Sucesso', 'Quiz atualizado!');
-          navigation.goBack();
+        }
+        navigation.goBack();
+      } else {
+        if (Platform.OS === 'web') {
+          alert('Não foi possível atualizar o quiz.');
         } else {
           Alert.alert('Erro', 'Não foi possível atualizar o quiz.');
         }
-      } else {
-        const newQuiz = await createQuiz(session.user.id, quizTitle, questions);
-        if (newQuiz) {
+      }
+    } else {
+      const newQuiz = await createQuiz(session.user.id, quizTitle, questions);
+      if (newQuiz) {
+        if (Platform.OS === 'web') {
+          alert('Quiz criado!');
+        } else {
           Alert.alert('Sucesso', 'Quiz criado!');
-          navigation.goBack();
+        }
+        navigation.goBack();
+      } else {
+        if (Platform.OS === 'web') {
+          alert('Não foi possível criar o quiz.');
         } else {
           Alert.alert('Erro', 'Não foi possível criar o quiz.');
         }
       }
-    } catch (error) {
-      console.error('Erro ao salvar quiz:', error);
+    }
+  } catch (error) {
+    console.error('Erro ao salvar quiz:', error);
+    if (Platform.OS === 'web') {
+      alert('Ocorreu um erro ao salvar o quiz.');
+    } else {
       Alert.alert('Erro', 'Ocorreu um erro ao salvar o quiz.');
     }
-  };
+  }
+};
 
+  // ✅ CORRIGIDO - Funciona na web
   const handleDeleteQuestion = () => {
+    console.log('🗑️ handleDeleteQuestion chamado');
+    
     if (questions.length <= 1) {
-      Alert.alert('Ação não permitida', 'Um quiz deve ter pelo menos uma questão.');
+      if (Platform.OS === 'web') {
+        alert('Um quiz deve ter pelo menos uma questão.');
+      } else {
+        Alert.alert('Ação não permitida', 'Um quiz deve ter pelo menos uma questão.');
+      }
       return;
     }
 
-    Alert.alert(
-      'Excluir Questão',
-      `Tem certeza de que deseja excluir a questão ${activeQuestionId}?`,
-      [
-        { text: 'Cancelar', style: 'cancel' },
-        {
-          text: 'Excluir',
-          style: 'destructive',
-          onPress: () => {
-            setQuestions(prevQuestions => {
-              const currentIndex = prevQuestions.findIndex(q => q.id === activeQuestionId);
-              const remainingQuestions = prevQuestions.filter(q => q.id !== activeQuestionId);
+    // Para web, usa window.confirm
+    if (Platform.OS === 'web') {
+      const confirmar = window.confirm(`Tem certeza de que deseja excluir a questão ${activeQuestionId}?`);
+      
+      if (!confirmar) {
+        console.log('❌ Usuário cancelou a exclusão da questão');
+        return;
+      }
 
-              if (remainingQuestions.length > 0) {
-                if (currentIndex > 0) {
-                  setActiveQuestionId(remainingQuestions[currentIndex - 1].id);
-                } else {
-                  setActiveQuestionId(remainingQuestions[0].id);
-                }
-              }
+      console.log('🔴 Usuário confirmou exclusão da questão');
 
-              return remainingQuestions;
-            });
+      setQuestions(prevQuestions => {
+        const currentIndex = prevQuestions.findIndex(q => q.id === activeQuestionId);
+        const remainingQuestions = prevQuestions.filter(q => q.id !== activeQuestionId);
+
+        if (remainingQuestions.length > 0) {
+          if (currentIndex > 0) {
+            setActiveQuestionId(remainingQuestions[currentIndex - 1].id);
+          } else {
+            setActiveQuestionId(remainingQuestions[0].id);
           }
         }
-      ]
-    );
-  };
 
-  const handleDeleteQuiz = async () => {
-    Alert.alert(
-      'Excluir Quiz',
-      `Tem certeza de que deseja excluir o quiz "${quizTitle}" permanentemente?`,
-      [
-        { text: 'Cancelar', style: 'cancel' },
-        {
-          text: 'Excluir',
-          style: 'destructive',
-          onPress: async () => {
-            if (quizId) {
-              const success = await deleteQuiz(quizId);
-              if (success) {
-                Alert.alert('Sucesso', 'Quiz excluído!');
-                navigation.goBack();
-              } else {
-                Alert.alert('Erro', 'Não foi possível excluir o quiz.');
-              }
-            } else {
-              navigation.goBack();
+        return remainingQuestions;
+      });
+    } else {
+      // Para mobile, usa Alert.alert
+      Alert.alert(
+        'Excluir Questão',
+        `Tem certeza de que deseja excluir a questão ${activeQuestionId}?`,
+        [
+          { text: 'Cancelar', style: 'cancel' },
+          {
+            text: 'Excluir',
+            style: 'destructive',
+            onPress: () => {
+              setQuestions(prevQuestions => {
+                const currentIndex = prevQuestions.findIndex(q => q.id === activeQuestionId);
+                const remainingQuestions = prevQuestions.filter(q => q.id !== activeQuestionId);
+
+                if (remainingQuestions.length > 0) {
+                  if (currentIndex > 0) {
+                    setActiveQuestionId(remainingQuestions[currentIndex - 1].id);
+                  } else {
+                    setActiveQuestionId(remainingQuestions[0].id);
+                  }
+                }
+
+                return remainingQuestions;
+              });
             }
           }
+        ]
+      );
+    }
+  };
+
+  // ✅ CORRIGIDO - Funciona na web
+  const handleDeleteQuiz = async () => {
+    console.log('🗑️ handleDeleteQuiz chamado');
+    console.log('   quizId:', quizId);
+    console.log('   quizTitle:', quizTitle);
+
+    // Para web, usa window.confirm
+    if (Platform.OS === 'web') {
+      const confirmar = window.confirm(`Tem certeza de que deseja excluir o quiz "${quizTitle}" permanentemente?`);
+      
+      if (!confirmar) {
+        console.log('❌ Usuário cancelou a exclusão');
+        return;
+      }
+
+      console.log('🔴 Usuário confirmou exclusão');
+
+      if (quizId) {
+        console.log('📤 Chamando deleteQuiz com ID:', quizId);
+        const success = await deleteQuiz(quizId);
+        console.log('📥 Resultado do deleteQuiz:', success);
+        
+        if (success) {
+          console.log('✅ Quiz excluído com sucesso!');
+          alert('Quiz excluído com sucesso!');
+          navigation.goBack();
+        } else {
+          console.log('❌ Falha ao excluir quiz');
+          alert('Não foi possível excluir o quiz.');
         }
-      ]
-    );
+      } else {
+        console.log('⚠️ Quiz não tem ID, apenas voltando');
+        navigation.goBack();
+      }
+    } else {
+      // Para mobile, usa Alert.alert
+      Alert.alert(
+        'Excluir Quiz',
+        `Tem certeza de que deseja excluir o quiz "${quizTitle}" permanentemente?`,
+        [
+          { text: 'Cancelar', style: 'cancel' },
+          {
+            text: 'Excluir',
+            style: 'destructive',
+            onPress: async () => {
+              if (quizId) {
+                const success = await deleteQuiz(quizId);
+                if (success) {
+                  Alert.alert('Sucesso', 'Quiz excluído!');
+                  navigation.goBack();
+                } else {
+                  Alert.alert('Erro', 'Não foi possível excluir o quiz.');
+                }
+              } else {
+                navigation.goBack();
+              }
+            }
+          }
+        ]
+      );
+    }
   };
 
   const handleUpdateQuestion = (questionId: number, field: 'questionText' | `option_${string}`, value: string) => {
