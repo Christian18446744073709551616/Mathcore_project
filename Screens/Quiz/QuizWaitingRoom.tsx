@@ -34,8 +34,14 @@ const QuizWaitingRoom = () => {
   // Buscar sessão do usuário
   useEffect(() => {
     const fetchSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      setSession(session);
+      try {
+        const resp = await supabase.auth.getSession();
+        const sessionFromResp = (resp as any)?.data?.session ?? null;
+        setSession(sessionFromResp);
+      } catch (err) {
+        console.error('Erro ao obter sessão:', err);
+        setSession(null);
+      }
     };
     fetchSession();
   }, []);
@@ -56,33 +62,49 @@ const QuizWaitingRoom = () => {
       return;
     }
 
-    // Buscar dados do host
-    const { data: matchData } = await supabase
+    if (!participantData || participantData.length === 0) {
+      setParticipants([]);
+      return;
+    }
+
+    const { data: matchData, error: matchError } = await supabase
       .from('quiz_matches')
       .select('host_id')
       .eq('id', matchId)
       .single();
 
-    const currentHostId = matchData?.host_id;
-
-    const userIds = participantData.map((p) => p.user_id);
-
-    // ✅ CORRIGIDO: Buscar perfis dos participantes
-    const { data: profileData, error: profileError } = await supabase
-      .from('profiles')
-      .select('id, username, avatar_url')
-      .in('id', userIds);
-
-    if (profileError) {
-      console.error('❌ Erro ao buscar perfis:', profileError);
-      return;
+    if (matchError) {
+      console.error('❌ Erro ao buscar match:', matchError);
     }
 
-    const participantList: Participant[] = participantData.map((p) => {
-      const profile = profileData?.find((prof) => prof.id === p.user_id);
+    const currentHostId = (matchData as any)?.host_id ?? null;
+    setHostId(currentHostId);
+    setIsHost(session?.user?.id === currentHostId);
+
+    const userIds = participantData.map((p: any) => p.user_id);
+
+    // Buscar perfis (se houver userIds)
+    let profileData: any[] = [];
+    if (userIds.length > 0) {
+      const { data: profiles, error: profileError } = await supabase
+        .from('profiles')
+        .select('id, username, avatar_url')
+        .in('id', userIds);
+
+      if (profileError) {
+        console.error('❌ Erro ao buscar perfis:', profileError);
+      } else {
+        profileData = profiles ?? [];
+      }
+    }
+
+    const participantList: Participant[] = participantData.map((p: any) => {
+      const profile = profileData.find((prof: any) => prof.id === p.user_id) ?? {};
       return {
         id: p.user_id,
-        is_ready: p.is_ready,
+        username: profile.username ?? 'Usuário',
+        avatar_url: profile.avatar_url ?? '',
+        is_ready: !!p.is_ready,
         is_host: p.user_id === currentHostId,
       };
     });
@@ -90,27 +112,103 @@ const QuizWaitingRoom = () => {
     console.log('✅ Participantes carregados:', participantList);
     setParticipants(participantList);
 
-    // Verificar se o usuário atual é o host
-    if (session?.user?.id === currentHostId) {
-      setIsHost(true);
+    // Atualiza isReady do usuário atual, se presente
+    if (session?.user?.id) {
+      const me = participantList.find((pt) => pt.id === session.user.id);
+      setIsReady(!!me?.is_ready);
+      setIsHost(session.user.id === currentHostId);
     }
   };
 
-  // Configurar canal de realtime
+  // Listener para detectar quando o jogo inicia
+  useEffect(() => {
+    if (!matchId) return;
+
+    console.log('🎮 Configurando listener para início do jogo...');
+    console.log('📦 quizData disponível:', !!quizData);
+
+    const matchChannel = supabase
+      .channel(`quiz_match_status:${matchId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'quiz_matches',
+          filter: `id=eq.${matchId}`,
+        },
+        async (payload: any) => {
+          console.log('🔔 Match atualizado:', payload);
+          
+          if (payload?.new?.is_active === true) {
+            console.log('🚀 Jogo iniciado! Navegando para GameQuizScreen...');
+            
+            // Buscar quizData se não tiver sido passado
+            let finalQuizData = quizData;
+            if (!finalQuizData) {
+              console.log('⚠️ quizData não disponível, buscando do Supabase...');
+              
+              const { data: quizFromDb, error } = await supabase
+                .from('quizzes')
+                .select('*')
+                .eq('id', quizId)
+                .single();
+              
+              if (error) {
+                console.error('❌ Erro ao buscar quiz:', error);
+                return;
+              }
+              
+              finalQuizData = {
+                id: (quizFromDb as any).id,
+                title: (quizFromDb as any).title,
+                questions: (quizFromDb as any).questions,
+              };
+              
+              console.log('✅ Quiz carregado do banco:', finalQuizData);
+            }
+
+            navigation.navigate('GameQuizScreen', {
+              quizData: finalQuizData,
+              mode: 'multiplayer',
+              matchId: matchId,
+            });
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      console.log('🔕 Desconectando listener de início de jogo');
+      try {
+        matchChannel.unsubscribe();
+      } catch (e) {
+        // ignora erros de unsubscribe
+      }
+    };
+  }, [matchId, quizData, quizId, navigation]);
+
+  // Configurar canal de realtime para participantes
   useEffect(() => {
     fetchParticipants();
 
-    const channel = setupQuizMatchChannel(matchId, (payload) => {
+    if (!matchId) return;
+
+    const channel = setupQuizMatchChannel(matchId, (payload: any) => {
       console.log('🔔 Atualização de participante:', payload);
       fetchParticipants();
     });
 
     return () => {
-      channel.unsubscribe();
+      try {
+        channel.unsubscribe();
+      } catch (e) {
+        // ignora
+      }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [matchId, session]);
 
-  // Alternar status "pronto"
   const toggleReadyStatus = async () => {
     if (!session?.user?.id) return;
 
@@ -125,10 +223,16 @@ const QuizWaitingRoom = () => {
 
     if (error) {
       console.error('❌ Erro ao atualizar status de pronto:', error);
+      // reverter estado local em caso de erro
+      setIsReady(!newReadyStatus);
+    } else {
+      // atualizar lista local para refletir mudança imediata
+      setParticipants((prev) =>
+        prev.map((p) => (p.id === session.user.id ? { ...p, is_ready: newReadyStatus } : p))
+      );
     }
   };
 
-  // ✅ HOST PODE INICIAR MANUALMENTE
   const handleStartGame = async () => {
     if (!isHost) {
       if (Platform.OS === 'web') {
@@ -148,6 +252,8 @@ const QuizWaitingRoom = () => {
       return;
     }
 
+    console.log('🚀 Host iniciando o jogo...');
+
     const { error } = await supabase
       .from('quiz_matches')
       .update({ is_active: true })
@@ -155,8 +261,15 @@ const QuizWaitingRoom = () => {
 
     if (error) {
       console.error('❌ Erro ao iniciar o jogo:', error);
+      if (Platform.OS === 'web') {
+        alert('Erro ao iniciar o jogo.');
+      } else {
+        Alert.alert('Erro', 'Não foi possível iniciar o jogo.');
+      }
       return;
     }
+
+    console.log('✅ Match atualizado para is_active=true');
 
     navigation.navigate('GameQuizScreen', {
       quizData: quizData,
@@ -165,7 +278,6 @@ const QuizWaitingRoom = () => {
     });
   };
 
-  // Sair da sala
   const handleLeaveRoom = () => {
     if (!session?.user?.id) return;
 
@@ -189,14 +301,12 @@ const QuizWaitingRoom = () => {
   const executarSaida = async () => {
     if (!session?.user?.id) return;
 
-    // Remover participante
     await supabase
       .from('quiz_participants')
       .delete()
       .eq('match_id', matchId)
       .eq('user_id', session.user.id);
 
-    // Se for o host, deletar a partida
     if (isHost) {
       await supabase.from('quiz_matches').delete().eq('id', matchId);
     }
@@ -254,7 +364,7 @@ const QuizWaitingRoom = () => {
             style={styles.startButton}
             onPress={handleStartGame}
           >
-            <Text style={styles.startButtonText}>Iniciar Jogo</Text>
+            <Text style={styles.startButtonText}>🚀 Iniciar Jogo</Text>
           </TouchableOpacity>
         )}
       </View>
