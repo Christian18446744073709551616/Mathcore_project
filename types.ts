@@ -46,4 +46,9 @@ export type RootStackParamList = {
     quizTitle: string;
     quizData?: Quiz;
   };
+  QuizResultsScreen: {
+  matchId: string;
+  quizTitle: string;
+  myFinishTime: string;
+};
 };

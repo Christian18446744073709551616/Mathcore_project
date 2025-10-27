@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
+import { supabase } from '../../lib/supabase';
 
 // --- ESTRUTURAS DE DADOS ---
 interface QuizOption { id: string; text: string; }
@@ -25,10 +26,20 @@ const GameQuizScreen = () => {
   const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null);
   const [isAnswered, setIsAnswered] = useState(false);
   const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
-  
   const [isQuizFinished, setIsQuizFinished] = useState(false);
+  const [session, setSession] = useState<any | null>(null);
+  const [resultSaved, setResultSaved] = useState(false);
 
   const currentQuestion = quizData?.questions[currentQuestionIndex];
+
+  // BUSCAR SESSÃO
+  useEffect(() => {
+    const fetchSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setSession(session);
+    };
+    fetchSession();
+  }, []);
 
   useEffect(() => {
     console.log('4. useEffect executado');
@@ -71,8 +82,63 @@ const GameQuizScreen = () => {
     }, 2000);
   };
 
+  // SALVAR RESULTADO QUANDO TERMINAR (MULTIPLAYER)
+  useEffect(() => {
+    if (isQuizFinished && !resultSaved) {
+      const { mode, matchId } = route.params as any;
+      
+      if (mode === 'multiplayer' && matchId && session?.user?.id) {
+        console.log('💾 Salvando resultado multiplayer...');
+        
+        const saveResult = async () => {
+          const { error } = await supabase
+            .from('quiz_results')
+            .insert({
+              match_id: matchId,
+              user_id: session.user.id,
+              finished_at: new Date().toISOString(),
+              score: 0,
+            });
+          
+          if (error) {
+            console.error('❌ Erro ao salvar resultado:', error);
+          } else {
+            console.log('✅ Resultado salvo!');
+            setResultSaved(true);
+            
+            // Navegar para tela de resultados
+            (navigation as any).navigate('QuizResultsScreen', {
+              matchId: matchId,
+              quizTitle: quizData.title,
+              myFinishTime: new Date().toISOString(),
+            });
+          }
+        };
+        
+        saveResult();
+      }
+    }
+  }, [isQuizFinished, resultSaved, session]);
+
   if (isQuizFinished) {
     console.log('12. Renderizando tela de finalização');
+    
+    const { mode, matchId } = route.params as any;
+    
+    // MULTIPLAYER - Aguardando salvar e navegar
+    if (mode === 'multiplayer' && matchId) {
+      return (
+        <LinearGradient colors={['#4CAF50', '#81C784']} style={styles.container}>
+          <View style={styles.finishedContainer}>
+            <Ionicons name="checkmark-circle" size={100} color="white" />
+            <Text style={styles.finishedTitle}>Você terminou!</Text>
+            <Text style={styles.finishedSubtitle}>Aguarde os outros jogadores...</Text>
+          </View>
+        </LinearGradient>
+      );
+    }
+    
+    // MODO SOLO
     return (
       <LinearGradient colors={['#4CAF50', '#81C784']} style={styles.container}>
         <View style={styles.finishedContainer}>
@@ -176,7 +242,8 @@ const styles = StyleSheet.create({
   progressText: { 
     fontSize: 16, 
     color: '#D3D3D3', 
-    marginTop: 5, },
+    marginTop: 5, 
+  },
   closeButton: { 
     position: 'absolute', 
     top: 0, 
@@ -184,7 +251,7 @@ const styles = StyleSheet.create({
   },
   gameArea: { 
     flex: 1, 
-    backgroundColor: '#FFF9E0', 
+    backgroundColor: '#FFF9E0',
     borderRadius: 20, 
     padding: 20, 
   },

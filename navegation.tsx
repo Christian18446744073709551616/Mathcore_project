@@ -22,6 +22,7 @@ import QuizScreen from './Screens/Quiz/QuizScreen';
 import NovoQuizScreen from './Screens/Quiz/NovoQuizScreen';
 import GameQuizScreen from './Screens/Quiz/GameQuizScreen';
 import QuizWaitingRoom from './Screens/Quiz/QuizWaitingRoom';
+import QuizResultsScreen from './Screens/Quiz/QuizResultsScreen';
 import QuizInviteNotification from './components/QuizInviteNotification';
 
 import CustomTabBar from './components/3d/CustomTabBar';
@@ -108,9 +109,9 @@ const Cornhub: React.FC<CornhubProps> = ({ session }) => (
         options={{ tabBarStyle: { display: 'none' } }}
       />
       <RootStack.Screen name="Lobby" component={Lobby} initialParams={{ session }} options={{ presentation: 'modal' }} />
-      {/* ✅ TELAS DE QUIZ MOVIDAS PARA ROOTSTACK (SEM TABBAR) */}
       <RootStack.Screen name="GameQuizScreen" component={GameQuizScreen} />
       <RootStack.Screen name="QuizWaitingRoom" component={QuizWaitingRoom} />
+      <RootStack.Screen name="QuizResultsScreen" component={QuizResultsScreen} />
     </RootStack.Navigator>
     
     {/* ✅ NOTIFICAÇÃO DENTRO DO NavigationContainer */}
