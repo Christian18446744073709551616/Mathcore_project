@@ -23,6 +23,7 @@ import NovoQuizScreen from './Screens/Quiz/NovoQuizScreen';
 import GameQuizScreen from './Screens/Quiz/GameQuizScreen';
 import QuizWaitingRoom from './Screens/Quiz/QuizWaitingRoom';
 import QuizResultsScreen from './Screens/Quiz/QuizResultsScreen';
+import QRScanner from './Screens/Quiz/QRScanner';
 import QuizInviteNotification from './components/QuizInviteNotification';
 
 import CustomTabBar from './components/3d/CustomTabBar';
@@ -58,6 +59,7 @@ const QuizStack: React.FC<{ session: Session }> = ({ session }) => (
   <Stack.Navigator screenOptions={{ headerShown: false }}>
     <Stack.Screen name="QuizScreen" component={QuizScreen} initialParams={{ session }} />
     <Stack.Screen name="NovoQuizScreen" component={NovoQuizScreen} initialParams={{ session }} />
+    <Stack.Screen name="QRScanner" component={QRScanner} options={{ title: 'Scanner de QR' }} />
   </Stack.Navigator>
 );
 

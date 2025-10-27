@@ -40,15 +40,11 @@ export type RootStackParamList = {
     mode?: 'solo' | 'multiplayer';
     matchId?: string;
   };
-  QuizWaitingRoom: {
-    matchId: string;
-    quizId: string;
-    quizTitle: string;
-    quizData?: Quiz;
-  };
+  QuizWaitingRoom: { matchId: string; quizId?: string; quizTitle?: string };
   QuizResultsScreen: {
   matchId: string;
   quizTitle: string;
   myFinishTime: string;
 };
+  QRScanner: undefined;
 };
