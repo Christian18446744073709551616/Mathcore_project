@@ -1,9 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, FlatList, StyleSheet } from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  FlatList,
+  StyleSheet,
+  TouchableOpacity,
+  Modal,
+} from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import AvatarView from '../components/AvatarView';
 import { supabase } from '../lib/supabase';
 import { useNavigation } from '@react-navigation/native';
-import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import { acceptFriendRequest } from '../services/Friendzone';
 
 interface UserProfile {
@@ -29,47 +37,68 @@ const updateLastActive = async () => {
     .eq('id', session.user.id);
 };
 
-const isUserOnline = (lastActiveAt?: string): boolean => {
-  if (!lastActiveAt) return false;
-  const now = new Date();
-  const diffInMinutes = (now.getTime() - new Date(lastActiveAt).getTime()) / (1000 * 60);
-  return diffInMinutes < 2;
-};
+const UserCard = ({
+  user,
+  navigation,
+  showChatChallenge = false,
+  onAccept,
+}: {
+  user: UserProfile;
+  navigation: any;
+  showChatChallenge?: boolean;
+  onAccept?: () => void;
+}) => (
+  <View style={styles.friendCard}>
+    <View style={styles.friendLeft}>
+      <AvatarView size={45} url={user.avatar_url} />
+      <Text style={styles.friendName}>{user.username}</Text>
+    </View>
 
-const Tab = createMaterialTopTabNavigator();
+    {showChatChallenge ? (
+      <View style={styles.friendButtons}>
+        <TouchableOpacity
+          style={styles.chatButton}
+          onPress={() =>
+            navigation.navigate('ChatScreen', {
+              friendId: user.id,
+              friendName: user.username,
+            })
+          }
+        >
+          <Ionicons name="chatbubbles" size={16} color="#fff" />
+          <Text style={styles.btnText}>Conversar</Text>
+        </TouchableOpacity>
 
-const FriendsTab = ({ friends, navigation }: { friends: UserProfile[], navigation: any }) => (
-  <View style={{ flex: 1, backgroundColor: '#0d1117' }}>
-    <FlatList
-      data={friends}
-      keyExtractor={(item) => item.id}
-      renderItem={({ item }) => (
-        <View style={styles.friendItem}>
-          <AvatarView size={50} url={item.avatar_url} />
-          <Text style={styles.friendName}>{item.username}</Text>
-          <View style={[styles.statusIndicator, { backgroundColor: isUserOnline(item.last_active_at) ? 'green' : 'gray' }]} />
-          <Button title="Ver Perfil" onPress={() => navigation.navigate('FriendDripRoast', { userId: item.id })} />
-          <Button title="Iniciar Chat" onPress={() => navigation.navigate('ChatScreen', { friendId: item.id, friendName: item.username })} />
-        </View>
-      )}
-    />
+        <TouchableOpacity
+          style={styles.challengeButton}
+          onPress={() => console.log('Desafiar', user.username)}
+        >
+          <Ionicons name="flash" size={16} color="#fff" />
+          <Text style={styles.btnText}>Desafiar</Text>
+        </TouchableOpacity>
+      </View>
+    ) : onAccept ? (
+      <TouchableOpacity style={styles.chatButton} onPress={onAccept}>
+        <Text style={styles.btnText}>Aceitar</Text>
+      </TouchableOpacity>
+    ) : (
+      <TouchableOpacity
+        style={styles.chatButton}
+        onPress={() => navigation.navigate('FriendDripRoast', { userId: user.id })}
+      >
+        <Text style={styles.btnText}>Ver Perfil</Text>
+      </TouchableOpacity>
+    )}
   </View>
 );
 
-const PendingRequestsTab = ({ pendingRequests, handleAcceptFriend }: { pendingRequests: UserProfile[], handleAcceptFriend: (id: string) => void }) => (
-  <View style={{ flex: 1, backgroundColor: '#0d1117' }}>
-    <FlatList
-      data={pendingRequests}
-      keyExtractor={(item) => item.id}
-      renderItem={({ item }) => (
-        <View style={styles.friendItem}>
-          <AvatarView size={50} url={item.avatar_url} />
-          <Text style={styles.friendName}>{item.username}</Text>
-          <Button title="Aceitar Pedido" onPress={() => handleAcceptFriend(item.id)} />
-        </View>
-      )}
-    />
-  </View>
+const FriendsTab = ({ friends, navigation }: { friends: UserProfile[]; navigation: any }) => (
+  <FlatList
+    data={friends}
+    keyExtractor={(item) => item.id}
+    contentContainerStyle={{ paddingBottom: 30 }}
+    renderItem={({ item }) => <UserCard user={item} navigation={navigation} showChatChallenge />}
+  />
 );
 
 const Friends = () => {
@@ -79,6 +108,7 @@ const Friends = () => {
   const [recentSearches, setRecentSearches] = useState<UserProfile[]>([]);
   const [session, setSession] = useState<Session | null>(null);
   const [searchActive, setSearchActive] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
   const navigation = useNavigation();
 
   const fetchSession = async () => {
@@ -88,225 +118,214 @@ const Friends = () => {
 
   const fetchFriends = async () => {
     if (!session?.user?.id) return;
-
     const { data, error } = await supabase
       .from('friendships')
-      .select(`
-        friend_id,
-        profiles:friend_id (
-          id,
-          username,
-          avatar_url,
-          last_active_at
-        )
-      `)
+      .select(`friend_id, profiles:friend_id ( id, username, avatar_url, last_active_at )`)
       .eq('user_id', session.user.id)
       .eq('accepted', true);
 
-    if (error) {
-      console.error('Error fetching friends:', error.message);
-      return;
+    if (!error && data) {
+      const formatted = data.map((f: any) => ({
+        id: f.profiles.id,
+        username: f.profiles.username,
+        avatar_url: f.profiles.avatar_url,
+        last_active_at: f.profiles.last_active_at,
+      }));
+      setFriends(formatted);
     }
-
-    const formattedData = data.map((friend: any) => ({
-      id: friend.profiles.id,
-      username: friend.profiles.username,
-      avatar_url: friend.profiles.avatar_url,
-      last_active_at: friend.profiles.last_active_at,
-    }));
-
-    setFriends(formattedData);
   };
 
   const fetchPendingRequests = async () => {
     if (!session?.user?.id) return;
-
     const { data, error } = await supabase
       .from('friendships')
       .select('user_id, profiles:user_id (id, username, avatar_url)')
       .eq('friend_id', session.user.id)
-      .eq('accepted', 'false');
+      .eq('accepted', false);
 
-    if (error) {
-      console.error('Erro ao buscar pedidos de amizade pendentes:', error);
-    } else {
-      const pendingUsers = data.map((request: any) => request.profiles);
-      setPendingRequests(pendingUsers);
-    }
-  };
-
-  const handleSearchUsers = async (query: string) => {
-    if (!session?.user?.id) return;
-
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('id, username, avatar_url')
-      .ilike('username', `%${query}%`)
-      .neq('id', session.user.id);
-
-    if (error) {
-      console.error('Erro ao buscar usuários:', error);
-    } else {
-      setRecentSearches(data);
-      setSearchActive(true);
+    if (!error && data) {
+      setPendingRequests(data.map((r: any) => r.profiles));
     }
   };
 
   const handleAcceptFriend = async (friendId: string) => {
     if (session?.user?.id) {
-      try {
-        await acceptFriendRequest(session.user.id, friendId);
-        fetchPendingRequests();
-        fetchFriends();
-      } catch (error) {
-        console.error('Erro ao aceitar pedido de amizade:', error);
-      }
+      await acceptFriendRequest(session.user.id, friendId);
+      fetchPendingRequests();
+      fetchFriends();
     }
   };
 
-  const resetRecentSearches = () => {
-    if (searchActive) {
-      setRecentSearches([]);
-      setSearchQuery('');
-      setSearchActive(false);
-    }
-  };
-
-  useEffect(() => {
-    const fetchData = async () => {
-      await fetchSession();
-    };
-    fetchData();
-  }, []);
-
-  useEffect(() => {
-    if (session?.user?.id) {
-      updateLastActive(); // ✅ Atualiza imediatamente após carregar sessão
-    }
-  }, [session]);
-
-  useEffect(() => {
+  const handleSearchUsers = async (query: string) => {
+    setSearchQuery(query);
     if (!session?.user?.id) return;
+    if (!query || query.trim().length === 0) {
+      setRecentSearches([]);
+      setSearchActive(false);
+      return;
+    }
 
-    const interval = setInterval(() => {
-      updateLastActive();
-    }, 2 * 60 * 1000); // ✅ Atualiza a cada 2 minutos
+    const { data } = await supabase
+      .from('profiles')
+      .select('id, username, avatar_url')
+      .ilike('username', `%${query}%`)
+      .neq('id', session.user.id);
 
-    updateLastActive(); // ✅ Atualiza também na entrada
+    setRecentSearches(data || []);
+    setSearchActive(true);
+  };
 
-    return () => clearInterval(interval);
-  }, [session]);
+  useEffect(() => {
+    fetchSession();
+  }, []);
 
   useEffect(() => {
     if (session) {
       fetchFriends();
       fetchPendingRequests();
+      updateLastActive();
+      const interval = setInterval(updateLastActive, 2 * 60 * 1000);
+      return () => clearInterval(interval);
     }
   }, [session]);
 
   return (
     <View style={styles.container}>
-      {searchActive && (
-        <Button title="Fechar Pesquisa" onPress={resetRecentSearches} />
-      )}
+      <Text style={styles.header}>Social</Text>
 
-      <TextInput
-        style={styles.searchInput}
-        placeholder="Buscar usuários..."
-        placeholderTextColor="#00eeff"
-        value={searchQuery}
-        onChangeText={(text) => {
-          setSearchQuery(text);
-          handleSearchUsers(text);
-        }}
-      />
+      <View style={styles.searchContainer}>
+        <Ionicons name="search" size={20} color="#fff" style={{ marginLeft: 10 }} />
+        <TextInput
+         style={[styles.searchInput, { borderWidth: 0, outlineStyle: 'none' }]}
+          placeholder="Encontre seus amigos"
+          placeholderTextColor="#ccc"
+          value={searchQuery}
+          onChangeText={handleSearchUsers}
+        />
+        <TouchableOpacity style={styles.iconButton} onPress={() => setModalVisible(true)}>
+          <Ionicons name="person-add" size={20} color="#fff" />
+          <View style={styles.badge}>
+            <Text style={styles.badgeText}>{pendingRequests.length}</Text>
+          </View>
+        </TouchableOpacity>
+      </View>
 
-      {searchActive && (
+      {searchActive ? (
         <FlatList
-          contentContainerStyle={styles.listContainer}
+          contentContainerStyle={{ paddingBottom: 30 }}
           data={recentSearches}
           keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <View style={styles.friendItem}>
-              <AvatarView size={50} url={item.avatar_url} />
-              <Text style={styles.friendName}>{item.username}</Text>
-              <Button title="Ver Perfil" onPress={() => navigation.navigate('FriendDripRoast', { userId: item.id })} />
-            </View>
-          )}
+          renderItem={({ item }) => <UserCard user={item} navigation={navigation} />}
         />
+      ) : (
+        <FriendsTab friends={friends} navigation={navigation} />
       )}
 
-      <Tab.Navigator
-        screenOptions={{
-          tabBarStyle: { backgroundColor: '#0d1117', borderTopColor: '#1f2937' },
-          tabBarActiveTintColor: '#00eeff',
-          tabBarInactiveTintColor: '#6a5acd',
-          tabBarLabelStyle: { fontSize: 14, fontWeight: 'bold' },
-        }}
+      <Modal
+        visible={modalVisible}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setModalVisible(false)}
       >
-        <Tab.Screen name="Amigos">
-          {() => <FriendsTab friends={friends} navigation={navigation} />}
-        </Tab.Screen>
-        <Tab.Screen name="Pedidos Pendentes">
-          {() => <PendingRequestsTab pendingRequests={pendingRequests} handleAcceptFriend={handleAcceptFriend} />}
-        </Tab.Screen>
-      </Tab.Navigator>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalTitle}>Pedidos Pendentes</Text>
+            <FlatList
+              data={pendingRequests}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) => (
+                <UserCard user={item} navigation={navigation} onAccept={() => handleAcceptFriend(item.id)} />
+              )}
+              ListEmptyComponent={
+                <Text style={{ color: '#ccc', textAlign: 'center', marginTop: 20 }}>
+                  Nenhum pedido pendente
+                </Text>
+              }
+            />
+            <TouchableOpacity style={styles.closeBtn} onPress={() => setModalVisible(false)}>
+              <Text style={styles.closeBtnText}>Fechar</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#0d0f14',
-    padding: 20,
-  },
-  listContainer: {
-    backgroundColor: '#0d1117',
-    paddingBottom: 20,
-  },
-  searchInput: {
-    borderWidth: 1,
-    borderColor: '#00eeff',
-    backgroundColor: '#161b22',
-    padding: 12,
-    marginTop: 40,
-    borderRadius: 10,
-    color: '#00eeff',
-    fontSize: 16,
-    fontFamily: 'monospace',
-  },
-  friendItem: {
+  container: { flex: 1, backgroundColor: '#1d2033', padding: 20 },
+  header: { fontSize: 24, fontWeight: '900', color: '#fff', marginBottom: 15 },
+  searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    backgroundColor: '#2a2e4d',
+    borderRadius: 30,
+    paddingHorizontal: 5,
+    paddingVertical: 5,
+    marginBottom: 12,
+  },
+  searchInput: { flex: 1, color: '#fff', fontSize: 16, paddingHorizontal: 10 },
+  iconButton: { padding: 10, position: 'relative' },
+  badge: {
+    position: 'absolute',
+    top: 5,
+    right: 5,
+    backgroundColor: '#00eeff',
+    borderRadius: 10,
+    paddingHorizontal: 5,
+  },
+  badgeText: { color: '#000', fontWeight: 'bold', fontSize: 10 },
+  friendCard: {
+    backgroundColor: '#30345a',
+    borderRadius: 20,
+    marginBottom: 12,
+    padding: 12,
+    flexDirection: 'row',
     justifyContent: 'space-between',
-    backgroundColor: '#1b1e2a',
-    marginVertical: 12,
-    padding: 15,
-    borderRadius: 12,
-    shadowColor: '#6a5acd',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.6,
-    shadowRadius: 6,
-    borderWidth: 1,
-    borderColor: '#6a5acd',
+    alignItems: 'center',
   },
-  friendName: {
-    fontSize: 18,
-    color: '#00eeff',
-    textShadowColor: '#6a5acd',
-    textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 3,
-    fontWeight: 'bold',
-    marginHorizontal: 10,
+  friendLeft: { flexDirection: 'row', alignItems: 'center' },
+  friendName: { color: '#fff', fontWeight: 'bold', fontSize: 16, marginLeft: 10 },
+  friendButtons: { flexDirection: 'row' },
+  chatButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#4a4e78',
+    borderRadius: 20,
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    marginLeft: 5,
   },
-  statusIndicator: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    marginLeft: 10,
-    backgroundColor: '#6a5acd',
+  challengeButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#00bfae',
+    borderRadius: 20,
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    marginLeft: 5,
   },
+  btnText: { color: '#fff', fontSize: 13, marginLeft: 6, fontWeight: 'bold' },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    padding: 20,
+  },
+  modalContainer: {
+    backgroundColor: '#2a2e4d',
+    borderRadius: 20,
+    padding: 20,
+    maxHeight: '80%',
+  },
+  modalTitle: { color: '#fff', fontSize: 18, fontWeight: 'bold', marginBottom: 15 },
+  closeBtn: {
+    backgroundColor: '#00eeff',
+    borderRadius: 15,
+    paddingVertical: 8,
+    marginTop: 15,
+  },
+  closeBtnText: { color: '#000', textAlign: 'center', fontWeight: 'bold' },
 });
 
 export default Friends;

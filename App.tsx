@@ -46,7 +46,9 @@ export default function App() {
   }
 
   return (
+    
     <View style={{ flex: 1 }}>
+      
       {session && session.user ? (
         <Cornhub session={session} /> // Se houver sessão, redireciona para o app principal
       ) : (
