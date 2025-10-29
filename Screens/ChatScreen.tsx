@@ -17,12 +17,14 @@ import {
   Poppins_600SemiBold,
 } from '@expo-google-fonts/poppins';
 
+
 import { supabase } from '../lib/supabase';
 import { NavigationProp, useNavigation, useRoute } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { RootStackParamList } from '../types';
 import { useIsFocused } from '@react-navigation/native';
+
 import ChatHeader from './ChatHeader';
 import Friends from './Friends';
 
@@ -32,6 +34,7 @@ interface Friend {
   avatar_url: string;
 }
 
+
 interface Message {
   id: string;
   sender_id: string;
@@ -40,6 +43,7 @@ interface Message {
   created_at: string;
   message_type: string; // 'text' ou 'invitation'
   lobby_id?: string; // opcional para convites
+
 }
 
 const OnlineChat = () => {
@@ -59,6 +63,7 @@ const OnlineChat = () => {
   useEffect(() => {
     navigation.getParent()?.setOptions({
       tabBarStyle: { display: isFocused ? 'none' : 'flex' },
+
     });
   }, [isFocused]);
 
@@ -68,6 +73,7 @@ const OnlineChat = () => {
       setSession(session);
       if (session) fetchMessages(session.user.id);
     };
+
     fetchSessionAndMessages();
   }, []);
 
@@ -90,10 +96,11 @@ const OnlineChat = () => {
     const messageData = {
       sender_id: session.user.id,
       receiver_id: friendId,
-      message_text: newMessage,
+      message_text: messageToSend,
       created_at: new Date().toISOString(),
       message_type: 'text',
     };
+
 
     setNewMessage('');
     Keyboard.dismiss();
@@ -177,10 +184,133 @@ const OnlineChat = () => {
                 ? prev
                 : [...prev, newMessage]
             );
+
           }
         }
       )
       .subscribe();
+
+
+      return () => {
+        try {
+          channel.unsubscribe();
+        } catch (e) {
+          // fallback: ignore unsubscribe errors
+        }
+      };
+    }
+  }, [session, friendId]);
+
+  useEffect(() => {
+    // tenta rolar para o fim quando as mensagens mudam
+    try {
+      (flatListRef.current as any)?.scrollToEnd?.({ animated: true });
+    } catch (e) {
+      // ignora erros de scroll
+    }
+  }, [messages]);
+
+  const parseInviteData = (messageText: string) => {
+    try {
+      const data = JSON.parse(messageText);
+
+      if (data && typeof data === 'object') {
+        if (data.match_id && data.quiz_id) {
+          return { type: 'quiz', data: data };
+        }
+
+        if (data.lobby_id) {
+          return { type: 'lobby', data: data };
+        }
+      }
+
+      return null;
+    } catch (error) {
+      return null;
+    }
+  };
+
+  const handleQuizInviteResponse = async (message_id: string, inviteData: any, response: 'accept' | 'reject') => {
+    if (!session) {
+      console.error('Usuário não está autenticado.');
+      return;
+    }
+
+    try {
+      console.log(`${response === 'accept' ? '✅ Aceitando' : '❌ Rejeitando'} convite de quiz`);
+
+      if (response === 'accept') {
+        const { error } = await supabase
+          .from('quiz_participants')
+          .insert({
+            match_id: inviteData.match_id,
+            user_id: session.user.id,
+            is_ready: false,
+          });
+
+        if (error) {
+          console.error('❌ Erro ao aceitar convite:', error);
+          if (Platform.OS === 'web') {
+            alert('Não foi possível aceitar o convite.');
+          } else {
+            Alert.alert('Erro', 'Não foi possível aceitar o convite.');
+          }
+          return;
+        }
+
+        await supabase.from('messages').delete().eq('id', message_id);
+
+        console.log('✅ Convite aceito! Navegando para QuizWaitingRoom...');
+
+        (navigation as any).navigate('QuizWaitingRoom', {
+          matchId: inviteData.match_id,
+          quizId: inviteData.quiz_id,
+          quizTitle: inviteData.quiz_title,
+        });
+      } else {
+        await supabase.from('messages').delete().eq('id', message_id);
+
+        console.log('❌ Convite rejeitado');
+
+        if (Platform.OS === 'web') {
+          alert('Convite rejeitado.');
+        } else {
+          Alert.alert('Convite rejeitado', 'Você recusou o convite para o quiz.');
+        }
+
+        if (session) fetchMessages(session.user.id);
+      }
+    } catch (error) {
+      console.error('❌ Erro ao processar convite de quiz:', error);
+    }
+  };
+
+  const handleLobbyInviteResponse = async (message_id: string, lobby_id: string, response: 'accept' | 'reject') => {
+    if (!session) {
+      console.error('Usuário não está autenticado.');
+      return;
+    }
+
+    try {
+      const updatedInviteData = {
+        invite_status: response === 'accept' ? 'accepted' : 'rejected',
+      };
+
+      const { error: updateError } = await supabase
+        .from('messages')
+        .update(updatedInviteData)
+        .eq('id', message_id)
+        .eq('receiver_id', session.user.id);
+
+      if (updateError) {
+        console.error('Erro ao atualizar convite:', updateError);
+        return;
+      }
+
+      console.log(`Convite de lobby ${response === 'accept' ? 'aceito' : 'rejeitado'} com sucesso.`);
+
+      if (response === 'accept') {
+        const { data: lobbyData, error: lobbyError } = await supabase
 
     return () => channel.unsubscribe();
   }, [session, friendId]);
@@ -212,6 +342,7 @@ const OnlineChat = () => {
           .select('lobby_name')
           .eq('id', lobby_id)
           .single();
+
         if (error || !lobbyData) return console.error(error);
 
         await supabase.from('lobby_players').insert([
@@ -240,12 +371,47 @@ const OnlineChat = () => {
     Poppins_600SemiBold,
   });
 
+
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       keyboardVerticalOffset={80}
     >
+
+
+        
+      
+              return (
+                <View style={styles.invitationMessage}>
+                  <Text style={styles.invitationText}>{item.message_text}</Text>
+
+                  
+                  <View style={styles.invitationMessage}>
+                    <Text style={styles.invitationText}>
+                      🎮 Convite para jogar Quiz
+                    </Text>
+                    <Text style={styles.quizTitleInChat}>
+                      📝 {inviteInfo.data.quiz_title}
+                    </Text>
+                    <View style={styles.invitationActions}>
+                      <TouchableOpacity
+                        style={styles.acceptButton}
+                        onPress={() => handleQuizInviteResponse(item.id, inviteInfo.data, 'accept')}
+                      >
+                        <Text style={styles.inviteButtonText}>✅ Aceitar</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={styles.declineButtonStyle}
+                        onPress={() => handleQuizInviteResponse(item.id, inviteInfo.data, 'reject')}
+                      >
+                        <Text style={styles.inviteButtonText}>❌ Rejeitar</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                );
+              }
+                  
       <ChatHeader
 
         groupName={`Chat com: ${friend ? friend.name : 'Carregando...'}`}
@@ -263,22 +429,33 @@ const OnlineChat = () => {
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.flatListContent}
           showsVerticalScrollIndicator={false}
-          renderItem={({ item }) => {
+        renderItem={({ item }) => {
             if (item.message_type === 'invitation') {
-              return (
-                <View style={styles.invitationMessage}>
-                  <Text style={styles.invitationText}>
-                    {item.message_text}
-                  </Text>
-                  <View style={styles.invitationActions}>
-                    <TouchableOpacity
-                      style={styles.acceptButton}
-                      onPress={() =>
-                        handleInviteResponse(
-                          item.id,
-                          item.lobby_id!,
-                          'accept'
-                        )
+              const inviteInfo = parseInviteData(item.message_text);
+
+              if (inviteInfo?.type === 'quiz') {
+              
+
+              if (inviteInfo?.type === 'lobby' && item.lobby_id) {
+                return (
+                  <View style={styles.invitationMessage}>
+                    <Text style={styles.invitationText}>{item.message_text}</Text>
+                    <View style={styles.invitationActions}>
+                      <TouchableOpacity
+                        style={styles.acceptButton}
+                        onPress={() => handleLobbyInviteResponse(item.id, item.lobby_id!, 'accept')}
+                      >
+                        <Text style={styles.inviteButtonText}>Aceitar</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={styles.inviteButton}
+                        onPress={() => handleLobbyInviteResponse(item.id, item.lobby_id!, 'reject')}
+                      >
+                        <Text style={styles.declineButton}>Rejeitar</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                );
                       }
                     >
                       <Text style={styles.acceptButtonText}>Aceitar</Text>
@@ -296,6 +473,7 @@ const OnlineChat = () => {
                       <Text style={styles.declineButtonText}>Rejeitar</Text>
                     </TouchableOpacity>
                   </View>
+
                 </View>
               );
             }
@@ -333,6 +511,7 @@ const OnlineChat = () => {
           </TouchableOpacity>
         </View>
    </View>
+
     </KeyboardAvoidingView>
   );
 };
@@ -341,6 +520,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#242948',
+
   },
   flatListContent: {
     padding: 12,
@@ -348,12 +528,14 @@ const styles = StyleSheet.create({
   },
   sentMessage: {
     alignSelf: 'flex-end',
+
     backgroundColor: '#fff',
     borderTopLeftRadius: 20,
     borderBottomLeftRadius: 20,
     borderTopRightRadius: 20,
     padding: 14,
     marginVertical: 6,
+
     maxWidth: '75%',
     color: '#000',
   },
@@ -364,6 +546,7 @@ const styles = StyleSheet.create({
   },
   receivedMessage: {
     alignSelf: 'flex-start',
+
     backgroundColor: '#BDC4EE',
     borderTopRightRadius: 20,
     borderBottomRightRadius: 20,
@@ -382,15 +565,67 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: '#000706ff',
     maxWidth: '50%',
+
   },
   invitationText: {
     color: '#fff',
     fontSize: 16,
-    marginBottom: 6,
+    fontWeight: 'bold',
+    marginBottom: 5,
+      },
+  quizTitleInChat: {
+    color: '#FFF9E0',
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
   },
   invitationActions: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    marginTop: 10,
+
+  acceptButton: {
+    backgroundColor: '#00bfae',
+    padding: 10,
+    borderRadius: 5,
+    marginRight: 5,
+    flex: 1,
+    alignItems: 'center',
+  },
+  declineButtonStyle: {
+    backgroundColor: '#d9534f',
+    padding: 10,
+    borderRadius: 5,
+    marginLeft: 5,
+    flex: 1,
+    alignItems: 'center',
+  },
+  inviteButton: {
+    backgroundColor: '#1E3A8A',
+    padding: 10,
+    borderRadius: 5,
+    marginLeft: 5,
+    flex: 1,
+    alignItems: 'center',
+  },
+  inviteButtonText: {
+    color: '#FFFFFF',
+    fontWeight: 'bold',
+  },
+  declineButton: {
+    color: '#FFFFFF',
+    fontWeight: 'bold',
+  },
+  sendButton: {
+    backgroundColor: '#00bfae',
+    padding: 12,
+    borderRadius: 5,
+    marginLeft: 10,
+  },
+  messageText: {
+    fontSize: 16,
+    color: '#e0e0e0',
+
   },
   acceptButton: {
     backgroundColor: '#00bfae',
@@ -404,20 +639,12 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 12,
+
   },
   declineButtonText: { color: '#fff', fontWeight: 'bold' },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    backgroundColor: 'transparent',
-    position: 'absolute',
-    bottom: 20,
-    width: '100%',
-  },
-  input: {
-    flex: 1,
     backgroundColor: '#fff',
     borderRadius: 30,
     paddingHorizontal: 20,
@@ -448,3 +675,4 @@ const styles = StyleSheet.create({
 });
 
 export default OnlineChat;
+

@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Modal } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Modal, Image } from 'react-native';
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
+import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
 
 // Ícones SVG customizados
 import HomeIcon from './icons/HomeIcon';
 import ExerciciosIcon from './icons/ExerciciosIcon';
-import QuizIcon from './icons/QuizIcon';
 import DesempenhoIcon from './icons/DesempenhoIcon';
+import QuizIconSecundario from './icons/QuizIconSecundario.js';
 import PeopleIcon from './icons/PeopleIcon';
 import PersonIcon from './icons/PersonIcon';
 import MenuIcon from './icons/MenuIcon';
@@ -15,20 +16,21 @@ import ConfiguracoesIcon from './icons/ConfiguracoesIcon';
 import SairIcon from './icons/SairIcon';
 
 const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigation }) => {
-  const [menuVisible, setMenuVisible] = useState(false);
+  const activeTabRoute = state.routes[state.index];
+  const focusedRouteName = getFocusedRouteNameFromRoute(activeTabRoute) ?? '';
+  const screensToHideTabBar = ['NovoQuizScreen', 'GameQuizScreen'];
 
-  // Função para abrir/fechar o menu
+  if (screensToHideTabBar.includes(focusedRouteName)) {
+    return null;
+  }
+  const [menuVisible, setMenuVisible] = useState(false);
   const toggleMenu = () => {
     setMenuVisible(!menuVisible);
   };
-
-  // Função para navegar a partir do menu
+  
   const handleMenuNavigation = (routeName: string) => {
     setMenuVisible(false);
-    
-    // Verifica se a rota existe antes de navegar
     const routeExists = state.routes.some(route => route.name === routeName);
-    
     if (routeExists) {
       navigation.navigate(routeName);
     } else {
@@ -36,7 +38,6 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigat
     }
   };
 
-  // Função auxiliar para verificar se a rota está ativa
   const isRouteActive = (routeName: string) => {
     return state.routes.some((route, index) => 
       route.name === routeName && state.index === index
@@ -45,7 +46,6 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigat
 
   return (
     <View style={styles.container}>
-      {/* Modal do Menu (a telinha com opções secundárias) */}
       <Modal
         visible={menuVisible}
         transparent={true}
@@ -58,7 +58,16 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigat
           onPress={() => setMenuVisible(false)}
         >
           <View style={styles.menuContainer}>
-            {/* Opções do menu */}
+            <TouchableOpacity 
+              style={styles.menuItem}
+              onPress={() => handleMenuNavigation('Settings')}
+            >
+              <PersonIcon size={24} color="#1f1f1fff" />
+              <Text style={styles.menuText}>Perfil</Text>
+            </TouchableOpacity> 
+
+            <View style={styles.separator} />
+
             <TouchableOpacity
               style={styles.menuItem}
               onPress={() => handleMenuNavigation('Exercicios')}
@@ -67,32 +76,24 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigat
               <Text style={styles.menuText}>Exercícios</Text>
             </TouchableOpacity>   
 
-            {/* DESEMPENHO AGORA COM ÍCONE DO QUIZ */}
-            <TouchableOpacity
-              style={styles.menuItem}
-              onPress={() => handleMenuNavigation('Desempenho')}
-            >
-              <QuizIcon size={24} color="#1f1f1fff" />
-              <Text style={styles.menuText}>Desempenho</Text>
-            </TouchableOpacity>
-
-            {/* QUIZ AGORA COM ÍCONE DO DESEMPENHO */}
             <TouchableOpacity
               style={styles.menuItem}
               onPress={() => handleMenuNavigation('Quiz')}
             >
-              <DesempenhoIcon size={24} color="#1f1f1fff" />
+              <QuizIconSecundario size={24} color="#1f1f1fff" />
               <Text style={styles.menuText}>Quiz</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity 
+            <TouchableOpacity
               style={styles.menuItem}
-              onPress={() => handleMenuNavigation('Settings')}
+              onPress={() => handleMenuNavigation('Desempenho')}
             >
-              <PersonIcon size={24} color="#1f1f1fff" />
-              <Text style={styles.menuText}>Perfil</Text>
-            </TouchableOpacity>            
+              <DesempenhoIcon size={24} color="#1f1f1fff" />
+              <Text style={styles.menuText}>Desempenho</Text>
+            </TouchableOpacity>           
             
+            <View style={styles.separator} />
+
             <TouchableOpacity 
               style={styles.menuItem}
               onPress={() => handleMenuNavigation('Flashcards')}
@@ -117,6 +118,8 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigat
               <Text style={styles.menuText}>Configurações</Text>
             </TouchableOpacity>
 
+            <View style={styles.separator} />
+
             <TouchableOpacity 
               style={styles.menuItem}
               onPress={() => handleMenuNavigation('Sair')}
@@ -128,10 +131,8 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigat
         </TouchableOpacity>
       </Modal>
 
-      {/* Retângulo flutuante com bordas arredondadas */}
       <View style={styles.floatingRectangle}>
         <View style={styles.tabBar}>
-          {/* Botão Home */}
           <TouchableOpacity
             style={styles.tab}
             onPress={() => navigation.navigate('Home')}
@@ -142,7 +143,6 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigat
             />
           </TouchableOpacity>
 
-          {/* Botão Exercícios */}
           <TouchableOpacity
             style={styles.tab}
             onPress={() => navigation.navigate('Exercicios')}
@@ -153,18 +153,22 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigat
             />
           </TouchableOpacity>
 
-          {/* Botão Quiz */}
           <TouchableOpacity
             style={styles.tab}
             onPress={() => navigation.navigate('Quiz')}
           >
-            <QuizIcon 
-              size={34} 
-              color={isRouteActive('Quiz') ? '#1f1f1fff' : '#cfd8dc'}
-            />
+            <View style={[
+              styles.quizImageContainer,
+              isRouteActive('Quiz') ? styles.quizImageActive : styles.quizImageInactive
+            ]}>
+              <Image
+                source={require('../../assets/quiz-icon.png')}
+                style={styles.quizImage}
+                resizeMode="cover"
+              />
+            </View>
           </TouchableOpacity>
 
-          {/* Botão Desempenho */}
           <TouchableOpacity
             style={styles.tab}
             onPress={() => navigation.navigate('Desempenho')}
@@ -175,7 +179,6 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigat
             />
           </TouchableOpacity>
 
-          {/* Botão Menu */}
           <TouchableOpacity style={styles.tab} onPress={toggleMenu}>
             <MenuIcon size={34} color={menuVisible ? '#1f1f1fff' : '#cfd8dc'} />
           </TouchableOpacity>
@@ -185,6 +188,7 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigat
   );
 };
 
+// Estilos
 const styles = StyleSheet.create({
   container: {
     backgroundColor: 'transparent',
@@ -222,8 +226,25 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingVertical: 8,
   },
-
-  // Estilos para o Menu Modal
+  quizImageContainer: {
+    width: 60,
+    height: 60,
+    borderRadius: 32.5,
+    overflow: 'hidden',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  quizImageActive: {
+    backgroundColor: '#1f1f1fff',
+  },
+  quizImageInactive: {
+    backgroundColor: '#cfd8dc',
+  },
+  quizImage: {
+    width: '85%',
+    height: '85%',
+    borderRadius: 72,
+  },
   menuOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
@@ -254,6 +275,21 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     fontWeight: '700',
   },
+  separator: {
+    height: 8,
+    backgroundColor: '#23273dff',
+    marginVertical: 3,
+    marginHorizontal: 5,
+    borderRadius: 9,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
 });
 
-export default CustomTabBar;  
+export default CustomTabBar;
