@@ -98,33 +98,28 @@ const FriendDripRoast = () => {
 
   const checkIfFriend = async (currentUserId: string, viewedUserId: string) => {
     try {
-      const { data: acceptedFriends, error: friendError } = await supabase
+      // Busca qualquer amizade entre os dois usuários, independente da direção
+      const { data: friendships, error } = await supabase
         .from('friendships')
-        .select('friend_id, user_id, accepted')
-        .or(`user_id.eq.${currentUserId},friend_id.eq.${currentUserId}`)
-        .or(`user_id.eq.${viewedUserId},friend_id.eq.${viewedUserId}`);
+        .select('user_id, friend_id, accepted')
+        .or(`and(user_id.eq.${currentUserId},friend_id.eq.${viewedUserId}),and(user_id.eq.${viewedUserId},friend_id.eq.${currentUserId})`);
   
-      if (friendError) {
-        console.error('Erro ao verificar amizade:', friendError);
+      if (error) {
+        console.error('Erro ao verificar amizade:', error);
         return;
       }
   
-      const isAlreadyFriend = acceptedFriends.some(
-        (friend: { friend_id: string; user_id: string; accepted: boolean }) =>
-          ((friend.friend_id === viewedUserId || friend.user_id === viewedUserId) &&
-            friend.accepted)
-      );
+      // Se algum registro for aceito => são amigos
+      const isAlreadyFriend = friendships.some(f => f.accepted);
   
-      const isPendingRequest = acceptedFriends.some(
-        (friend: { friend_id: string; user_id: string; accepted: boolean }) =>
-          (friend.friend_id === viewedUserId || friend.user_id === viewedUserId) &&
-          !friend.accepted
-      );
+      // Se algum registro existir mas não aceito => pedido pendente
+      const isPendingRequest = friendships.some(f => !f.accepted);
   
       setIsFriend(isAlreadyFriend);
       setRequestSent(isPendingRequest);
-    } catch (error) {
-      console.error('Erro ao verificar amizade:', error);
+  
+    } catch (err) {
+      console.error('Erro inesperado ao verificar amizade:', err);
     }
   };
   
@@ -144,17 +139,22 @@ const FriendDripRoast = () => {
   };
 
   const handleRemoveFriend = () => {
+
+    console.log("⚠️ handleRemoveFriend chamado");
     Alert.alert(
       "Remover Amigo",
       "Tem certeza de que deseja remover este amigo?",
       [
+        { text: "Cancelar", style: "cancel" },
         {
-          text: "Cancelar",
-          style: "cancel"
+          text: "Remover",
+          onPress: () => {
+            console.log("🧠 Botão 'Remover' pressionado");
+            confirmRemoveFriend(); // não use await aqui
+          },
         },
-        { text: "Remover", onPress: async () => await confirmRemoveFriend() }
       ]
-    );
+    );  
   };
 
   const confirmRemoveFriend = async () => {
@@ -253,6 +253,7 @@ const FriendDripRoast = () => {
     <ScrollView
       contentContainerStyle={styles.scrollContainer}
       style={styles.scrollView} // Adicionando o estilo diretamente no ScrollView
+        keyboardShouldPersistTaps="handled"
     >
       <View style={styles.container}>
         <AvatarView size={200} url={userProfile?.avatar_url} />

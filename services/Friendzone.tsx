@@ -10,35 +10,34 @@ export async function addFriend(userId: string, friendId: string) {
     console.error('Error adding friend:', error.message);
     return null;
   }
-  
+
   return data;
 }
 
 // Remover um amigo ou cancelar uma solicitação
 export async function removeFriend(userId: string, friendId: string) {
-  const { error } = await supabase
-    .from('friendships')
-    .delete()
-    .match({ user_id: userId, friend_id: friendId });
+  console.log("🧩 removeFriend iniciado", { userId, friendId });
 
-  if (error) {
-    console.error('Error removing friend (first call):', error.message);
-    return null;
+  try {
+    const { data, error } = await supabase
+      .from('friendships')
+      .delete()
+      .or(`and(user_id.eq.${userId},friend_id.eq.${friendId}),and(user_id.eq.${friendId},friend_id.eq.${userId})`)
+      .select(); // ⚠️ select() força o retorno dos registros afetados
+
+    console.log("📡 Resposta Supabase", { data, error });
+
+    if (error) {
+      console.error("❌ Erro Supabase:", error.message);
+    } else {
+      console.log("✅ Delete efetuado, registros:", data);
+    }
+
+    return data;
+  } catch (err) {
+    console.error("💥 Erro inesperado:", err);
   }
-
-  const { error: secondError } = await supabase
-    .from('friendships')
-    .delete()
-    .match({ user_id: friendId, friend_id: userId });
-
-  if (secondError) {
-    console.error('Error removing friend (second call):', secondError.message);
-    return null;
-  }
-
-  return true; // ou retornar os dados se necessário
 }
-
 
 // Aceitar uma solicitação de amizade (e criar amizade mútua)
 export async function acceptFriendRequest(userId: string, friendId: string) {
@@ -57,17 +56,17 @@ export async function acceptFriendRequest(userId: string, friendId: string) {
 
     // atualiza o segundo registro invertendo user_id e friend_id para garantir a amizade mútua
     const { data: insertData, error: insertError } = await supabase
-    .from('friendships')
-    .update({ accepted: true })
-    .eq('user_id', userId)
-    .eq('friend_id', friendId);
-  
-  if (insertError) {
-    console.error('Erro ao criar amizade mútua:', insertError.message);
-    return null;
-  }
-  
-  return { updateData, insertData }; // Retorna ambas as operações para referência
+      .from('friendships')
+      .update({ accepted: true })
+      .eq('user_id', userId)
+      .eq('friend_id', friendId);
+
+    if (insertError) {
+      console.error('Erro ao criar amizade mútua:', insertError.message);
+      return null;
+    }
+
+    return { updateData, insertData }; // Retorna ambas as operações para referência
 
   } catch (error) {
     console.error('Erro ao processar pedido de amizade:', error);
@@ -87,7 +86,7 @@ export async function getFriends(userId: string) {
   if (error) {
     console.error('Error fetching friends:', error.message);
     return null;
-    
+
   }
 
   return data;
@@ -102,7 +101,7 @@ export async function getPendingFriendRequests(userId: string) {
     .select('friend_id')
     .eq('user_id', userId)
     .eq('accepted', 'false');
-  
+
 
   if (error) {
     console.error('Error fetching pending friend requests:', error.message);

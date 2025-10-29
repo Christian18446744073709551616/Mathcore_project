@@ -3,13 +3,13 @@ import {
   View,
   Text,
   TextInput,
-  Animated,
   TouchableOpacity,
   FlatList,
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
   Keyboard,
+  Alert,
 } from 'react-native';
 import {
   useFonts,
@@ -17,23 +17,19 @@ import {
   Poppins_600SemiBold,
 } from '@expo-google-fonts/poppins';
 
-
 import { supabase } from '../lib/supabase';
 import { NavigationProp, useNavigation, useRoute } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
 import { RootStackParamList } from '../types';
 import { useIsFocused } from '@react-navigation/native';
 
 import ChatHeader from './ChatHeader';
-import Friends from './Friends';
 
 interface Friend {
   id: string;
   name: string;
   avatar_url: string;
 }
-
 
 interface Message {
   id: string;
@@ -42,13 +38,11 @@ interface Message {
   message_text: string;
   created_at: string;
   message_type: string; // 'text' ou 'invitation'
-  lobby_id?: string; // opcional para convites
-
+  lobby_id?: string;
 }
 
 const OnlineChat = () => {
   const [friend, setFriend] = useState<Friend | null>(null);
-
   const route = useRoute();
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const isFocused = useIsFocused();
@@ -57,13 +51,11 @@ const OnlineChat = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [session, setSession] = useState<any | null>(null);
-
   const flatListRef = useRef<FlatList>(null);
 
   useEffect(() => {
     navigation.getParent()?.setOptions({
       tabBarStyle: { display: isFocused ? 'none' : 'flex' },
-
     });
   }, [isFocused]);
 
@@ -73,7 +65,6 @@ const OnlineChat = () => {
       setSession(session);
       if (session) fetchMessages(session.user.id);
     };
-
     fetchSessionAndMessages();
   }, []);
 
@@ -92,15 +83,13 @@ const OnlineChat = () => {
 
   const handleSendMessage = async () => {
     if (!newMessage.trim() || !session) return;
-
     const messageData = {
       sender_id: session.user.id,
       receiver_id: friendId,
-      message_text: messageToSend,
+      message_text: newMessage,
       created_at: new Date().toISOString(),
       message_type: 'text',
     };
-
 
     setNewMessage('');
     Keyboard.dismiss();
@@ -116,12 +105,7 @@ const OnlineChat = () => {
 
   useEffect(() => {
     const fetchFriend = async () => {
-
-
       if (!friendId) return;
-
-      console.log('FriendId:', friendId);
-      console.log('avatar_url:', friend?.avatar_url);
 
       const { data, error } = await supabase
         .from('profiles')
@@ -130,14 +114,10 @@ const OnlineChat = () => {
         .single();
 
       if (error) console.error('Erro ao buscar amigo:', error);
-      else console.log('NOME:', friend?.name);
 
       if (data) {
-
         let avatar = data.avatar_url;
-
         if (avatar && !avatar.startsWith('http') && !avatar.startsWith('data:image')) {
-          // se estiver guardado como base64 no banco, transforma em data URI
           avatar = `data:image/jpeg;base64,${avatar}`;
         }
         if (avatar) {
@@ -149,14 +129,8 @@ const OnlineChat = () => {
           id: data.id,
           name: data.username,
           avatar_url: avatar || '',
-
         };
         setFriend(friendData);
-        console.log('avatar_url:', friendData.avatar_url)
-
-
-      } else if (error) {
-        console.error('Erro ao buscar amigo:', error.message);
       }
     };
 
@@ -168,201 +142,36 @@ const OnlineChat = () => {
 
     const channel = supabase
       .channel(`chat:${friendId}`)
-      .on(
-        'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'messages' },
-        (payload) => {
-          const newMessage = payload.new as Message;
-          if (
-            (newMessage.sender_id === session.user.id &&
-              newMessage.receiver_id === friendId) ||
-            (newMessage.sender_id === friendId &&
-              newMessage.receiver_id === session.user.id)
-          ) {
-            setMessages((prev) =>
-              prev.find((msg) => msg.id === newMessage.id)
-                ? prev
-                : [...prev, newMessage]
-            );
-
-          }
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, (payload) => {
+        const newMessage = payload.new as Message;
+        if (
+          (newMessage.sender_id === session.user.id && newMessage.receiver_id === friendId) ||
+          (newMessage.sender_id === friendId && newMessage.receiver_id === session.user.id)
+        ) {
+          setMessages((prev) =>
+            prev.find((msg) => msg.id === newMessage.id) ? prev : [...prev, newMessage]
+          );
         }
-      )
+      })
       .subscribe();
 
-
-      return () => {
-        try {
-          channel.unsubscribe();
-        } catch (e) {
-          // fallback: ignore unsubscribe errors
-        }
-      };
-    }
+    return () => {
+      try {
+        channel.unsubscribe();
+      } catch (e) {}
+    };
   }, [session, friendId]);
-
-  useEffect(() => {
-    // tenta rolar para o fim quando as mensagens mudam
-    try {
-      (flatListRef.current as any)?.scrollToEnd?.({ animated: true });
-    } catch (e) {
-      // ignora erros de scroll
-    }
-  }, [messages]);
 
   const parseInviteData = (messageText: string) => {
     try {
       const data = JSON.parse(messageText);
-
       if (data && typeof data === 'object') {
-        if (data.match_id && data.quiz_id) {
-          return { type: 'quiz', data: data };
-        }
-
-        if (data.lobby_id) {
-          return { type: 'lobby', data: data };
-        }
+        if (data.match_id && data.quiz_id) return { type: 'quiz', data };
+        if (data.lobby_id) return { type: 'lobby', data };
       }
-
       return null;
-    } catch (error) {
+    } catch {
       return null;
-    }
-  };
-
-  const handleQuizInviteResponse = async (message_id: string, inviteData: any, response: 'accept' | 'reject') => {
-    if (!session) {
-      console.error('Usuário não está autenticado.');
-      return;
-    }
-
-    try {
-      console.log(`${response === 'accept' ? '✅ Aceitando' : '❌ Rejeitando'} convite de quiz`);
-
-      if (response === 'accept') {
-        const { error } = await supabase
-          .from('quiz_participants')
-          .insert({
-            match_id: inviteData.match_id,
-            user_id: session.user.id,
-            is_ready: false,
-          });
-
-        if (error) {
-          console.error('❌ Erro ao aceitar convite:', error);
-          if (Platform.OS === 'web') {
-            alert('Não foi possível aceitar o convite.');
-          } else {
-            Alert.alert('Erro', 'Não foi possível aceitar o convite.');
-          }
-          return;
-        }
-
-        await supabase.from('messages').delete().eq('id', message_id);
-
-        console.log('✅ Convite aceito! Navegando para QuizWaitingRoom...');
-
-        (navigation as any).navigate('QuizWaitingRoom', {
-          matchId: inviteData.match_id,
-          quizId: inviteData.quiz_id,
-          quizTitle: inviteData.quiz_title,
-        });
-      } else {
-        await supabase.from('messages').delete().eq('id', message_id);
-
-        console.log('❌ Convite rejeitado');
-
-        if (Platform.OS === 'web') {
-          alert('Convite rejeitado.');
-        } else {
-          Alert.alert('Convite rejeitado', 'Você recusou o convite para o quiz.');
-        }
-
-        if (session) fetchMessages(session.user.id);
-      }
-    } catch (error) {
-      console.error('❌ Erro ao processar convite de quiz:', error);
-    }
-  };
-
-  const handleLobbyInviteResponse = async (message_id: string, lobby_id: string, response: 'accept' | 'reject') => {
-    if (!session) {
-      console.error('Usuário não está autenticado.');
-      return;
-    }
-
-    try {
-      const updatedInviteData = {
-        invite_status: response === 'accept' ? 'accepted' : 'rejected',
-      };
-
-      const { error: updateError } = await supabase
-        .from('messages')
-        .update(updatedInviteData)
-        .eq('id', message_id)
-        .eq('receiver_id', session.user.id);
-
-      if (updateError) {
-        console.error('Erro ao atualizar convite:', updateError);
-        return;
-      }
-
-      console.log(`Convite de lobby ${response === 'accept' ? 'aceito' : 'rejeitado'} com sucesso.`);
-
-      if (response === 'accept') {
-        const { data: lobbyData, error: lobbyError } = await supabase
-
-    return () => channel.unsubscribe();
-  }, [session, friendId]);
-
-  useEffect(() => {
-    if (flatListRef.current)
-      flatListRef.current.scrollToEnd({ animated: true });
-  }, [messages]);
-
-  const handleInviteResponse = async (
-    message_id: string,
-    lobby_id: string,
-    response: 'accept' | 'reject'
-  ) => {
-    if (!session) return;
-    try {
-      const { error: updateError } = await supabase
-        .from('messages')
-        .update({
-          invite_status: response === 'accept' ? 'accepted' : 'rejected',
-        })
-        .eq('id', message_id)
-        .eq('receiver_id', session.user.id);
-      if (updateError) return console.error(updateError);
-
-      if (response === 'accept') {
-        const { data: lobbyData, error } = await supabase
-          .from('lobbies')
-          .select('lobby_name')
-          .eq('id', lobby_id)
-          .single();
-
-        if (error || !lobbyData) return console.error(error);
-
-        await supabase.from('lobby_players').insert([
-          {
-            lobby_id,
-            player_id: session.user.id,
-            is_ready: false,
-            is_host: false,
-            joined_at: new Date().toISOString(),
-          },
-        ]);
-
-        navigation.navigate('Lobby', {
-          lessonTitle: lobbyData.lobby_name,
-          lobbyId: lobby_id,
-          session,
-        });
-      }
-    } catch (err) {
-      console.error(err);
     }
   };
 
@@ -371,6 +180,7 @@ const OnlineChat = () => {
     Poppins_600SemiBold,
   });
 
+  if (!fontsLoaded) return null;
 
   return (
     <KeyboardAvoidingView
@@ -378,32 +188,46 @@ const OnlineChat = () => {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       keyboardVerticalOffset={80}
     >
+      <ChatHeader
+        groupName={`Chat com: ${friend ? friend.name : 'Carregando...'}`}
+        friendName={friend ? friend.name : 'Carregando...'}
+        friendAvatar={
+          friend && friend.avatar_url
+            ? friend.avatar_url
+            : require('../assets/IconDefault.jpg')
+        }
+        onChallengePress={() => {}}
+        onBackPress={() => navigation.goBack()}
+      />
 
+      <View style={styles.container}>
+        <FlatList
+          ref={flatListRef}
+          data={messages}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={styles.flatListContent}
+          showsVerticalScrollIndicator={false}
+          renderItem={({ item }) => {
+            if (item.message_type === 'invitation') {
+              const inviteInfo = parseInviteData(item.message_text);
 
-        
-      
-              return (
-                <View style={styles.invitationMessage}>
-                  <Text style={styles.invitationText}>{item.message_text}</Text>
-
-                  
+              if (inviteInfo?.type === 'quiz') {
+                return (
                   <View style={styles.invitationMessage}>
-                    <Text style={styles.invitationText}>
-                      🎮 Convite para jogar Quiz
-                    </Text>
+                    <Text style={styles.invitationText}>🎮 Convite para jogar Quiz</Text>
                     <Text style={styles.quizTitleInChat}>
                       📝 {inviteInfo.data.quiz_title}
                     </Text>
                     <View style={styles.invitationActions}>
                       <TouchableOpacity
                         style={styles.acceptButton}
-                        onPress={() => handleQuizInviteResponse(item.id, inviteInfo.data, 'accept')}
+                        onPress={() => {}}
                       >
                         <Text style={styles.inviteButtonText}>✅ Aceitar</Text>
                       </TouchableOpacity>
                       <TouchableOpacity
                         style={styles.declineButtonStyle}
-                        onPress={() => handleQuizInviteResponse(item.id, inviteInfo.data, 'reject')}
+                        onPress={() => {}}
                       >
                         <Text style={styles.inviteButtonText}>❌ Rejeitar</Text>
                       </TouchableOpacity>
@@ -411,30 +235,6 @@ const OnlineChat = () => {
                   </View>
                 );
               }
-                  
-      <ChatHeader
-
-        groupName={`Chat com: ${friend ? friend.name : 'Carregando...'}`}
-        friendName={friend ? friend.name : 'Carregando...'}
-        friendAvatar={friend && friend.avatar_url ? friend.avatar_url : require('../assets/IconDefault.jpg')}
-        onChallengePress={() => { }}
-        onBackPress={() => navigation.goBack()}
-      />
-
-      <View style={styles.container}>
-
-        <FlatList
-          ref={flatListRef}
-          data={messages}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={styles.flatListContent}
-          showsVerticalScrollIndicator={false}
-        renderItem={({ item }) => {
-            if (item.message_type === 'invitation') {
-              const inviteInfo = parseInviteData(item.message_text);
-
-              if (inviteInfo?.type === 'quiz') {
-              
 
               if (inviteInfo?.type === 'lobby' && item.lobby_id) {
                 return (
@@ -443,39 +243,20 @@ const OnlineChat = () => {
                     <View style={styles.invitationActions}>
                       <TouchableOpacity
                         style={styles.acceptButton}
-                        onPress={() => handleLobbyInviteResponse(item.id, item.lobby_id!, 'accept')}
+                        onPress={() => {}}
                       >
                         <Text style={styles.inviteButtonText}>Aceitar</Text>
                       </TouchableOpacity>
                       <TouchableOpacity
-                        style={styles.inviteButton}
-                        onPress={() => handleLobbyInviteResponse(item.id, item.lobby_id!, 'reject')}
+                        style={styles.declineButtonStyle}
+                        onPress={() => {}}
                       >
-                        <Text style={styles.declineButton}>Rejeitar</Text>
+                        <Text style={styles.inviteButtonText}>Rejeitar</Text>
                       </TouchableOpacity>
                     </View>
                   </View>
                 );
-                      }
-                    >
-                      <Text style={styles.acceptButtonText}>Aceitar</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={styles.declineButton}
-                      onPress={() =>
-                        handleInviteResponse(
-                          item.id,
-                          item.lobby_id!,
-                          'reject'
-                        )
-                      }
-                    >
-                      <Text style={styles.declineButtonText}>Rejeitar</Text>
-                    </TouchableOpacity>
-                  </View>
-
-                </View>
-              );
+              }
             }
 
             return (
@@ -503,50 +284,30 @@ const OnlineChat = () => {
             returnKeyType="send"
             onSubmitEditing={handleSendMessage}
           />
-          <TouchableOpacity
-            onPress={handleSendMessage}
-            style={styles.sendButton}
-          >
+          <TouchableOpacity onPress={handleSendMessage} style={styles.sendButton}>
             <Ionicons name="send" size={24} color="#fff" />
           </TouchableOpacity>
         </View>
-   </View>
-
+      </View>
     </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#242948',
-
-  },
-  flatListContent: {
-    padding: 12,
-    paddingBottom: 140,
-  },
+  container: { flex: 1, backgroundColor: '#242948' },
+  flatListContent: { padding: 12, paddingBottom: 140 },
   sentMessage: {
     alignSelf: 'flex-end',
-
     backgroundColor: '#fff',
     borderTopLeftRadius: 20,
     borderBottomLeftRadius: 20,
     borderTopRightRadius: 20,
     padding: 14,
     marginVertical: 6,
-
     maxWidth: '75%',
-    color: '#000',
-  },
-  messageText: {
-    fontSize: 16,
-    color: '#000000ff',
-    fontFamily: 'Poppins_400Regular',
   },
   receivedMessage: {
     alignSelf: 'flex-start',
-
     backgroundColor: '#BDC4EE',
     borderTopRightRadius: 20,
     borderBottomRightRadius: 20,
@@ -554,7 +315,10 @@ const styles = StyleSheet.create({
     padding: 14,
     marginVertical: 6,
     maxWidth: '75%',
-    color: '#fff',
+  },
+  messageText: {
+    fontSize: 16,
+    color: '#000',
     fontFamily: 'Poppins_400Regular',
   },
   invitationMessage: {
@@ -565,14 +329,13 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: '#000706ff',
     maxWidth: '50%',
-
   },
   invitationText: {
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 5,
-      },
+  },
   quizTitleInChat: {
     color: '#FFF9E0',
     fontSize: 18,
@@ -583,7 +346,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginTop: 10,
-
+  },
   acceptButton: {
     backgroundColor: '#00bfae',
     padding: 10,
@@ -600,57 +363,24 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
   },
-  inviteButton: {
-    backgroundColor: '#1E3A8A',
-    padding: 10,
-    borderRadius: 5,
-    marginLeft: 5,
-    flex: 1,
-    alignItems: 'center',
-  },
   inviteButtonText: {
     color: '#FFFFFF',
     fontWeight: 'bold',
   },
-  declineButton: {
-    color: '#FFFFFF',
-    fontWeight: 'bold',
-  },
-  sendButton: {
-    backgroundColor: '#00bfae',
-    padding: 12,
-    borderRadius: 5,
-    marginLeft: 10,
-  },
-  messageText: {
-    fontSize: 16,
-    color: '#e0e0e0',
-
-  },
-  acceptButton: {
-    backgroundColor: '#00bfae',
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 12,
-  },
-  acceptButtonText: { color: '#fff', fontWeight: 'bold' },
-  declineButton: {
-    backgroundColor: '#d9534f',
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 12,
-
-  },
-  declineButtonText: { color: '#fff', fontWeight: 'bold' },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#fff',
-    borderRadius: 30,
+    borderRadius: 26,
     paddingHorizontal: 20,
     paddingVertical: 10,
-    fontSize: 16,
-    fontFamily: 'Poppins_400Regular',
+    marginBottom: 10,
+    marginLeft: 5,
+    marginRight: 5,
+    height: 55,
+  },
+  input: {
+    flex: 1,
     color: '#000',
   },
   sendButton: {
@@ -659,20 +389,6 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     marginLeft: 8,
   },
-  returnButtonContainer: {
-    position: 'absolute',
-    top: 16,
-    left: 16,
-  },
-  returnButton: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: '#2c2f44',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
 });
 
 export default OnlineChat;
-
