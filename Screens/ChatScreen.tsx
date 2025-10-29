@@ -1,10 +1,39 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, KeyboardAvoidingView, Platform, Keyboard, Alert } from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  Animated,
+  TouchableOpacity,
+  FlatList,
+  StyleSheet,
+  KeyboardAvoidingView,
+  Platform,
+  Keyboard,
+} from 'react-native';
+import {
+  useFonts,
+  Poppins_400Regular,
+  Poppins_600SemiBold,
+} from '@expo-google-fonts/poppins';
+
+
 import { supabase } from '../lib/supabase';
 import { NavigationProp, useNavigation, useRoute } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { RootStackParamList } from '../types';
 import { useIsFocused } from '@react-navigation/native';
+
+import ChatHeader from './ChatHeader';
+import Friends from './Friends';
+
+interface Friend {
+  id: string;
+  name: string;
+  avatar_url: string;
+}
+
 
 interface Message {
   id: string;
@@ -12,30 +41,35 @@ interface Message {
   receiver_id: string;
   message_text: string;
   created_at: string;
-  message_type: string;
-  lobby_id?: string;
+  message_type: string; // 'text' ou 'invitation'
+  lobby_id?: string; // opcional para convites
+
 }
 
 const OnlineChat = () => {
+  const [friend, setFriend] = useState<Friend | null>(null);
+
   const route = useRoute();
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const isFocused = useIsFocused();
   const { friendId } = route.params as { friendId: string };
+
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [session, setSession] = useState<any | null>(null);
-  const flatListRef = useRef<FlatList<Message> | null>(null);
+
+  const flatListRef = useRef<FlatList>(null);
 
   useEffect(() => {
     navigation.getParent()?.setOptions({
-      tabBarStyle: { display: isFocused ? 'none' : 'flex' }
+      tabBarStyle: { display: isFocused ? 'none' : 'flex' },
+
     });
   }, [isFocused]);
 
   useEffect(() => {
     const fetchSessionAndMessages = async () => {
-      const { data } = await supabase.auth.getSession();
-      const session = (data as any)?.session ?? null;
+      const { data: { session } } = await supabase.auth.getSession();
       setSession(session);
       if (session) fetchMessages(session.user.id);
     };
@@ -47,32 +81,17 @@ const OnlineChat = () => {
     const { data, error } = await supabase
       .from('messages')
       .select('*')
-      .or(`and(sender_id.eq.${userId},receiver_id.eq.${friendId}),and(sender_id.eq.${friendId},receiver_id.eq.${userId})`)
+      .or(
+        `and(sender_id.eq.${userId},receiver_id.eq.${friendId}),and(sender_id.eq.${friendId},receiver_id.eq.${userId})`
+      )
       .order('created_at', { ascending: true });
 
-    if (error) {
-      console.error('Erro ao buscar mensagens:', error);
-      setMessages([]);
-    } else {
-      setMessages((data as Message[]) ?? []);
-    }
+    if (error) console.error('Erro ao buscar mensagens:', error);
+    else setMessages(data || []);
   };
 
   const handleSendMessage = async () => {
-    if (!session) {
-      console.error('Usuário não autenticado.');
-      if (Platform.OS === 'web') {
-        alert('Você precisa estar autenticado para enviar mensagens.');
-      } else {
-        Alert.alert('Erro', 'Você precisa estar autenticado para enviar mensagens.');
-      }
-      return;
-    }
-
-    if (!newMessage.trim()) return;
-
-    const messageToSend = newMessage.trim();
-    setNewMessage('');
+    if (!newMessage.trim() || !session) return;
 
     const messageData = {
       sender_id: session.user.id,
@@ -82,39 +101,95 @@ const OnlineChat = () => {
       message_type: 'text',
     };
 
-    const { data: insertedData, error } = await supabase.from('messages').insert([messageData]).select().single();
 
-    if (error) {
-      console.error('Erro ao enviar mensagem:', error);
-    } else if (insertedData) {
-      setMessages((prevMessages) => [...prevMessages, insertedData as Message]);
-      Keyboard.dismiss();
-    }
+    setNewMessage('');
+    Keyboard.dismiss();
+
+    const { data: insertedData, error } = await supabase
+      .from('messages')
+      .insert([messageData])
+      .single();
+
+    if (error) console.error('Erro ao enviar mensagem:', error);
+    else if (insertedData) setMessages((prev) => [...prev, insertedData as Message]);
   };
 
   useEffect(() => {
-    if (session) {
-      const channel = supabase
-        .channel(`chat:${friendId}`)
-        .on('postgres_changes', {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'messages',
-        }, (payload) => {
-          const newMessageReceived = payload.new as Message;
+    const fetchFriend = async () => {
+
+
+      if (!friendId) return;
+
+      console.log('FriendId:', friendId);
+      console.log('avatar_url:', friend?.avatar_url);
+
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id, username, avatar_url')
+        .eq('id', friendId)
+        .single();
+
+      if (error) console.error('Erro ao buscar amigo:', error);
+      else console.log('NOME:', friend?.name);
+
+      if (data) {
+
+        let avatar = data.avatar_url;
+
+        if (avatar && !avatar.startsWith('http') && !avatar.startsWith('data:image')) {
+          // se estiver guardado como base64 no banco, transforma em data URI
+          avatar = `data:image/jpeg;base64,${avatar}`;
+        }
+        if (avatar) {
+          avatar = avatar.replace(/^data:image\/\w+;base64,/, '');
+          avatar = `data:image/jpeg;base64,${avatar}`;
+        }
+
+        const friendData: Friend = {
+          id: data.id,
+          name: data.username,
+          avatar_url: avatar || '',
+
+        };
+        setFriend(friendData);
+        console.log('avatar_url:', friendData.avatar_url)
+
+
+      } else if (error) {
+        console.error('Erro ao buscar amigo:', error.message);
+      }
+    };
+
+    fetchFriend();
+  }, [friendId]);
+
+  useEffect(() => {
+    if (!session) return;
+
+    const channel = supabase
+      .channel(`chat:${friendId}`)
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'messages' },
+        (payload) => {
+          const newMessage = payload.new as Message;
           if (
-            (newMessageReceived.sender_id === friendId && newMessageReceived.receiver_id === session.user.id) ||
-            (newMessageReceived.sender_id === session.user.id && newMessageReceived.receiver_id === friendId)
+            (newMessage.sender_id === session.user.id &&
+              newMessage.receiver_id === friendId) ||
+            (newMessage.sender_id === friendId &&
+              newMessage.receiver_id === session.user.id)
           ) {
-            setMessages((prevMessages) => {
-              if (!prevMessages.find((msg) => msg.id === newMessageReceived.id)) {
-                return [...prevMessages, newMessageReceived];
-              }
-              return prevMessages;
-            });
+            setMessages((prev) =>
+              prev.find((msg) => msg.id === newMessage.id)
+                ? prev
+                : [...prev, newMessage]
+            );
+
           }
-        })
-        .subscribe();
+        }
+      )
+      .subscribe();
+
 
       return () => {
         try {
@@ -236,60 +311,66 @@ const OnlineChat = () => {
 
       if (response === 'accept') {
         const { data: lobbyData, error: lobbyError } = await supabase
+
+    return () => channel.unsubscribe();
+  }, [session, friendId]);
+
+  useEffect(() => {
+    if (flatListRef.current)
+      flatListRef.current.scrollToEnd({ animated: true });
+  }, [messages]);
+
+  const handleInviteResponse = async (
+    message_id: string,
+    lobby_id: string,
+    response: 'accept' | 'reject'
+  ) => {
+    if (!session) return;
+    try {
+      const { error: updateError } = await supabase
+        .from('messages')
+        .update({
+          invite_status: response === 'accept' ? 'accepted' : 'rejected',
+        })
+        .eq('id', message_id)
+        .eq('receiver_id', session.user.id);
+      if (updateError) return console.error(updateError);
+
+      if (response === 'accept') {
+        const { data: lobbyData, error } = await supabase
           .from('lobbies')
           .select('lobby_name')
           .eq('id', lobby_id)
           .single();
 
-        if (lobbyError) {
-          console.error('Erro ao buscar o lobby_name:', lobbyError);
-          return;
-        }
+        if (error || !lobbyData) return console.error(error);
 
-        const lessonTitle = (lobbyData as any)?.lobby_name ?? 'Lobby';
+        await supabase.from('lobby_players').insert([
+          {
+            lobby_id,
+            player_id: session.user.id,
+            is_ready: false,
+            is_host: false,
+            joined_at: new Date().toISOString(),
+          },
+        ]);
 
-        const { error: insertError } = await supabase
-          .from('lobby_players')
-          .insert([
-            {
-              lobby_id: lobby_id,
-              player_id: session.user.id,
-              is_ready: false,
-              is_host: false,
-              joined_at: new Date().toISOString(),
-            },
-          ]);
-
-        if (insertError) {
-          console.error('Erro ao adicionar o jogador ao lobby:', insertError);
-          return;
-        }
-
-        console.log('Jogador adicionado ao lobby com sucesso.');
-
-        try {
-          const lobbyChannel = supabase.channel(`lobby:${lobby_id}`);
-          lobbyChannel.send({
-            type: 'broadcast',
-            event: 'player_joined',
-            payload: {
-              player_id: session.user.id,
-              username: session.user.user_metadata?.username,
-              avatar_url: session.user.user_metadata?.avatar_url,
-              is_ready: false,
-              is_host: false,
-            },
-          });
-        } catch (e) {
-          // ignora erros de broadcast
-        }
-
-        (navigation as any).navigate('Lobby', { lessonTitle: lessonTitle, lobbyId: lobby_id, session: session });
+        navigation.navigate('Lobby', {
+          lessonTitle: lobbyData.lobby_name,
+          lobbyId: lobby_id,
+          session,
+        });
       }
-    } catch (error) {
-      console.error('Erro ao processar o convite de lobby:', error);
+    } catch (err) {
+      console.error(err);
     }
   };
+
+  const [fontsLoaded] = useFonts({
+    Poppins_400Regular,
+    Poppins_600SemiBold,
+  });
+
 
   return (
     <KeyboardAvoidingView
@@ -297,18 +378,15 @@ const OnlineChat = () => {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       keyboardVerticalOffset={80}
     >
-      <View style={styles.container}>
-        <FlatList
-          ref={flatListRef}
-          data={messages}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={styles.flatListContent}
-          renderItem={({ item }) => {
-            if (item.message_type === 'invitation') {
-              const inviteInfo = parseInviteData(item.message_text);
 
-              if (inviteInfo?.type === 'quiz') {
-                return (
+
+        
+      
+              return (
+                <View style={styles.invitationMessage}>
+                  <Text style={styles.invitationText}>{item.message_text}</Text>
+
+                  
                   <View style={styles.invitationMessage}>
                     <Text style={styles.invitationText}>
                       🎮 Convite para jogar Quiz
@@ -333,6 +411,30 @@ const OnlineChat = () => {
                   </View>
                 );
               }
+                  
+      <ChatHeader
+
+        groupName={`Chat com: ${friend ? friend.name : 'Carregando...'}`}
+        friendName={friend ? friend.name : 'Carregando...'}
+        friendAvatar={friend && friend.avatar_url ? friend.avatar_url : require('../assets/IconDefault.jpg')}
+        onChallengePress={() => { }}
+        onBackPress={() => navigation.goBack()}
+      />
+
+      <View style={styles.container}>
+
+        <FlatList
+          ref={flatListRef}
+          data={messages}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={styles.flatListContent}
+          showsVerticalScrollIndicator={false}
+        renderItem={({ item }) => {
+            if (item.message_type === 'invitation') {
+              const inviteInfo = parseInviteData(item.message_text);
+
+              if (inviteInfo?.type === 'quiz') {
+              
 
               if (inviteInfo?.type === 'lobby' && item.lobby_id) {
                 return (
@@ -354,11 +456,24 @@ const OnlineChat = () => {
                     </View>
                   </View>
                 );
-              }
+                      }
+                    >
+                      <Text style={styles.acceptButtonText}>Aceitar</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.declineButton}
+                      onPress={() =>
+                        handleInviteResponse(
+                          item.id,
+                          item.lobby_id!,
+                          'reject'
+                        )
+                      }
+                    >
+                      <Text style={styles.declineButtonText}>Rejeitar</Text>
+                    </TouchableOpacity>
+                  </View>
 
-              return (
-                <View style={styles.invitationMessage}>
-                  <Text style={styles.invitationText}>{item.message_text}</Text>
                 </View>
               );
             }
@@ -377,30 +492,26 @@ const OnlineChat = () => {
           }}
         />
 
-        <View>
-          <TouchableOpacity
-            style={styles.returnButton}
-            onPress={() => navigation.navigate('Home2')}
-          >
-            <Ionicons name="arrow-back-circle-outline" size={80} color="black" style={{ fontWeight:'bold'}} />
-          </TouchableOpacity>
-        </View>
-
         <View style={styles.inputContainer}>
           <TextInput
-            style={styles.input}
-            placeholder="Digite sua mensagem..."
+            style={[styles.input, { outlineStyle: 'none' }]}
+            placeholder="Mande uma mensagem"
             placeholderTextColor="#aaa"
             value={newMessage}
             onChangeText={setNewMessage}
-            autoFocus
             blurOnSubmit={false}
+            returnKeyType="send"
+            onSubmitEditing={handleSendMessage}
           />
-          <TouchableOpacity onPress={handleSendMessage} style={styles.sendButton}>
-            <Ionicons name="send" size={20} color="#fff" />
+          <TouchableOpacity
+            onPress={handleSendMessage}
+            style={styles.sendButton}
+          >
+            <Ionicons name="send" size={24} color="#fff" />
           </TouchableOpacity>
         </View>
-      </View>
+   </View>
+
     </KeyboardAvoidingView>
   );
 };
@@ -408,53 +519,60 @@ const OnlineChat = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1a1a2e',
-    paddingBottom: 100,
+    backgroundColor: '#242948',
+
   },
   flatListContent: {
-    padding: 10,
-    paddingBottom: 100,
-  },
-  returnButton: {
-    width: 80,
-    height: 80,
-    borderRadius: 100,
-    backgroundColor: '#D9D9D9',
-    justifyContent: 'center',
-    alignItems: 'center',
+    padding: 12,
+    paddingBottom: 140,
   },
   sentMessage: {
     alignSelf: 'flex-end',
-    backgroundColor: '#00bfae',
-    borderRadius: 15,
-    padding: 10,
-    marginVertical: 5,
+
+    backgroundColor: '#fff',
+    borderTopLeftRadius: 20,
+    borderBottomLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: 14,
+    marginVertical: 6,
+
     maxWidth: '75%',
+    color: '#000',
+  },
+  messageText: {
+    fontSize: 16,
+    color: '#000000ff',
+    fontFamily: 'Poppins_400Regular',
   },
   receivedMessage: {
     alignSelf: 'flex-start',
-    backgroundColor: '#5c4f9d',
-    borderRadius: 15,
-    padding: 10,
-    marginVertical: 5,
+
+    backgroundColor: '#BDC4EE',
+    borderTopRightRadius: 20,
+    borderBottomRightRadius: 20,
+    borderTopLeftRadius: 20,
+    padding: 14,
+    marginVertical: 6,
     maxWidth: '75%',
+    color: '#fff',
+    fontFamily: 'Poppins_400Regular',
   },
   invitationMessage: {
-    backgroundColor: '#1e3a8a',
-    borderRadius: 10,
-    padding: 15,
-    marginVertical: 5,
-    alignSelf: 'flex-start',
-    maxWidth: '80%',
+    backgroundColor: '#5C6494',
+    borderRadius: 15,
+    padding: 12,
+    marginVertical: 4,
     borderWidth: 2,
-    borderColor: '#00bfae',
+    borderColor: '#000706ff',
+    maxWidth: '50%',
+
   },
   invitationText: {
-    color: '#FFFFFF',
+    color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 5,
-  },
+      },
   quizTitleInChat: {
     color: '#FFF9E0',
     fontSize: 18,
@@ -465,7 +583,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginTop: 10,
-  },
+
   acceptButton: {
     backgroundColor: '#00bfae',
     padding: 10,
@@ -507,26 +625,54 @@ const styles = StyleSheet.create({
   messageText: {
     fontSize: 16,
     color: '#e0e0e0',
+
   },
+  acceptButton: {
+    backgroundColor: '#00bfae',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 12,
+  },
+  acceptButtonText: { color: '#fff', fontWeight: 'bold' },
+  declineButton: {
+    backgroundColor: '#d9534f',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 12,
+
+  },
+  declineButtonText: { color: '#fff', fontWeight: 'bold' },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 10,
-    backgroundColor: '#2c2f44',
-    borderTopWidth: 1,
-    borderColor: '#444466',
-    position: 'absolute',
-    bottom: 0,
-    width: '100%',
+    backgroundColor: '#fff',
+    borderRadius: 30,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    fontSize: 16,
+    fontFamily: 'Poppins_400Regular',
+    color: '#000',
   },
-  input: {
-    flex: 1,
-    padding: 10,
-    backgroundColor: '#3a3d57',
-    borderRadius: 20,
-    marginRight: 10,
-    color: '#FFFFFF',
+  sendButton: {
+    backgroundColor: '#242948',
+    padding: 12,
+    borderRadius: 25,
+    marginLeft: 8,
+  },
+  returnButtonContainer: {
+    position: 'absolute',
+    top: 16,
+    left: 16,
+  },
+  returnButton: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: '#2c2f44',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 
 export default OnlineChat;
+

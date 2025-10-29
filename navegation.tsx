@@ -114,6 +114,7 @@ const Cornhub: React.FC<CornhubProps> = ({ session }) => (
       <RootStack.Screen name="GameQuizScreen" component={GameQuizScreen} />
       <RootStack.Screen name="QuizWaitingRoom" component={QuizWaitingRoom} />
       <RootStack.Screen name="QuizResultsScreen" component={QuizResultsScreen} />
+
     </RootStack.Navigator>
     
     {/* ✅ NOTIFICAÇÃO DENTRO DO NavigationContainer */}
