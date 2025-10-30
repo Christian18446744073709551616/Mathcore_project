@@ -6,6 +6,7 @@ import { RootStackParamList } from '../types';
 import { supabase } from '../lib/supabase';
 import { AntDesign, MaterialIcons, Entypo, FontAwesome, FontAwesome5, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import { allTopics, Topic } from '../data/topicsData';
 
 // Importando dados das lições
 import AdicaoSubtracao from '../Vsauces/MathBasicCont/AdicaoSubtracao.json';
