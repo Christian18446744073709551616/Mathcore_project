@@ -1,0 +1,234 @@
+[
+  {
+    "question": "Qual é a área de um quadrado com lado de comprimento 5?",
+    "options": [
+      {
+        "formula": "L²",
+        "formula_steps": "5 * 5",
+        "correct": true,
+        "correct_answer": "25"
+      },
+      {
+        "formula": "2L",
+        "formula_steps": "5 + 5",
+        "correct": false,
+        "correct_answer": "25"
+      },
+      {
+        "formula": "L + L",
+        "formula_steps": "5 + 5 + 5",
+        "correct": false,
+        "correct_answer": "25"
+      },
+      {
+        "formula": "L/2",
+        "formula_steps": "5 / 2",
+        "correct": false,
+        "correct_answer": "25"
+      }
+    ]
+  },
+  {
+    "question": "Qual é o perímetro de um quadrado cujo lado mede 8 unidades?",
+    "options": [
+      {
+        "formula": "4L",
+        "formula_steps": "8 + 8 + 8 + 8",
+        "correct": true,
+        "correct_answer": "32"
+      },
+      {
+        "formula": "L + L",
+        "formula_steps": "8 + 8",
+        "correct": false,
+        "correct_answer": "32"
+      },
+      {
+        "formula": "2L",
+        "formula_steps": "8 + 8",
+        "correct": false,
+        "correct_answer": "32"
+      },
+      {
+        "formula": "L + L + L",
+        "formula_steps": "8 + 8 + 8",
+        "correct": false,
+        "correct_answer": "32"
+      }
+    ]
+  },
+  {
+    "question": "Se o lado de um quadrado é 6, qual é o valor de sua área?",
+    "options": [
+      {
+        "formula": "L²",
+        "formula_steps": "6 * 6",
+        "correct": true,
+        "correct_answer": "36"
+      },
+      {
+        "formula": "L + L",
+        "formula_steps": "6 + 6",
+        "correct": false,
+        "correct_answer": "36"
+      },
+      {
+        "formula": "L * 4",
+        "formula_steps": "6 * 4",
+        "correct": false,
+        "correct_answer": "36"
+      },
+      {
+        "formula": "L/2",
+        "formula_steps": "6 / 2",
+        "correct": false,
+        "correct_answer": "36"
+      }
+    ]
+  },
+  {
+    "question": "Qual é o perímetro de um quadrado com lado 7?",
+    "options": [
+      {
+        "formula": "4L",
+        "formula_steps": "7 + 7 + 7 + 7",
+        "correct": true,
+        "correct_answer": "28"
+      },
+      {
+        "formula": "L + L",
+        "formula_steps": "7 + 7",
+        "correct": false,
+        "correct_answer": "28"
+      },
+      {
+        "formula": "2L",
+        "formula_steps": "7 + 7",
+        "correct": false,
+        "correct_answer": "28"
+      },
+      {
+        "formula": "L + L + L",
+        "formula_steps": "7 + 7 + 7",
+        "correct": false,
+        "correct_answer": "28"
+      }
+    ]
+  },
+  {
+    "question": "Um quadrado tem um perímetro de 20 unidades. Qual é o comprimento de um de seus lados?",
+    "options": [
+      {
+        "formula": "P / 4",
+        "formula_steps": "20 / 4",
+        "correct": true,
+        "correct_answer": "5"
+      },
+      {
+        "formula": "P * 4",
+        "formula_steps": "20 * 4",
+        "correct": false,
+        "correct_answer": "5"
+      },
+      {
+        "formula": "P / 2",
+        "formula_steps": "20 / 2",
+        "correct": false,
+        "correct_answer": "5"
+      },
+      {
+        "formula": "P * 2",
+        "formula_steps": "20 * 2",
+        "correct": false,
+        "correct_answer": "5"
+      }
+    ]
+  },
+  {
+    "question": "Se a área de um quadrado é 64, qual é o comprimento do lado?",
+    "options": [
+      {
+        "formula": "√A",
+        "formula_steps": "√64",
+        "correct": true,
+        "correct_answer": "8"
+      },
+      {
+        "formula": "A + 4",
+        "formula_steps": "64 + 4",
+        "correct": false,
+        "correct_answer": "8"
+      },
+      {
+        "formula": "A / 8",
+        "formula_steps": "64 / 8",
+        "correct": false,
+        "correct_answer": "8"
+      },
+      {
+        "formula": "A / 2",
+        "formula_steps": "64 / 2",
+        "correct": false,
+        "correct_answer": "8"
+      }
+    ]
+  },
+  {
+    "question": "Se um quadrado tem lado de comprimento 12, qual é o valor de sua área?",
+    "options": [
+      {
+        "formula": "L²",
+        "formula_steps": "12 * 12",
+        "correct": true,
+        "correct_answer": "144"
+      },
+      {
+        "formula": "L + L",
+        "formula_steps": "12 + 12",
+        "correct": false,
+        "correct_answer": "144"
+      },
+      {
+        "formula": "L * 4",
+        "formula_steps": "12 * 4",
+        "correct": false,
+        "correct_answer": "144"
+      },
+      {
+        "formula": "L / 2",
+        "formula_steps": "12 / 2",
+        "correct": false,
+        "correct_answer": "144"
+      }
+    ]
+  },
+  {
+    "question": "Se um quadrado tem área de 36, qual é o comprimento do lado?",
+    "options": [
+      {
+        "formula": "√A",
+        "formula_steps": "√36",
+        "correct": true,
+        "correct_answer": "6"
+      },
+      {
+        "formula": "A + 2",
+        "formula_steps": "36 + 2",
+        "correct": false,
+        "correct_answer": "6"
+      },
+      {
+        "formula": "A / 6",
+        "formula_steps": "36 / 6",
+        "correct": false,
+        "correct_answer": "6"
+      },
+      {
+        "formula": "A / 4",
+        "formula_steps": "36 / 4",
+        "correct": false,
+        "correct_answer": "6"
+      }
+    ]
+  }
+]
