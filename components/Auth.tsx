@@ -140,7 +140,6 @@ export default function Auth() {
         } else {
           console.log('Nome do usuário após criação:', profileData.username)
         }
-        // ===================================
       }
     }
 
