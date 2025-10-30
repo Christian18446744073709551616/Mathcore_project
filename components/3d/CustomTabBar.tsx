@@ -14,6 +14,7 @@ import MenuIcon from './icons/MenuIcon';
 import FlashcardsIcon from './icons/FlashcardsIcon';
 import ConfiguracoesIcon from './icons/ConfiguracoesIcon';
 import SairIcon from './icons/SairIcon';
+import { supabase } from '../../lib/supabase';
 
 const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigation }) => {
   const activeTabRoute = state.routes[state.index];
@@ -122,7 +123,9 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigat
 
             <TouchableOpacity 
               style={styles.menuItem}
-              onPress={() => handleMenuNavigation('Sair')}
+
+
+                onPress={() => supabase.auth.signOut()}
             >
               <SairIcon size={24} color="#1f1f1fff" />
               <Text style={styles.menuText}>Sair</Text>

@@ -25,7 +25,7 @@ AppState.addEventListener('change', (state) => {
 
 export default function Auth() {
   const [isSignUp, setIsSignUp] = useState<boolean>(false)
-  
+
   // Login states
   const [email, setEmail] = useState<string>('')
   const [password, setPassword] = useState<string>('')
@@ -78,61 +78,44 @@ export default function Auth() {
       setLoading(false)
       return
     }
-
     if (!email.trim()) {
       setEmailError('Digite seu e-mail')
       setLoading(false)
       return
     }
-
     if (!password) {
       setPasswordError('Digite sua senha')
       setLoading(false)
       return
     }
-
     if (hasTEA === null) {
       Alert.alert('Atenção', 'Por favor, selecione se você tem TEA')
       setLoading(false)
       return
     }
 
-    const {
-      data: { session },
-      error,
-    } = await supabase.auth.signUp({
+    // Cria usuário no Supabase
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
-      options: {
-        data: {
-          name: name,
-          has_tea: hasTEA,
-        },
-      },
+      options: { data: { has_tea: hasTEA } },
     })
 
     if (error) {
-      const msg = error.message.toLowerCase()
-
-      if (msg.includes('already registered') || msg.includes('already exists')) {
-        setEmailError('Este e-mail já está em uso.')
-      } else if (msg.includes('password')) {
-        setPasswordError('Senha inválida ou muito fraca.')
-      } else {
-        Alert.alert('Erro ao cadastrar', error.message)
-      }
-
+      Alert.alert('Erro ao criar conta', error.message)
       setLoading(false)
       return
     }
 
-    // Criar perfil na tabela profiles com username e has_tea
-    if (session) {
+    if (data.user) {
+      const userId = data.user.id
+
+      // Cria perfil
       const { error: profileError } = await supabase
         .from('profiles')
         .insert({
-          id: session.user.id,
-          username: name,  // Nome vira username
+          id: userId,
+          username: name.trim(),
           has_tea: hasTEA,
           avatar_url: '',
           updated_at: new Date(),
@@ -140,18 +123,34 @@ export default function Auth() {
 
       if (profileError) {
         console.error('Erro ao criar perfil:', profileError)
-        Alert.alert('Erro', 'Não foi possível criar seu perfil. Tente novamente.')
+        Alert.alert('Erro', 'Não foi possível criar seu perfil.')
       } else {
-        console.log('Perfil criado com sucesso! Username:', name)
+        console.log('Perfil criado com sucesso!', name)
+
+        // ==== ADICIONE ISSO PARA TESTES ====
+        // Busca o perfil logo após criar para ver se o nome está lá
+        const { data: profileData, error: fetchError } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', userId)
+          .single()
+
+        if (fetchError) {
+          console.error('Erro ao buscar perfil após criação:', fetchError)
+        } else {
+          console.log('Nome do usuário após criação:', profileData.username)
+        }
+        // ===================================
       }
     }
 
-    if (!session) {
-      Alert.alert('Confira seu e-mail para verificar sua conta!')
-    }
-
+    Alert.alert(
+      'Verifique seu e-mail',
+      'Enviamos um link de confirmação. Após confirmar, entre novamente.'
+    )
     setLoading(false)
   }
+
 
   function switchToSignUp() {
     setIsSignUp(true)
@@ -213,11 +212,11 @@ export default function Auth() {
                     rightIcon={
                       emailError
                         ? {
-                            type: 'font-awesome',
-                            name: 'exclamation-circle',
-                            color: 'red',
-                            size: 20,
-                          }
+                          type: 'font-awesome',
+                          name: 'exclamation-circle',
+                          color: 'red',
+                          size: 20,
+                        }
                         : undefined
                     }
                   />
@@ -329,11 +328,11 @@ export default function Auth() {
                     rightIcon={
                       emailError
                         ? {
-                            type: 'font-awesome',
-                            name: 'exclamation-circle',
-                            color: 'red',
-                            size: 20,
-                          }
+                          type: 'font-awesome',
+                          name: 'exclamation-circle',
+                          color: 'red',
+                          size: 20,
+                        }
                         : undefined
                     }
                   />
