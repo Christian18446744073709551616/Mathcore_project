@@ -99,7 +99,7 @@ const FlashcardsScreen = () => {
   };
 
   const handleNavigateToAICreation = () => {
-    navigation.navigate('CreateFlashcardScreen', { withAI: true, decks: decks });
+    navigation.navigate('AICreateFlashcardScreen', { withAI: true, decks: decks });
   };
 
   const handleNavigateToManualCreation = () => {

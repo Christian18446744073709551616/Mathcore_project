@@ -31,14 +31,15 @@ import QuizResultsScreen from './Screens/Quiz/QuizResultsScreen';
 import QRScanner from './Screens/Quiz/QRScanner';
 import QuizInviteNotification from './components/QuizInviteNotification';
 
-import ChangePassword from './Screens/ChangePassword';    
+import ChangePassword from './Screens/ChangePassword';
 import AudioScreen from './Screens/Audio';
-import AreaTEAScreen from './Screens/AreaTEA';  
-import QuestionGenerator from './components/QuestionGenerator'; 
+import AreaTEAScreen from './Screens/AreaTEA';
+import QuestionGenerator from './components/QuestionGenerator';
 
 
 import CustomTabBar from './components/3d/CustomTabBar';
 import { RootStackParamList } from './types';
+import AICreateFlashcardScreen from 'Screens/Flashcards/AICreateFlashcardScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -81,6 +82,12 @@ const FlashcardsStack: React.FC<{ session: Session }> = ({ session }) => (
     <Stack.Screen name="FlashcardsScreen" component={FlashcardsScreen} initialParams={{ session }} />
     <Stack.Screen name="CreateFlashcardScreen" component={CreateFlashcardScreen} initialParams={{ session }} />
     <Stack.Screen name="ReviewFlashcardScreen" component={ReviewFlashcardScreen} initialParams={{ session }} />
+    <Stack.Screen
+      name="AICreateFlashcardScreen"
+      component={AICreateFlashcardScreen}
+      initialParams={{ session }}
+    />
+
   </Stack.Navigator>
 );
 
@@ -108,8 +115,8 @@ const Tabs: React.FC<{ session: Session }> = ({ session }) => (
       },
     })}
   >
-    
-    <Tab.Screen name="GeometryLessons" children={() => <HomeStack session={session} />} /> 
+
+    <Tab.Screen name="GeometryLessons" children={() => <HomeStack session={session} />} />
     <Tab.Screen name="MathFincLessons" children={() => <HomeStack session={session} />} />
     <Tab.Screen name="Friends" children={() => <FriendsStack session={session} />} />
     <Tab.Screen name="Exercicios" children={SimpleStack(QuestionGenerator, session)} />
@@ -128,9 +135,9 @@ const Cornhub: React.FC<CornhubProps> = ({ session }) => (
   <NavigationContainer>
     <RootStack.Navigator screenOptions={{ headerShown: false }}>
       <RootStack.Screen name="Tabs" children={() => <Tabs session={session} />} />
-      <RootStack.Screen 
-        name="ChatScreen" 
-        component={ChatScreen} 
+      <RootStack.Screen
+        name="ChatScreen"
+        component={ChatScreen}
         options={{ tabBarStyle: { display: 'none' } }}
       />
       <RootStack.Screen name="Lobby" component={Lobby} initialParams={{ session }} options={{ presentation: 'modal' }} />
@@ -141,7 +148,7 @@ const Cornhub: React.FC<CornhubProps> = ({ session }) => (
       <RootStack.Screen name="Audio" component={AudioScreen} initialParams={{ session }} />
       <RootStack.Screen name="AreaTEA" component={AreaTEAScreen} initialParams={{ session }} />
     </RootStack.Navigator>
-    
+
     <QuizInviteNotification userId={session.user.id} />
   </NavigationContainer>
 );
