@@ -28,9 +28,13 @@ import QuizWaitingRoom from './Screens/Quiz/QuizWaitingRoom';
 import QuizResultsScreen from './Screens/Quiz/QuizResultsScreen';
 import QRScanner from './Screens/Quiz/QRScanner';
 import QuizInviteNotification from './components/QuizInviteNotification';
+
 import ChangePassword from './Screens/ChangePassword';    
 import AudioScreen from './Screens/Audio';
-import AreaTEAScreen from './Screens/AreaTEA';
+import AreaTEAScreen from './Screens/AreaTEA';  
+import QuestionGenerator from './components/QuestionGenerator'; 
+
+
 import CustomTabBar from './components/3d/CustomTabBar';
 import { RootStackParamList } from './types';
 
@@ -94,7 +98,7 @@ const Tabs: React.FC<{ session: Session }> = ({ session }) => (
     <Tab.Screen name="GeometryLessons" children={() => <HomeStack session={session} />} /> 
     <Tab.Screen name="MathFincLessons" children={() => <HomeStack session={session} />} />
     <Tab.Screen name="Friends" children={() => <FriendsStack session={session} />} />
-    <Tab.Screen name="Exercicios" children={SimpleStack(ExerciciosScreen, session)} />
+    <Tab.Screen name="Exercicios" children={SimpleStack(QuestionGenerator, session)} />
     <Tab.Screen name="Desempenho" children={SimpleStack(DesempenhoScreen, session)} />
     <Tab.Screen name="Quiz" children={() => <QuizStack session={session} />} />
     <Tab.Screen name="Flashcards" children={SimpleStack(FlashcardsScreen, session)} />
