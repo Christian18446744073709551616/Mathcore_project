@@ -25,6 +25,7 @@ import QuizWaitingRoom from './Screens/Quiz/QuizWaitingRoom';
 import QuizResultsScreen from './Screens/Quiz/QuizResultsScreen';
 import QRScanner from './Screens/Quiz/QRScanner';
 import QuizInviteNotification from './components/QuizInviteNotification';
+import ChangePassword from './Screens/ChangePassword';    
 
 import CustomTabBar from './components/3d/CustomTabBar';
 import { RootStackParamList } from './types';
@@ -93,7 +94,7 @@ const Tabs: React.FC<{ session: Session }> = ({ session }) => (
     <Tab.Screen name="Desempenho" children={SimpleStack(DesempenhoScreen, session)} />
     <Tab.Screen name="Quiz" children={() => <QuizStack session={session} />} />
     <Tab.Screen name="Flashcards" children={SimpleStack(FlashcardsScreen, session)} />
-    <Tab.Screen name="Configuracoes" children={SimpleStack(ConfiguracoesScreen, session)} />
+    <Tab.Screen name="Configuracoes" children={SimpleStack(ChangePassword, session)} />
     <Tab.Screen name="Settings" children={() => <SettingsScreen />} />
   </Tab.Navigator>
 );
