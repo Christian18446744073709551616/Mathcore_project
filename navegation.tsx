@@ -29,7 +29,8 @@ import QuizResultsScreen from './Screens/Quiz/QuizResultsScreen';
 import QRScanner from './Screens/Quiz/QRScanner';
 import QuizInviteNotification from './components/QuizInviteNotification';
 import ChangePassword from './Screens/ChangePassword';    
-
+import AudioScreen from './Screens/Audio';
+import AreaTEAScreen from './Screens/AreaTEA';
 import CustomTabBar from './components/3d/CustomTabBar';
 import { RootStackParamList } from './types';
 
@@ -40,7 +41,6 @@ interface CornhubProps {
   session: Session;
 }
 
-// Stacks para Home e Friends
 const HomeStack: React.FC<{ session: Session }> = ({ session }) => (
   <Stack.Navigator initialRouteName="Home2" screenOptions={{ headerShown: false }}>
     <Stack.Screen name="Home2" component={Home2Screen} />
@@ -61,7 +61,6 @@ const FriendsStack: React.FC<{ session: Session }> = ({ session }) => (
   </Stack.Navigator>
 );
 
-// --- QUIZSTACK ---
 const QuizStack: React.FC<{ session: Session }> = ({ session }) => (
   <Stack.Navigator screenOptions={{ headerShown: false }}>
     <Stack.Screen name="QuizScreen" component={QuizScreen} initialParams={{ session }} />
@@ -70,14 +69,12 @@ const QuizStack: React.FC<{ session: Session }> = ({ session }) => (
   </Stack.Navigator>
 );
 
-// Stacks simples
 const SimpleStack = (ScreenComponent: React.FC<any>, session?: Session) => () => (
   <Stack.Navigator screenOptions={{ headerShown: false }}>
     <Stack.Screen name={ScreenComponent.name} component={ScreenComponent} initialParams={session ? { session } : undefined} />
   </Stack.Navigator>
 );
 
-// Navegação por Tabs
 const Tabs: React.FC<{ session: Session }> = ({ session }) => (
   <Tab.Navigator
     initialRouteName="GeometryLessons"
@@ -101,12 +98,11 @@ const Tabs: React.FC<{ session: Session }> = ({ session }) => (
     <Tab.Screen name="Desempenho" children={SimpleStack(DesempenhoScreen, session)} />
     <Tab.Screen name="Quiz" children={() => <QuizStack session={session} />} />
     <Tab.Screen name="Flashcards" children={SimpleStack(FlashcardsScreen, session)} />
-    <Tab.Screen name="Configuracoes" children={SimpleStack(ChangePassword, session)} />
+    <Tab.Screen name="Configuracoes" children={SimpleStack(ConfiguracoesScreen, session)} />
     <Tab.Screen name="Settings" children={() => <SettingsScreen />} />
   </Tab.Navigator>
 );
 
-// RootStack
 const RootStack = createNativeStackNavigator();
 
 const Cornhub: React.FC<CornhubProps> = ({ session }) => (
@@ -122,10 +118,11 @@ const Cornhub: React.FC<CornhubProps> = ({ session }) => (
       <RootStack.Screen name="GameQuizScreen" component={GameQuizScreen} />
       <RootStack.Screen name="QuizWaitingRoom" component={QuizWaitingRoom} />
       <RootStack.Screen name="QuizResultsScreen" component={QuizResultsScreen} />
-
+      <RootStack.Screen name="ChangePassword" component={ChangePassword} initialParams={{ session }} />
+      <RootStack.Screen name="Audio" component={AudioScreen} initialParams={{ session }} />
+      <RootStack.Screen name="AreaTEA" component={AreaTEAScreen} initialParams={{ session }} />
     </RootStack.Navigator>
     
-    {/* ✅ NOTIFICAÇÃO DENTRO DO NavigationContainer */}
     <QuizInviteNotification userId={session.user.id} />
   </NavigationContainer>
 );
