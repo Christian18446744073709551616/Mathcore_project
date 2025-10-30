@@ -1,0 +1,29 @@
+{
+  "lessonTitle": "Quadrados",
+  "fundamentals": "O quadrado é uma figura plana em que todos seus lados têm o mesmo tamanho, formando um ângulo de 90°. Lados opostos, paralelos e equivalentes, todos são ângulos retos.",
+  "formulas": [
+    {
+      "name": "Área",
+      "formula": "A área de um quadrado é igual à multiplicação das medidas de dois lados A = L²",
+      "teste": "ExemploQuadrado.jpg"
+    },
+    {
+      "name": "Perímetro",
+      "formula": "O perímetro P de um quadrado de lado L é a soma dos quatro lados, o que resulta na fórmula: P = 4L"
+    },
+    {
+      "name": "Diagonal",
+      "formula": "A medida d da diagonal de um quadrado de lado L é dada pela fórmula: d = L√2"
+    }
+  ],
+  "examples": [
+    {
+      "question": "Se o lado de um quadrado é 5, qual sua área?",
+      "solution": "A = 5² = 25"
+    },
+    {
+      "question": "Qual é o perímetro de um quadrado com lado 3?",
+      "solution": "P = 4 * 3 = 12"
+    }
+  ]
+}

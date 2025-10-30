@@ -7,7 +7,7 @@ interface TitleScreenProps {
   session: any; // Sessão atual
 }
 
-const TitleScreen: React.FC<TitleScreenProps> = ({ onFinish, session }) => {
+const TitleScreen: React.FC<TitleScreenProps> = ({ onFinish, session }) => { 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Mathcore</Text>

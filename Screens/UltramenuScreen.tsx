@@ -14,7 +14,7 @@ const UltramenuScreen = ({ route }: { route: UltramenuScreenRouteProp }) => {
   const navigation = useNavigation<UltramenuScreenNavigationProp>();
   const { lessonTitle } = route.params; // Recebe o título da lição
   const [session, setSession] = useState<any | null>(null);
-  console.log('UltramenuScreen renderizou');
+  console.log('UltramenuScreen renderizou'); 
 
   
   useEffect(() => {
