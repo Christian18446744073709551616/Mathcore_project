@@ -19,7 +19,9 @@ import Lobby from './Screens/Lobby';
 import ChatScreen from './Screens/ChatScreen';
 import ExerciciosScreen from './Screens/ExerciciosScreen';
 import DesempenhoScreen from './Screens/DesempenhoScreen';
-import FlashcardsScreen from './Screens/FlashcardsScreen';
+import FlashcardsScreen from './Screens/Flashcards/FlashcardsScreen';
+import CreateFlashcardScreen from './Screens/Flashcards/CreateFlashcardScreen';
+import ReviewFlashcardScreen from './Screens/Flashcards/ReviewFlashcardScreen';
 import ConfiguracoesScreen from './Screens/ConfiguracoesScreen';
 import QuizScreen from './Screens/Quiz/QuizScreen';
 import NovoQuizScreen from './Screens/Quiz/NovoQuizScreen';
@@ -73,6 +75,17 @@ const QuizStack: React.FC<{ session: Session }> = ({ session }) => (
   </Stack.Navigator>
 );
 
+
+const FlashcardsStack: React.FC<{ session: Session }> = ({ session }) => (
+  <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Screen name="FlashcardsScreen" component={FlashcardsScreen} initialParams={{ session }} />
+    <Stack.Screen name="CreateFlashcardScreen" component={CreateFlashcardScreen} initialParams={{ session }} />
+    <Stack.Screen name="ReviewFlashcardScreen" component={ReviewFlashcardScreen} initialParams={{ session }} />
+  </Stack.Navigator>
+);
+
+
+
 const SimpleStack = (ScreenComponent: React.FC<any>, session?: Session) => () => (
   <Stack.Navigator screenOptions={{ headerShown: false }}>
     <Stack.Screen name={ScreenComponent.name} component={ScreenComponent} initialParams={session ? { session } : undefined} />
@@ -103,6 +116,7 @@ const Tabs: React.FC<{ session: Session }> = ({ session }) => (
     <Tab.Screen name="Quiz" children={() => <QuizStack session={session} />} />
     <Tab.Screen name="Flashcards" children={SimpleStack(FlashcardsScreen, session)} />
     <Tab.Screen name="Configuracoes" children={SimpleStack(ConfiguracoesScreen, session)} />
+
     <Tab.Screen name="Settings" children={() => <SettingsScreen />} />
   </Tab.Navigator>
 );

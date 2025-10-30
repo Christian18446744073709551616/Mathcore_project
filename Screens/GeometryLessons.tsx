@@ -6,6 +6,7 @@ import { RootStackParamList } from '../types';
 import { supabase } from '../lib/supabase';
 import { AntDesign, MaterialIcons, Entypo, FontAwesome, FontAwesome5, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import { allTopics, Topic } from '../data/topicsData';
 
 // Importando dados das lições
 import quadradosData from '../Vsauces/GeometryCont/quadrados.json';
@@ -29,7 +30,36 @@ type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Geometr
 
 function Accordion() {
   const [open, setOpen] = useState(false);
-  const navigation = useNavigation<HomeScreenNavigationProp>();
+  const navigation = useNavigation<any>();
+  
+  // --- Lendo os tópicos de Geometria (ID '1') ---
+  const geometryTopics = allTopics['1'];
+
+  // Função para renderizar os botões em pares
+  const renderTopicRows = (topics: Topic[]) => {
+    const rows = [];
+    for (let i = 0; i < topics.length; i += 2) {
+      rows.push(
+        <View style={styles.row} key={`row-${i}`}>
+          <TouchableOpacity
+            style={styles.lessonBox}
+            onPress={() => navigation.navigate('Lesson', { lessonTitle: topics[i].name })}
+          >
+            <Text style={styles.lessonTitle}>{topics[i].name}</Text>
+          </TouchableOpacity>
+          {topics[i + 1] ? (
+            <TouchableOpacity
+              style={styles.lessonBox}
+              onPress={() => navigation.navigate('Lesson', { lessonTitle: topics[i + 1].name })}
+            >
+              <Text style={styles.lessonTitle}>{topics[i + 1].name}</Text>
+            </TouchableOpacity>
+          ) : <View style={{flex: 1, marginHorizontal: 30}} /> /* Espaço vazio para alinhar */}
+        </View>
+      );
+    }
+    return rows;
+  };
 
   return (
     <View style={styles.container}>
@@ -44,6 +74,9 @@ function Accordion() {
           <ScrollView style={styles.scrollLesson} showsVerticalScrollIndicator={false}
           showsHorizontalScrollIndicator={false}>
           <View style={styles.content}>
+            <View style={styles.lessonContainer}>
+              {renderTopicRows(geometryTopics)}
+              </View>
             <View style={styles.lessonContainer}>
               <View style={styles.row}>
                 {/* ✅ Quadrados agora vai direto para Lesson */}

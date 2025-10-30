@@ -19,7 +19,7 @@ import { supabase } from '../../lib/supabase';
 const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigation }) => {
   const activeTabRoute = state.routes[state.index];
   const focusedRouteName = getFocusedRouteNameFromRoute(activeTabRoute) ?? '';
-  const screensToHideTabBar = ['NovoQuizScreen', 'GameQuizScreen'];
+  const screensToHideTabBar = ['NovoQuizScreen', 'GameQuizScreen', 'CreateFlashcardScreen', 'ReviewFlashcardScreen'];
 
   if (screensToHideTabBar.includes(focusedRouteName)) {
     return null;
