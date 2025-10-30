@@ -108,13 +108,14 @@ const Tabs: React.FC<{ session: Session }> = ({ session }) => (
       },
     })}
   >
+    
     <Tab.Screen name="GeometryLessons" children={() => <HomeStack session={session} />} /> 
     <Tab.Screen name="MathFincLessons" children={() => <HomeStack session={session} />} />
     <Tab.Screen name="Friends" children={() => <FriendsStack session={session} />} />
     <Tab.Screen name="Exercicios" children={SimpleStack(QuestionGenerator, session)} />
     <Tab.Screen name="Desempenho" children={SimpleStack(DesempenhoScreen, session)} />
     <Tab.Screen name="Quiz" children={() => <QuizStack session={session} />} />
-    <Tab.Screen name="Flashcards" children={SimpleStack(FlashcardsScreen, session)} />
+    <Tab.Screen name="Flashcards" component={FlashcardsStack} />
     <Tab.Screen name="Configuracoes" children={SimpleStack(ConfiguracoesScreen, session)} />
 
     <Tab.Screen name="Settings" children={() => <SettingsScreen />} />

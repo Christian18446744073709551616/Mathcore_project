@@ -4,7 +4,7 @@ import { Feather } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { supabase } from '../../lib/supabase';
-
+import CreateFlashcardScreen from './CreateFlashcardScreen';
 // --- ATUALIZAÇÃO 1: Importando a fonte de dados dos tópicos ---
 import { allTopics } from '../../data/topicsData'; // Garanta que o caminho esteja correto
 import { Content } from './home.2';
@@ -104,6 +104,7 @@ const FlashcardsScreen = () => {
 
   const handleNavigateToManualCreation = () => {
     navigation.navigate('CreateFlashcardScreen', { withAI: false, decks: decks });
+    console.log('Navegando...', navigation.getState());
   };
 
   if (loading) {
