@@ -9,6 +9,7 @@ import {
   ScrollView,
   Text,
   Image,
+  TouchableOpacity,
 } from 'react-native'
 import { supabase } from '../lib/supabase'
 import { Button, Input } from '@rneui/themed'
@@ -23,13 +24,20 @@ AppState.addEventListener('change', (state) => {
 })
 
 export default function Auth() {
+  const [isSignUp, setIsSignUp] = useState<boolean>(false)
+  
+  // Login states
   const [email, setEmail] = useState<string>('')
   const [password, setPassword] = useState<string>('')
   const [loading, setLoading] = useState<boolean>(false)
   const [showPassword, setShowPassword] = useState<boolean>(false)
-
   const [emailError, setEmailError] = useState<string>('')
   const [passwordError, setPasswordError] = useState<string>('')
+
+  // SignUp states
+  const [name, setName] = useState<string>('')
+  const [nameError, setNameError] = useState<string>('')
+  const [hasTEA, setHasTEA] = useState<boolean | null>(null)
 
   async function signInWithEmail() {
     setLoading(true)
@@ -60,8 +68,34 @@ export default function Auth() {
 
   async function signUpWithEmail() {
     setLoading(true)
+    setNameError('')
     setEmailError('')
     setPasswordError('')
+
+    // Validações
+    if (!name.trim()) {
+      setNameError('Digite seu nome')
+      setLoading(false)
+      return
+    }
+
+    if (!email.trim()) {
+      setEmailError('Digite seu e-mail')
+      setLoading(false)
+      return
+    }
+
+    if (!password) {
+      setPasswordError('Digite sua senha')
+      setLoading(false)
+      return
+    }
+
+    if (hasTEA === null) {
+      Alert.alert('Atenção', 'Por favor, selecione se você tem TEA')
+      setLoading(false)
+      return
+    }
 
     const {
       data: { session },
@@ -69,6 +103,12 @@ export default function Auth() {
     } = await supabase.auth.signUp({
       email,
       password,
+      options: {
+        data: {
+          name: name,
+          has_tea: hasTEA,
+        },
+      },
     })
 
     if (error) {
@@ -86,11 +126,47 @@ export default function Auth() {
       return
     }
 
+    // Criar perfil na tabela profiles com username e has_tea
+    if (session) {
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .insert({
+          id: session.user.id,
+          username: name,  // Nome vira username
+          has_tea: hasTEA,
+          avatar_url: '',
+          updated_at: new Date(),
+        })
+
+      if (profileError) {
+        console.error('Erro ao criar perfil:', profileError)
+        Alert.alert('Erro', 'Não foi possível criar seu perfil. Tente novamente.')
+      } else {
+        console.log('Perfil criado com sucesso! Username:', name)
+      }
+    }
+
     if (!session) {
       Alert.alert('Confira seu e-mail para verificar sua conta!')
     }
 
     setLoading(false)
+  }
+
+  function switchToSignUp() {
+    setIsSignUp(true)
+    // Limpa erros
+    setEmailError('')
+    setPasswordError('')
+    setNameError('')
+  }
+
+  function switchToLogin() {
+    setIsSignUp(false)
+    // Limpa erros
+    setEmailError('')
+    setPasswordError('')
+    setNameError('')
   }
 
   return (
@@ -112,91 +188,256 @@ export default function Auth() {
               <Text style={styles.titleText}>MathCore</Text>
             </View>
 
-            {/* Email */}
-            <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>Email</Text>
-              <Input
-                style={{ outlineStyle: 'none' }}
-                onChangeText={(text) => {
-                  setEmail(text)
-                  if (emailError) setEmailError('')
-                }}
-                value={email}
-                placeholder="Digite seu e-mail"
-                autoCapitalize="none"
-                containerStyle={styles.inputContainerStyle}
-                inputContainerStyle={[
-                  styles.inputContainerStyleInner,
-                  emailError ? { borderColor: 'red', borderWidth: 1 } : {},
-                ]}
-                inputStyle={styles.inputStyle}
-                placeholderTextColor="#999"
-                rightIcon={
-                  emailError
-                    ? {
-                        type: 'font-awesome',
-                        name: 'exclamation-circle',
-                        color: 'red',
-                        size: 20,
-                      }
-                    : undefined
-                }
-              />
-              {emailError ? (
-                <Text style={{ color: 'red', marginLeft: 10 }}>{emailError}</Text>
-              ) : null}
-            </View>
+            {/* TELA DE LOGIN */}
+            {!isSignUp && (
+              <>
+                {/* Email */}
+                <View style={styles.inputContainer}>
+                  <Text style={styles.inputLabel}>Email</Text>
+                  <Input
+                    style={{ outlineStyle: 'none' }}
+                    onChangeText={(text) => {
+                      setEmail(text)
+                      if (emailError) setEmailError('')
+                    }}
+                    value={email}
+                    placeholder="Qual seu e-mail?"
+                    autoCapitalize="none"
+                    containerStyle={styles.inputContainerStyle}
+                    inputContainerStyle={[
+                      styles.inputContainerStyleInner,
+                      emailError ? { borderColor: 'red', borderWidth: 1 } : {},
+                    ]}
+                    inputStyle={styles.inputStyle}
+                    placeholderTextColor="#999"
+                    rightIcon={
+                      emailError
+                        ? {
+                            type: 'font-awesome',
+                            name: 'exclamation-circle',
+                            color: 'red',
+                            size: 20,
+                          }
+                        : undefined
+                    }
+                  />
+                  {emailError ? (
+                    <Text style={{ color: 'red', marginLeft: 10 }}>{emailError}</Text>
+                  ) : null}
+                </View>
 
-            {/* Senha */}
-            <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>Senha</Text>
-              <Input
-                style={{ outlineStyle: 'none' }}
-                onChangeText={(text) => {
-                  setPassword(text)
-                  if (passwordError) setPasswordError('')
-                }}
-                value={password}
-                secureTextEntry={!showPassword}
-                placeholder="Digite sua senha"
-                autoCapitalize="none"
-                containerStyle={styles.inputContainerStyle}
-                inputContainerStyle={[
-                  styles.inputContainerStyleInner,
-                  passwordError ? { borderColor: 'red', borderWidth: 1 } : {},
-                ]}
-                inputStyle={styles.inputStyle}
-                placeholderTextColor="#999999ff"
-                rightIcon={{
-                  type: 'font-awesome',
-                  name: showPassword ? 'eye-slash' : 'eye',
-                  color: passwordError ? 'red' : '#666',
-                  size: 16,
-                  onPress: () => setShowPassword(!showPassword),
-                }}
-              />
-              {passwordError ? (
-                <Text style={{ color: 'red', marginLeft: 10 }}>{passwordError}</Text>
-              ) : null}
-            </View>
+                {/* Senha */}
+                <View style={styles.inputContainer}>
+                  <Text style={styles.inputLabel}>Senha</Text>
+                  <Input
+                    style={{ outlineStyle: 'none' }}
+                    onChangeText={(text) => {
+                      setPassword(text)
+                      if (passwordError) setPasswordError('')
+                    }}
+                    value={password}
+                    secureTextEntry={!showPassword}
+                    placeholder="Escolha uma senha"
+                    autoCapitalize="none"
+                    containerStyle={styles.inputContainerStyle}
+                    inputContainerStyle={[
+                      styles.inputContainerStyleInner,
+                      passwordError ? { borderColor: 'red', borderWidth: 1 } : {},
+                    ]}
+                    inputStyle={styles.inputStyle}
+                    placeholderTextColor="#999999ff"
+                    rightIcon={{
+                      type: 'font-awesome',
+                      name: showPassword ? 'eye-slash' : 'eye',
+                      color: passwordError ? 'red' : '#666',
+                      size: 16,
+                      onPress: () => setShowPassword(!showPassword),
+                    }}
+                  />
+                  {passwordError ? (
+                    <Text style={{ color: 'red', marginLeft: 10 }}>{passwordError}</Text>
+                  ) : null}
+                </View>
 
-            {/* Botões */}
-            <View style={styles.buttonContainer}>
-              <Button
-                title="Entrar"
-                disabled={loading}
-                onPress={signInWithEmail}
-                buttonStyle={styles.enterButtonStyle}
-                titleStyle={styles.enterButtonTitleStyle}
-              />
-              <Button
-                title="Criar conta"
-                disabled={loading}
-                onPress={signUpWithEmail}
-                buttonStyle={styles.createButtonStyle}
-                titleStyle={styles.createButtonTitleStyle}
-              />
-            </View>
+                {/* Botões */}
+                <View style={styles.buttonContainer}>
+                  <Button
+                    title="Primeiro acesso?"
+                    disabled={loading}
+                    onPress={switchToSignUp}
+                    buttonStyle={styles.firstAccessButtonStyle}
+                    titleStyle={styles.firstAccessButtonTitleStyle}
+                  />
+                  <Button
+                    title="Entrar"
+                    disabled={loading}
+                    onPress={signInWithEmail}
+                    buttonStyle={styles.enterButtonStyle}
+                    titleStyle={styles.enterButtonTitleStyle}
+                  />
+                </View>
+              </>
+            )}
+
+            {/* TELA DE CADASTRO */}
+            {isSignUp && (
+              <>
+                {/* Nome */}
+                <View style={styles.inputContainer}>
+                  <Text style={styles.inputLabel}>Nome de Usuário</Text>
+                  <Input
+                    style={{ outlineStyle: 'none' }}
+                    onChangeText={(text) => {
+                      setName(text)
+                      if (nameError) setNameError('')
+                    }}
+                    value={name}
+                    placeholder="Qual seu nome?"
+                    autoCapitalize="words"
+                    containerStyle={styles.inputContainerStyle}
+                    inputContainerStyle={[
+                      styles.inputContainerStyleInner,
+                      nameError ? { borderColor: 'red', borderWidth: 1 } : {},
+                    ]}
+                    inputStyle={styles.inputStyle}
+                    placeholderTextColor="#999"
+                  />
+                  {nameError ? (
+                    <Text style={{ color: 'red', marginLeft: 10 }}>{nameError}</Text>
+                  ) : null}
+                </View>
+
+                {/* Email */}
+                <View style={styles.inputContainer}>
+                  <Text style={styles.inputLabel}>Email</Text>
+                  <Input
+                    style={{ outlineStyle: 'none' }}
+                    onChangeText={(text) => {
+                      setEmail(text)
+                      if (emailError) setEmailError('')
+                    }}
+                    value={email}
+                    placeholder="Qual seu e-mail?"
+                    autoCapitalize="none"
+                    containerStyle={styles.inputContainerStyle}
+                    inputContainerStyle={[
+                      styles.inputContainerStyleInner,
+                      emailError ? { borderColor: 'red', borderWidth: 1 } : {},
+                    ]}
+                    inputStyle={styles.inputStyle}
+                    placeholderTextColor="#999"
+                    rightIcon={
+                      emailError
+                        ? {
+                            type: 'font-awesome',
+                            name: 'exclamation-circle',
+                            color: 'red',
+                            size: 20,
+                          }
+                        : undefined
+                    }
+                  />
+                  {emailError ? (
+                    <Text style={{ color: 'red', marginLeft: 10 }}>{emailError}</Text>
+                  ) : null}
+                </View>
+
+                {/* Senha */}
+                <View style={styles.inputContainer}>
+                  <Text style={styles.inputLabel}>Senha</Text>
+                  <Input
+                    style={{ outlineStyle: 'none' }}
+                    onChangeText={(text) => {
+                      setPassword(text)
+                      if (passwordError) setPasswordError('')
+                    }}
+                    value={password}
+                    secureTextEntry={!showPassword}
+                    placeholder="Escolha uma senha"
+                    autoCapitalize="none"
+                    containerStyle={styles.inputContainerStyle}
+                    inputContainerStyle={[
+                      styles.inputContainerStyleInner,
+                      passwordError ? { borderColor: 'red', borderWidth: 1 } : {},
+                    ]}
+                    inputStyle={styles.inputStyle}
+                    placeholderTextColor="#999999ff"
+                    rightIcon={{
+                      type: 'font-awesome',
+                      name: showPassword ? 'eye-slash' : 'eye',
+                      color: passwordError ? 'red' : '#666',
+                      size: 16,
+                      onPress: () => setShowPassword(!showPassword),
+                    }}
+                  />
+                  {passwordError ? (
+                    <Text style={{ color: 'red', marginLeft: 10 }}>{passwordError}</Text>
+                  ) : null}
+                </View>
+
+                {/* TEA */}
+                <View style={styles.teaContainer}>
+                  <Text style={styles.teaQuestion}>Você tem TEA?</Text>
+                  <View style={styles.teaOptions}>
+                    <TouchableOpacity
+                      style={styles.teaOption}
+                      onPress={() => setHasTEA(true)}
+                    >
+                      <View
+                        style={[
+                          styles.teaRadio,
+                          hasTEA === true && styles.teaRadioSelected,
+                        ]}
+                      >
+                        {hasTEA === true && <View style={styles.teaRadioInner} />}
+                      </View>
+                      <Text style={styles.teaLabel}>Sim</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                      style={styles.teaOption}
+                      onPress={() => setHasTEA(false)}
+                    >
+                      <View
+                        style={[
+                          styles.teaRadio,
+                          hasTEA === false && styles.teaRadioSelectedNo,
+                        ]}
+                      >
+                        {hasTEA === false && <View style={styles.teaRadioInner} />}
+                      </View>
+                      <Text style={styles.teaLabel}>Não</Text>
+                    </TouchableOpacity>
+                  </View>
+
+                  {hasTEA === true && (
+                    <View style={styles.teaInfo}>
+                      <Text style={styles.teaInfoText}>
+                        Ao selecionar "Sim" você ativará novas funções de
+                        personalização do MathCore (essa opção poderá ser editada a
+                        qualquer momento nas configurações do aplicativo)
+                      </Text>
+                    </View>
+                  )}
+                </View>
+
+                {/* Botões */}
+                <View style={styles.buttonContainer}>
+                  <Button
+                    title="Criar conta"
+                    disabled={loading}
+                    onPress={signUpWithEmail}
+                    buttonStyle={styles.enterButtonStyle}
+                    titleStyle={styles.enterButtonTitleStyle}
+                  />
+                </View>
+
+                {/* Link voltar */}
+                <TouchableOpacity style={styles.backLink} onPress={switchToLogin}>
+                  <Text style={styles.backLinkText}>Já tenho conta</Text>
+                </TouchableOpacity>
+              </>
+            )}
           </View>
         </ScrollView>
       </View>
@@ -243,7 +484,7 @@ const styles = StyleSheet.create({
   },
   headerContainer: {
     alignItems: 'center',
-    marginBottom: 40,
+    marginBottom: 30,
   },
   logoContainer: {
     width: 60,
@@ -254,7 +495,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 10,
   },
-  logoImage: { width: 85, height: 85, resizeMode: 'contain', },
+  logoImage: {
+    width: 85,
+    height: 85,
+    resizeMode: 'contain',
+  },
   titleText: {
     fontSize: 24,
     fontWeight: 'bold',
@@ -269,6 +514,7 @@ const styles = StyleSheet.create({
     color: '#000000ff',
     marginBottom: 8,
     marginLeft: 5,
+    fontWeight: '500',
   },
   inputContainerStyle: {
     paddingHorizontal: 0,
@@ -284,12 +530,83 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#333',
   },
+  teaContainer: {
+    width: '100%',
+    marginVertical: 10,
+  },
+  teaQuestion: {
+    fontSize: 14,
+    color: '#000000ff',
+    marginBottom: 12,
+    marginLeft: 5,
+    fontWeight: '500',
+  },
+  teaOptions: {
+    flexDirection: 'row',
+    gap: 20,
+  },
+  teaOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  teaRadio: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    borderWidth: 2,
+    borderColor: '#666',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  teaRadioSelected: {
+    backgroundColor: '#4CAF50',
+    borderColor: '#4CAF50',
+  },
+  teaRadioSelectedNo: {
+    backgroundColor: '#666',
+    borderColor: '#666',
+  },
+  teaRadioInner: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: 'white',
+  },
+  teaLabel: {
+    fontSize: 15,
+    color: '#000',
+    fontWeight: '500',
+  },
+  teaInfo: {
+    backgroundColor: 'rgba(255, 255, 255, 0.5)',
+    padding: 12,
+    borderRadius: 12,
+    marginTop: 12,
+  },
+  teaInfoText: {
+    fontSize: 11,
+    color: '#000',
+    lineHeight: 16,
+  },
   buttonContainer: {
     width: '100%',
     gap: 15,
+    marginTop: 5,
+  },
+  firstAccessButtonStyle: {
+    backgroundColor: '#000000ff',
+    borderRadius: 25,
+    height: 45,
+    width: '100%',
+  },
+  firstAccessButtonTitleStyle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#fff',
   },
   enterButtonStyle: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#319e35ff',
     borderRadius: 25,
     height: 50,
     width: '100%',
@@ -299,14 +616,12 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: 'white',
   },
-  createButtonStyle: {
-    backgroundColor: '#333',
-    borderRadius: 25,
-    height: 50,
-    width: '100%',
+  backLink: {
+    marginTop: 15,
   },
-  createButtonTitleStyle: {
-    fontSize: 16,
-    fontWeight: 'bold',
+  backLinkText: {
+    fontSize: 14,
+    color: '#000',
+    fontWeight: '500',
   },
 })
