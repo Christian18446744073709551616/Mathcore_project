@@ -138,7 +138,7 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigat
         <View style={styles.tabBar}>
           <TouchableOpacity
             style={styles.tab}
-            onPress={() => navigation.navigate('Home')}
+            onPress={() => navigation.navigate('Home2')}
           >
             <HomeIcon 
               size={34} 

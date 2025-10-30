@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Platform, Image as RNImage } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 interface ChatHeaderProps {
@@ -19,11 +19,11 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
 }) => {
   // 🔥 Tratamento direto e seguro do avatar (base64, URL, ou imagem local)
   const avatarSource =
-    typeof friendAvatar === 'string'
-      ? friendAvatar.startsWith('data:image') || friendAvatar.startsWith('http')
-        ? { uri: friendAvatar } // Base64 ou URL HTTP
-        : require('../assets/IconDefault.jpg') // fallback
-      : friendAvatar || require('../assets/IconDefault.jpg'); // imagem local fallback
+    friendAvatar && typeof friendAvatar === 'string'
+      ? { uri: friendAvatar.trim() } // remove espaços ou caracteres ocultos
+      : require('../assets/IconDefault.jpg');
+
+  const AvatarComponent = Platform.OS === 'web' ? 'img' : RNImage;
 
   return (
     <View style={styles.container}>
@@ -32,7 +32,11 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
       </TouchableOpacity>
 
       <View style={styles.infoContainer}>
-        <Image source={avatarSource} style={styles.avatar} />
+        <AvatarComponent
+          src={Platform.OS === 'web' ? avatarSource.uri : undefined}
+          source={Platform.OS !== 'web' ? avatarSource : undefined}
+          style={styles.avatar}
+        />
         <View>
           <Text style={styles.friendName}>{friendName}</Text>
           <Text style={styles.groupName}>{groupName}</Text>
@@ -72,6 +76,7 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: '#ffffff44',
     marginRight: 8,
+    resizeMode: 'cover', // <=== adicione isso
   },
   friendName: {
     color: '#fff',
