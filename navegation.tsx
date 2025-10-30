@@ -5,7 +5,10 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
 import { Session } from '@supabase/supabase-js';
 import Home2Screen from './Screens/home.2';
-import HomeScreen from './Screens/home';
+import AlgebraLessonsScreen from './Screens/AlgebraLessons';
+import MathBasicLessonsScreen from './Screens/MathBasicLessons';
+import MathFincLessonsScreen from './Screens/MathFincLessons';
+import GeometryLessonsScreen from './Screens/GeometryLessons';
 import LessonScreen from './Screens/LessonScreen';
 import SettingsScreen from './Screens/Settings';
 import GameScreen from './Screens/GameScreen';
@@ -41,7 +44,10 @@ interface CornhubProps {
 const HomeStack: React.FC<{ session: Session }> = ({ session }) => (
   <Stack.Navigator initialRouteName="Home2" screenOptions={{ headerShown: false }}>
     <Stack.Screen name="Home2" component={Home2Screen} />
-    <Stack.Screen name="Home" component={HomeScreen} />
+    <Stack.Screen name="GeometryLessons" component={GeometryLessonsScreen} />
+    <Stack.Screen name="MathFincLessons" component={MathFincLessonsScreen} />
+    <Stack.Screen name="MathBasicLessons" component={MathBasicLessonsScreen} />
+    <Stack.Screen name="AlgebraLessons" component={AlgebraLessonsScreen} />
     <Stack.Screen name="Ultramenu" component={UltramenuScreen} />
     <Stack.Screen name="Lesson" component={LessonScreen} options={{ presentation: 'modal' }} />
     <Stack.Screen name="GameScreen" component={GameScreen} options={{ presentation: 'modal' }} />
@@ -74,21 +80,22 @@ const SimpleStack = (ScreenComponent: React.FC<any>, session?: Session) => () =>
 // Navegação por Tabs
 const Tabs: React.FC<{ session: Session }> = ({ session }) => (
   <Tab.Navigator
-    initialRouteName="Home"
+    initialRouteName="GeometryLessons"
     tabBar={(props) => <CustomTabBar {...props} />}
     screenOptions={({ route }) => ({
       headerShown: false,
 
       tabBarIcon: ({ color, size }) => {
         let iconName = 'home';
-        if (route.name === 'Home') iconName = 'home';
+        if (route.name === 'home') iconName = 'home';
         else if (route.name === 'Friends') iconName = 'people';
         else if (route.name === 'Settings') iconName = 'person';
         return <Ionicons name={iconName as any} size={size} color={color} />;
       },
     })}
   >
-    <Tab.Screen name="Home" children={() => <HomeStack session={session} />} />
+    <Tab.Screen name="GeometryLessons" children={() => <HomeStack session={session} />} /> 
+    <Tab.Screen name="MathFincLessons" children={() => <HomeStack session={session} />} />
     <Tab.Screen name="Friends" children={() => <FriendsStack session={session} />} />
     <Tab.Screen name="Exercicios" children={SimpleStack(ExerciciosScreen, session)} />
     <Tab.Screen name="Desempenho" children={SimpleStack(DesempenhoScreen, session)} />

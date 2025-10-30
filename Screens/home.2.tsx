@@ -33,7 +33,9 @@ const Home2Screen = () => {
   const boxWidth = width > 500 ? 400 : width * 0.9; // max width 400, otherwise 90% of screen
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
+    <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}
+          showsHorizontalScrollIndicator={false}>
+      
       <Text style={styles.title}>MathCore</Text>
       <Text style={styles.prompt}>O que vamos aprender hoje, {username}?</Text>
 
@@ -41,7 +43,7 @@ const Home2Screen = () => {
         {/* Geometria */}
         <TouchableOpacity
           style={[styles.box, { backgroundColor: '#731dca', width: boxWidth, height: 200 }]}
-          onPress={() => navigation.navigate('Home')}
+          onPress={() => navigation.navigate('GeometryLessons')}
         >
           <Text style={styles.textBox}>Geometria</Text>
           <Ionicons name="shapes" size={80} style={{ marginTop: 10 }} />
@@ -60,7 +62,7 @@ const Home2Screen = () => {
         {/* Matemática Financeira */}
         <TouchableOpacity
           style={[styles.box, { backgroundColor: '#4b843d', width: boxWidth, height: 200 }]}
-          onPress={() => navigation.navigate('Home')}
+          onPress={() => navigation.navigate('MathFincLessons')}
         >
           <Text style={styles.textBox}>Matemática Financeira</Text>
           <Entypo name="bar-graph" size={80} style={{ marginTop: 10 }} />
@@ -79,7 +81,7 @@ const Home2Screen = () => {
         {/* Matemática Básica */}
         <TouchableOpacity
           style={[styles.box, { backgroundColor: '#5c1dcb', width: boxWidth, height: 200 }]}
-          onPress={() => navigation.navigate('Home')}
+          onPress={() => navigation.navigate('MathBasicLessons')}
         >
           <Text style={styles.textBox}>Matemática Básica</Text>
           <MaterialCommunityIcons name="division" size={80} style={{ marginTop: 10 }} />
@@ -98,11 +100,12 @@ const Home2Screen = () => {
         {/* Álgebra */}
         <TouchableOpacity
           style={[styles.box, { backgroundColor: '#2c3c92', width: boxWidth, height: 200 }]}
-          onPress={() => navigation.navigate('Home')}
+          onPress={() => navigation.navigate('AlgebraLessons')}
         >
           <Text style={styles.textBox}>Álgebra</Text>
           <FontAwesome5 name="square-root-alt" size={80} style={{ marginTop: 10 }} />
           <View style={styles.progress}>
+            
             <LinearGradient
               colors={['#219d40', '#FFFFFF']}
               locations={[0, 0.01]}
