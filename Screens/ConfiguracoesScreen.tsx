@@ -201,6 +201,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingTop: 60,
+    paddingBottom: 90,
     paddingHorizontal: 20,
     alignItems: 'center',
   },
@@ -224,7 +225,9 @@ const styles = StyleSheet.create({
   menuContainer: {
     gap: 12,
     width: '85%',
-    marginTop: 20,
+    marginTop: -50,
+    marginBottom: 90,
+    
   },
   menuButton: {
     borderRadius: 16,

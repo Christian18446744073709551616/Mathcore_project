@@ -146,25 +146,25 @@ const Account: React.FC<{ navigation: any }> = ({ navigation }) => {
         console.log('Sessão carregada:', data.session);
       }
     };
-  
+
     fetchSession();
-  
+
     const { data: authListener } = supabase.auth.onAuthStateChange(
       (_event, session) => {
         setSession(session);
         console.log('Sessão atualizada:', session);
       }
     );
-  
+
     return () => {
       authListener?.subscription?.unsubscribe();
     };
   }, []);
-  
+
 
   useEffect(() => {
     console.log('Session carregada no useEffect:', session);
-  
+
     if (session) {
       console.log('User ID:', session.user.id);
       getProfile();
@@ -173,8 +173,8 @@ const Account: React.FC<{ navigation: any }> = ({ navigation }) => {
       getProgress();
     }
   }, [session]);
-  
-  
+
+
 
   async function getAllUsers() {
     const { data, error } = await supabase.from('profiles').select('id');
@@ -291,7 +291,7 @@ const Account: React.FC<{ navigation: any }> = ({ navigation }) => {
       showsVerticalScrollIndicator={false}
     >
       {/* --- BOTÃO DE TEMA (ADICIONADO) --- */}
-      <TouchableOpacity 
+      <TouchableOpacity
         style={styles.themeButton}
         onPress={() => setShowThemeModal(true)}
       >
@@ -314,10 +314,11 @@ const Account: React.FC<{ navigation: any }> = ({ navigation }) => {
           </View>
         </View>
 
-        {/* EMAIL */}
+       
 <View style={styles.inputGroup}>
   <Text style={[styles.label, { color: theme.textSecondary }]}>Email</Text>
   <TextInput
+  value={session?.user.email || ''}
     style={[
       styles.inputContainer,
       { 
@@ -329,7 +330,7 @@ const Account: React.FC<{ navigation: any }> = ({ navigation }) => {
   />
 </View>
 
-        {/* USERNAME */}
+       
 <View style={styles.inputGroup}>
   <Text style={[styles.label, { color: theme.textSecondary }]}>Username</Text>
   <View style={styles.usernameRow}>
@@ -357,6 +358,7 @@ const Account: React.FC<{ navigation: any }> = ({ navigation }) => {
     </TouchableOpacity>
   </View>
 </View>
+
 
         {/* BOTÕES */}
         <View style={styles.buttonContainer}>
@@ -397,8 +399,8 @@ const Account: React.FC<{ navigation: any }> = ({ navigation }) => {
                       item.progressPercentage >= 80
                         ? 'green'
                         : item.progressPercentage >= 50
-                        ? 'orange'
-                        : 'red',
+                          ? 'orange'
+                          : 'red',
 
 
                   },
@@ -415,21 +417,21 @@ const Account: React.FC<{ navigation: any }> = ({ navigation }) => {
 
       {/* --- MODAL DE TEMA (ADICIONADO) --- */}
       <Modal visible={showThemeModal} transparent animationType="fade" onRequestClose={() => setShowThemeModal(false)}>
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.modalOverlay}
           activeOpacity={1}
           onPress={() => setShowThemeModal(false)}
         >
           <View style={[styles.themeModalContent, { backgroundColor: theme.background }]}>
             <Text style={[styles.modalTitle, { color: theme.textWhite }]}>Escolha um Tema</Text>
-            
+
             <ScrollView style={styles.themeList}>
               {Object.entries(themes).map(([key, themeOption]) => (
                 <TouchableOpacity
                   key={key}
                   style={[
                     styles.themeOption,
-                    { 
+                    {
                       backgroundColor: themeOption.card,
                       borderColor: currentTheme === key ? themeOption.primary : 'transparent',
                     }
