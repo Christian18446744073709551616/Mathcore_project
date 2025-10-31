@@ -90,21 +90,22 @@ const themes = {
     },
 }
 
+
 export default function ChangePassword() {
-    const [currentPassword, setCurrentPassword] = useState('')
-    const [newPassword, setNewPassword] = useState('')
-    const [confirmPassword, setConfirmPassword] = useState('')
+  const navigation = useNavigation()
+  const [currentPassword, setCurrentPassword] = useState('')
+  const [newPassword, setNewPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
 
-    const [loading, setLoading] = useState(false)
-    const [showCurrent, setShowCurrent] = useState(false)
-    const [showNew, setShowNew] = useState(false)
-    const [showConfirm, setShowConfirm] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [showCurrent, setShowCurrent] = useState(false)
+  const [showNew, setShowNew] = useState(false)
+  const [showConfirm, setShowConfirm] = useState(false)
 
-    const [currentError, setCurrentError] = useState('')
-    const [newError, setNewError] = useState('')
-    const [confirmError, setConfirmError] = useState('')
-    const [userEmail, setUserEmail] = useState<string | null>(null)
-
+  const [currentError, setCurrentError] = useState('')
+  const [newError, setNewError] = useState('')
+  const [confirmError, setConfirmError] = useState('')
+  const [userEmail, setUserEmail] = useState<string | null>(null)
     const [currentTheme, setCurrentTheme] = useState('padrao')
     const [showThemeModal, setShowThemeModal] = useState(false)
 
@@ -151,77 +152,112 @@ export default function ChangePassword() {
         setCurrentError('')
         setNewError('')
         setConfirmError('')
+
+  useEffect(() => {
+    let isMounted = true
+    async function loadUser() {
+      const { data, error } = await supabase.auth.getUser()
+      if (!error && isMounted) setUserEmail(data.user?.email ?? null)
     }
+    loadUser()
+    return () => {
+      isMounted = false
+
+    }
+  }, [])
+
+  function resetErrors() {
+    setCurrentError('')
+    setNewError('')
+    setConfirmError('')
+  }
+
 
     function validatePasswordStrength(password: string) {
         const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])/
         return regex.test(password)
+
+ 
+  function validateLocal() {
+    resetErrors()
+    let ok = true
+    if (!currentPassword) {
+      setCurrentError('Informe a senha atual.')
+      ok = false
+    }
+    if (!newPassword) {
+      setNewError('Informe a nova senha.')
+      ok = false
+    } else if (newPassword.length < 6) {
+      setNewError('A senha deve ter ao menos 6 caracteres.')
+      ok = false
+    } else if (!validatePasswordStrength(newPassword)) {
+      setNewError('A senha deve conter letra maiúscula, minúscula, número e símbolo.')
+      ok = false
+    }
+    if (confirmPassword !== newPassword) {
+      setConfirmError('As senhas não coincidem.')
+      ok = false
+
+    }
+    return ok
+  }
+
+  async function handleChangePassword() {
+    if (!validateLocal()) return
+    if (!userEmail) {
+      Alert.alert('Erro', 'Usuário não autenticado. Faça login novamente.')
+      return
     }
 
-    function validateLocal() {
-        resetErrors()
-        let ok = true
-        if (!currentPassword) {
-            setCurrentError('Informe a senha atual.')
-            ok = false
-        }
-        if (!newPassword) {
-            setNewError('Informe a nova senha.')
-            ok = false
-        } else if (newPassword.length < 6) {
-            setNewError('A senha deve ter ao menos 6 caracteres.')
-            ok = false
-        } else if (!validatePasswordStrength(newPassword)) {
-            setNewError(
-                'A senha deve conter letra maiúscula, minúscula, número e símbolo.'
-            )
-            ok = false
-        }
-        if (confirmPassword !== newPassword) {
-            setConfirmError('As senhas não coincidem.')
-            ok = false
-        }
-        return ok
+    setLoading(true)
+    const { error: signInError } = await supabase.auth.signInWithPassword({
+      email: userEmail,
+      password: currentPassword,
+    })
+    if (signInError) {
+      setLoading(false)
+      setCurrentError('Senha atual incorreta.')
+      return
     }
 
-    async function handleChangePassword() {
-        if (!validateLocal()) return
-        if (!userEmail) {
-            Alert.alert('Erro', 'Usuário não autenticado. Faça login novamente.')
-            return
-        }
+    const { error: updateError } = await supabase.auth.updateUser({
+      password: newPassword,
+    })
 
-        setLoading(true)
-        const { error: signInError } = await supabase.auth.signInWithPassword({
-            email: userEmail,
-            password: currentPassword,
-        })
-        if (signInError) {
-            setLoading(false)
-            setCurrentError('Senha atual incorreta.')
-            return
-        }
-
-        const { error: updateError } = await supabase.auth.updateUser({
-            password: newPassword,
-        })
-
-        setLoading(false)
-        if (updateError) {
-            const msg = updateError.message.toLowerCase()
-            if (msg.includes('password')) {
-                setNewError('Senha inválida ou não atende aos requisitos.')
-            } else {
-                Alert.alert('Erro', updateError.message)
-            }
-            return
-        }
-
-        Alert.alert('Sucesso', 'Senha alterada com sucesso!')
-        setCurrentPassword('')
-        setNewPassword('')
-        setConfirmPassword('')
+    setLoading(false)
+    if (updateError) {
+      const msg = updateError.message.toLowerCase()
+      if (msg.includes('password')) {
+        setNewError('Senha inválida ou não atende aos requisitos.')
+      } else {
+        Alert.alert('Erro', updateError.message)
+      }
+      return
     }
+
+    Alert.alert('Sucesso', 'Senha alterada com sucesso!')
+    setCurrentPassword('')
+    setNewPassword('')
+    setConfirmPassword('')
+  }
+
+  return (
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    >
+      <View style={styles.backgroundView}>
+        <ScrollView contentContainerStyle={styles.scrollViewContainer}>
+          <View style={[styles.cardContainer, { outlineStyle: 'none' }]}>
+            {/* Botão de voltar */}
+            <TouchableOpacity
+              style={styles.backButton}
+              onPress={() => navigation.goBack()}
+            >
+              <Ionicons name="arrow-back" size={22} color="#fff" />
+            </TouchableOpacity>
+
 
     return (
         <KeyboardAvoidingView

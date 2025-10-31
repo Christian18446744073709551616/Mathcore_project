@@ -6,6 +6,8 @@ import Auth from './components/Auth';
 import TitleScreen from './Screens/TitleFight';
 import { Session } from '@supabase/supabase-js';
 
+import { MusicProvider } from './components/MusicContext';
+
 export default function App() {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
@@ -46,12 +48,15 @@ export default function App() {
   return (
     
     <View style={{ flex: 1 }}>
-      
+       
+        <MusicProvider>
       {session && session.user ? (
         <Cornhub session={session} />
       ) : (
         <Auth />
+        
       )}
+      </MusicProvider>
     </View>
   );
 }

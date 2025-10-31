@@ -126,6 +126,15 @@ const updateLastActive = async () => {
     .eq('id', session.user.id);
 };
 
+
+
+const getFontSize = (name: string) => {
+  if (name.length > 15) return 12;
+  if (name.length > 10) return 14;
+  return 16;
+};
+
+
 const UserCard = ({
   user,
   navigation,
@@ -145,20 +154,73 @@ const UserCard = ({
       <Text style={[styles.friendName, { color: theme.text }]}>{user.username}</Text>
     </View>
 
-    {showChatChallenge ? (
-      <View style={styles.friendButtons}>
+}) => {
+  // Função para ajustar tamanho da fonte com base no comprimento do nome
+  const getFontSize = (name: string) => {
+    if (name.length > 18) return 12;
+    if (name.length > 12) return 14;
+    return 16;
+  };
+
+  return (
+    <View style={styles.friendCard}>
+      <View style={styles.friendLeft}>
+        <AvatarView size={45} url={user.avatar_url} />
+
+        <Text
+          style={[
+            styles.friendName,
+            { fontSize: getFontSize(user.username) },
+          ]}
+          numberOfLines={1}
+          ellipsizeMode="tail"
+        >
+          {user.username}
+        </Text>
+      </View>
+
+      {showChatChallenge ? (
+        <View style={styles.friendButtons}>
+          <TouchableOpacity
+            style={styles.chatButton}
+            onPress={() =>
+              navigation.navigate('ChatScreen', {
+                friendId: user.id,
+                friendName: user.username,
+              })
+            }
+          >
+            <Ionicons name="chatbubbles" size={16} color="#fff" />
+            <Text style={styles.btnText}>Conversar</Text>
+          </TouchableOpacity>
+
+
+          <TouchableOpacity
+            style={styles.challengeButton}
+            onPress={() => console.log('Desafiar', user.username)}
+          >
+            <Ionicons name="flash" size={16} color="#fff" />
+            <Text style={styles.btnText}>Desafiar</Text>
+          </TouchableOpacity>
+        </View>
+      ) : onAccept ? (
+        <TouchableOpacity style={styles.chatButton} onPress={onAccept}>
+          <Text style={styles.btnText}>Aceitar</Text>
+        </TouchableOpacity>
+      ) : (
         <TouchableOpacity
           style={[styles.chatButton, { backgroundColor: theme.button }]}
           onPress={() =>
-            navigation.navigate('ChatScreen', {
-              friendId: user.id,
-              friendName: user.username,
-            })
+            navigation.navigate('FriendDripRoast', { userId: user.id })
           }
         >
-          <Ionicons name="chatbubbles" size={16} color="#fff" />
-          <Text style={styles.btnText}>Conversar</Text>
+          <Text style={styles.btnText}>Ver Perfil</Text>
         </TouchableOpacity>
+      )}
+    </View>
+  );
+};
+
 
         <TouchableOpacity
           style={[styles.challengeButton, { backgroundColor: theme.buttonPrimary }]}
@@ -183,8 +245,10 @@ const UserCard = ({
   </View>
 );
 
+
 const FriendsTab = ({ friends, navigation, theme }: { friends: UserProfile[]; navigation: any; theme: any }) => (
   <FlatList
+    showsVerticalScrollIndicator={false}
     data={friends}
     keyExtractor={(item) => item.id}
     contentContainerStyle={{ paddingBottom: 30 }}
@@ -327,7 +391,10 @@ const Friends = () => {
       <View style={[styles.searchContainer, { backgroundColor: theme.searchBar }]}>
         <Ionicons name="search" size={20} color={theme.text} style={{ marginLeft: 10 }} />
         <TextInput
+
           style={[styles.searchInput, { borderWidth: 0, outlineStyle: 'none', color: theme.text }]}
+
+
           placeholder="Encontre seus amigos"
           placeholderTextColor={theme.textSecondary}
           value={searchQuery}
@@ -343,6 +410,7 @@ const Friends = () => {
 
       {searchActive ? (
         <FlatList
+          showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: 30 }}
           data={recentSearches}
           keyExtractor={(item) => item.id}
@@ -363,6 +431,7 @@ const Friends = () => {
           <View style={[styles.modalContainer, { backgroundColor: theme.modal }]}>
             <Text style={[styles.modalTitle, { color: theme.text }]}>Pedidos Pendentes</Text>
             <FlatList
+              showsVerticalScrollIndicator={false}
               data={pendingRequests}
               keyExtractor={(item) => item.id}
               renderItem={({ item }) => (
@@ -439,10 +508,12 @@ const Friends = () => {
 };
 
 const styles = StyleSheet.create({
+
   container: { flex: 1, padding: 20 },
   headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 15 },
   header: { fontSize: 24, fontWeight: '900' },
   themeButton: { padding: 8 },
+
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
