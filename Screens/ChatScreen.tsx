@@ -116,12 +116,19 @@ const OnlineChat = () => {
       if (error) console.error('Erro ao buscar amigo:', error);
 
       if (data) {
-        let avatar = data.avatar_url;
+        let avatar = data?.avatar_url || '';
+
+        console.log('🔍 Avatar original:', avatar);
+
+        // Se vier algo tipo "avatars/foto123.jpg"
         if (avatar && !avatar.startsWith('http') && !avatar.startsWith('data:image')) {
-          avatar = `data:image/jpeg;base64,${avatar}`;
+          const { data: publicData } = supabase.storage.from('avatars').getPublicUrl(avatar);
+          avatar = publicData?.publicUrl || '';
+          console.log('✅ URL pública gerada:', avatar);
         }
-        if (avatar) {
-          avatar = avatar.replace(/^data:image\/\w+;base64,/, '');
+
+        // Se ainda não tiver formato válido
+        if (avatar && !avatar.startsWith('http') && !avatar.startsWith('data:image')) {
           avatar = `data:image/jpeg;base64,${avatar}`;
         }
 
@@ -131,6 +138,7 @@ const OnlineChat = () => {
           avatar_url: avatar || '',
         };
         setFriend(friendData);
+        console.log('🖼️ URL final usada no header:', avatar);
       }
     };
 
@@ -158,9 +166,11 @@ const OnlineChat = () => {
     return () => {
       try {
         channel.unsubscribe();
-      } catch (e) {}
+      } catch (e) { }
     };
   }, [session, friendId]);
+
+  
 
   const parseInviteData = (messageText: string) => {
     try {
@@ -182,6 +192,145 @@ const OnlineChat = () => {
 
   if (!fontsLoaded) return null;
 
+    const handleLobbyInviteResponse = async (message_id: string, lobby_id: string, response: 'accept' | 'reject') => {
+    if (!session) {
+      console.error('Usuário não está autenticado.');
+      return;
+    }
+
+    try {
+      const updatedInviteData = {
+        invite_status: response === 'accept' ? 'accepted' : 'rejected',
+      };
+
+      const { error: updateError } = await supabase
+        .from('messages')
+        .update(updatedInviteData)
+        .eq('id', message_id)
+        .eq('receiver_id', session.user.id);
+
+      if (updateError) {
+        console.error('Erro ao atualizar convite:', updateError);
+        return;
+      }
+
+      console.log(`Convite de lobby ${response === 'accept' ? 'aceito' : 'rejeitado'} com sucesso.`);
+
+      if (response === 'accept') {
+        const { data: lobbyData, error: lobbyError } = await supabase
+          .from('lobbies')
+          .select('lobby_name')
+          .eq('id', lobby_id)
+          .single();
+
+        if (lobbyError) {
+          console.error('Erro ao buscar o lobby_name:', lobbyError);
+          return;
+        }
+
+        const lessonTitle = (lobbyData as any)?.lobby_name ?? 'Lobby';
+
+        const { error: insertError } = await supabase
+          .from('lobby_players')
+          .insert([
+            {
+              lobby_id: lobby_id,
+              player_id: session.user.id,
+              is_ready: false,
+              is_host: false,
+              joined_at: new Date().toISOString(),
+            },
+          ]);
+
+        if (insertError) {
+          console.error('Erro ao adicionar o jogador ao lobby:', insertError);
+          return;
+        }
+
+        console.log('Jogador adicionado ao lobby com sucesso.');
+
+        try {
+          const lobbyChannel = supabase.channel(`lobby:${lobby_id}`);
+          lobbyChannel.send({
+            type: 'broadcast',
+            event: 'player_joined',
+            payload: {
+              player_id: session.user.id,
+              username: session.user.user_metadata?.username,
+              avatar_url: session.user.user_metadata?.avatar_url,
+              is_ready: false,
+              is_host: false,
+            },
+          });
+        } catch (e) {
+          // ignora erros de broadcast
+        }
+
+        (navigation as any).navigate('Lobby', { lessonTitle: lessonTitle, lobbyId: lobby_id, session: session });
+      }
+    } catch (error) {
+      console.error('Erro ao processar o convite de lobby:', error);
+    }
+  };
+
+   const handleQuizInviteResponse = async (message_id: string, inviteData: any, response: 'accept' | 'reject') => {
+    if (!session) {
+      console.error('Usuário não está autenticado.');
+      return;
+    }
+
+    try {
+      console.log(`${response === 'accept' ? '✅ Aceitando' : '❌ Rejeitando'} convite de quiz`);
+
+      if (response === 'accept') {
+        const { error } = await supabase
+          .from('quiz_participants')
+          .insert({
+            match_id: inviteData.match_id,
+            user_id: session.user.id,
+            is_ready: false,
+          });
+
+        if (error) {
+          console.error('❌ Erro ao aceitar convite:', error);
+          if (Platform.OS === 'web') {
+            alert('Não foi possível aceitar o convite.');
+          } else {
+            Alert.alert('Erro', 'Não foi possível aceitar o convite.');
+          }
+          return;
+        }
+
+        await supabase.from('messages').delete().eq('id', message_id);
+
+        console.log('✅ Convite aceito! Navegando para QuizWaitingRoom...');
+
+        (navigation as any).navigate('QuizWaitingRoom', {
+          matchId: inviteData.match_id,
+          quizId: inviteData.quiz_id,
+          quizTitle: inviteData.quiz_title,
+        });
+      } else {
+        await supabase.from('messages').delete().eq('id', message_id);
+
+        console.log('❌ Convite rejeitado');
+
+        if (Platform.OS === 'web') {
+          alert('Convite rejeitado.');
+        } else {
+          Alert.alert('Convite rejeitado', 'Você recusou o convite para o quiz.');
+        }
+
+        if (session) fetchMessages(session.user.id);
+      }
+    } catch (error) {
+      console.error('❌ Erro ao processar convite de quiz:', error);
+    }
+  };
+
+
+
+
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
@@ -196,7 +345,7 @@ const OnlineChat = () => {
             ? friend.avatar_url
             : require('../assets/IconDefault.jpg')
         }
-        onChallengePress={() => {}}
+        onChallengePress={() => { }}
         onBackPress={() => navigation.goBack()}
       />
 
@@ -221,13 +370,15 @@ const OnlineChat = () => {
                     <View style={styles.invitationActions}>
                       <TouchableOpacity
                         style={styles.acceptButton}
-                        onPress={() => {}}
+                        onPress={() => handleQuizInviteResponse(item.id, inviteInfo.data, 'accept')}
+
                       >
                         <Text style={styles.inviteButtonText}>✅ Aceitar</Text>
                       </TouchableOpacity>
                       <TouchableOpacity
                         style={styles.declineButtonStyle}
-                        onPress={() => {}}
+                         onPress={() => handleQuizInviteResponse(item.id, inviteInfo.data, 'reject')}
+
                       >
                         <Text style={styles.inviteButtonText}>❌ Rejeitar</Text>
                       </TouchableOpacity>
@@ -243,13 +394,13 @@ const OnlineChat = () => {
                     <View style={styles.invitationActions}>
                       <TouchableOpacity
                         style={styles.acceptButton}
-                        onPress={() => {}}
+                        onPress={() => { }}
                       >
                         <Text style={styles.inviteButtonText}>Aceitar</Text>
                       </TouchableOpacity>
                       <TouchableOpacity
                         style={styles.declineButtonStyle}
-                        onPress={() => {}}
+                        onPress={() => { }}
                       >
                         <Text style={styles.inviteButtonText}>Rejeitar</Text>
                       </TouchableOpacity>

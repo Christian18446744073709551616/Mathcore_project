@@ -19,7 +19,9 @@ import Lobby from './Screens/Lobby';
 import ChatScreen from './Screens/ChatScreen';
 import ExerciciosScreen from './Screens/ExerciciosScreen';
 import DesempenhoScreen from './Screens/DesempenhoScreen';
-import FlashcardsScreen from './Screens/FlashcardsScreen';
+import FlashcardsScreen from './Screens/Flashcards/FlashcardsScreen';
+import CreateFlashcardScreen from './Screens/Flashcards/CreateFlashcardScreen';
+import ReviewFlashcardScreen from './Screens/Flashcards/ReviewFlashcardScreen';
 import ConfiguracoesScreen from './Screens/ConfiguracoesScreen';
 import QuizScreen from './Screens/Quiz/QuizScreen';
 import NovoQuizScreen from './Screens/Quiz/NovoQuizScreen';
@@ -28,10 +30,16 @@ import QuizWaitingRoom from './Screens/Quiz/QuizWaitingRoom';
 import QuizResultsScreen from './Screens/Quiz/QuizResultsScreen';
 import QRScanner from './Screens/Quiz/QRScanner';
 import QuizInviteNotification from './components/QuizInviteNotification';
-import ChangePassword from './Screens/ChangePassword';    
+
+import ChangePassword from './Screens/ChangePassword';
+import AudioScreen from './Screens/Audio';
+import AreaTEAScreen from './Screens/AreaTEA';
+import QuestionGenerator from './components/QuestionGenerator';
+
 
 import CustomTabBar from './components/3d/CustomTabBar';
 import { RootStackParamList } from './types';
+import AICreateFlashcardScreen from 'Screens/Flashcards/AICreateFlashcardScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -40,7 +48,6 @@ interface CornhubProps {
   session: Session;
 }
 
-// Stacks para Home e Friends
 const HomeStack: React.FC<{ session: Session }> = ({ session }) => (
   <Stack.Navigator initialRouteName="Home2" screenOptions={{ headerShown: false }}>
     <Stack.Screen name="Home2" component={Home2Screen} />
@@ -61,7 +68,6 @@ const FriendsStack: React.FC<{ session: Session }> = ({ session }) => (
   </Stack.Navigator>
 );
 
-// --- QUIZSTACK ---
 const QuizStack: React.FC<{ session: Session }> = ({ session }) => (
   <Stack.Navigator screenOptions={{ headerShown: false }}>
     <Stack.Screen name="QuizScreen" component={QuizScreen} initialParams={{ session }} />
@@ -70,14 +76,29 @@ const QuizStack: React.FC<{ session: Session }> = ({ session }) => (
   </Stack.Navigator>
 );
 
-// Stacks simples
+
+const FlashcardsStack: React.FC<{ session: Session }> = ({ session }) => (
+  <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Screen name="FlashcardsScreen" component={FlashcardsScreen} initialParams={{ session }} />
+    <Stack.Screen name="CreateFlashcardScreen" component={CreateFlashcardScreen} initialParams={{ session }} />
+    <Stack.Screen name="ReviewFlashcardScreen" component={ReviewFlashcardScreen} initialParams={{ session }} />
+    <Stack.Screen
+      name="AICreateFlashcardScreen"
+      component={AICreateFlashcardScreen}
+      initialParams={{ session }}
+    />
+
+  </Stack.Navigator>
+);
+
+
+
 const SimpleStack = (ScreenComponent: React.FC<any>, session?: Session) => () => (
   <Stack.Navigator screenOptions={{ headerShown: false }}>
     <Stack.Screen name={ScreenComponent.name} component={ScreenComponent} initialParams={session ? { session } : undefined} />
   </Stack.Navigator>
 );
 
-// Navegação por Tabs
 const Tabs: React.FC<{ session: Session }> = ({ session }) => (
   <Tab.Navigator
     initialRouteName="GeometryLessons"
@@ -94,38 +115,40 @@ const Tabs: React.FC<{ session: Session }> = ({ session }) => (
       },
     })}
   >
-    <Tab.Screen name="GeometryLessons" children={() => <HomeStack session={session} />} /> 
+
+    <Tab.Screen name="GeometryLessons" children={() => <HomeStack session={session} />} />
     <Tab.Screen name="MathFincLessons" children={() => <HomeStack session={session} />} />
     <Tab.Screen name="Friends" children={() => <FriendsStack session={session} />} />
-    <Tab.Screen name="Exercicios" children={SimpleStack(ExerciciosScreen, session)} />
+    <Tab.Screen name="Exercicios" children={SimpleStack(QuestionGenerator, session)} />
     <Tab.Screen name="Desempenho" children={SimpleStack(DesempenhoScreen, session)} />
     <Tab.Screen name="Quiz" children={() => <QuizStack session={session} />} />
-    <Tab.Screen name="Flashcards" children={SimpleStack(FlashcardsScreen, session)} />
-    <Tab.Screen name="Configuracoes" children={SimpleStack(ChangePassword, session)} />
+    <Tab.Screen name="Flashcards" component={FlashcardsStack} />
+    <Tab.Screen name="Configuracoes" children={SimpleStack(ConfiguracoesScreen, session)} />
+
     <Tab.Screen name="Settings" children={() => <SettingsScreen />} />
   </Tab.Navigator>
 );
 
-// RootStack
 const RootStack = createNativeStackNavigator();
 
 const Cornhub: React.FC<CornhubProps> = ({ session }) => (
   <NavigationContainer>
     <RootStack.Navigator screenOptions={{ headerShown: false }}>
       <RootStack.Screen name="Tabs" children={() => <Tabs session={session} />} />
-      <RootStack.Screen 
-        name="ChatScreen" 
-        component={ChatScreen} 
+      <RootStack.Screen
+        name="ChatScreen"
+        component={ChatScreen}
         options={{ tabBarStyle: { display: 'none' } }}
       />
       <RootStack.Screen name="Lobby" component={Lobby} initialParams={{ session }} options={{ presentation: 'modal' }} />
       <RootStack.Screen name="GameQuizScreen" component={GameQuizScreen} />
       <RootStack.Screen name="QuizWaitingRoom" component={QuizWaitingRoom} />
       <RootStack.Screen name="QuizResultsScreen" component={QuizResultsScreen} />
-
+      <RootStack.Screen name="ChangePassword" component={ChangePassword} initialParams={{ session }} />
+      <RootStack.Screen name="Audio" component={AudioScreen} initialParams={{ session }} />
+      <RootStack.Screen name="AreaTEA" component={AreaTEAScreen} initialParams={{ session }} />
     </RootStack.Navigator>
-    
-    {/* ✅ NOTIFICAÇÃO DENTRO DO NavigationContainer */}
+
     <QuizInviteNotification userId={session.user.id} />
   </NavigationContainer>
 );

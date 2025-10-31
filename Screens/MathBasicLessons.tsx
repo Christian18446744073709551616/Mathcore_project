@@ -6,6 +6,7 @@ import { RootStackParamList } from '../types';
 import { supabase } from '../lib/supabase';
 import { MaterialIcons, Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import { allTopics, Topic } from '../data/topicsData';
 
 type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'MathBasicLessons'>;
 

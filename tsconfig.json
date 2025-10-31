@@ -1,6 +1,21 @@
 {
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
-    "strict": true
-  }
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "allowJs": true,
+    "noEmit": true,
+    "moduleResolution": "node",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@/Screens/*": ["./src/Screens/*"],
+      "@/components/*": ["./src/components/*"]
+    }
+  },
+  "include": ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx"],
+  "exclude": ["node_modules", "dist", "build"]
 }

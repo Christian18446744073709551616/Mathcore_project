@@ -1,145 +1,380 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, useWindowDimensions } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, useWindowDimensions,Modal, ActivityIndicator } from 'react-native';
+
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../types';
 import { supabase } from '../lib/supabase';
 import { AntDesign, Entypo, FontAwesome5, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Home'>;
+
+
+// Definição dos temas
+const themes = {
+  padrao: {
+    name: 'Padrão',
+    background: '#0F172A',
+    text: '#FFFFFF',
+    textSecondary: '#94A3B8',
+    boxes: ['#731dca', '#4b843d', '#5c1dcb', '#2c3c92'],
+  },
+  roxo: {
+    name: 'Roxo',
+    background: '#1d2033',
+    text: '#FFFFFF',
+    textSecondary: '#B4B7D6',
+    boxes: ['#8B5CF6', '#9333EA', '#7C3AED', '#6D28D9'],
+  },
+  azulClaro: {
+    name: 'Azul Claro',
+    background: '#5b6b85',
+    text: '#1e293b',
+    textSecondary: '#475569',
+    boxes: ['#3B82F6', '#06B6D4', '#0EA5E9', '#2563EB'],
+  },
+  altoContraste: {
+    name: 'Alto Contraste',
+    background: '#000000',
+    text: '#FFFFFF',
+    textSecondary: '#CCCCCC',
+    boxes: ['#FFFF00', '#00FF00', '#FF00FF', '#00FFFF'],
+  },
+  deuteranopia: {
+    name: 'Deuteranopia',
+    background: '#faf9f7',
+    text: '#2c2c2c',
+    textSecondary: '#666666',
+    boxes: ['#0077b6', '#9d4edd', '#ff9500', '#0466c8'],
+  },
+  protanopia: {
+    name: 'Protanopia',
+    background: '#f8f9fa',
+    text: '#212529',
+    textSecondary: '#6c757d',
+    boxes: ['#0466c8', '#7209b7', '#fb8500', '#0353a4'],
+  },
+  tritanopia: {
+    name: 'Tritanopia',
+    background: '#fefefe',
+    text: '#1e1e1e',
+    textSecondary: '#666666',
+    boxes: ['#e63946', '#06ffa5', '#ff006e', '#d62828'],
+  },
+};
+
+// --- ATUALIZAÇÃO 1: Definindo o tipo para nosso Conteúdo ---
+export interface Content {
+  id: string;
+  name: string;
+  color: string;
+  icon_name: string; // Nome do ícone para renderização dinâmica
+  navigation_target: keyof RootStackParamList; // Tela para qual navegar
+}
+
 
 const Home2Screen = () => {
   const navigation = useNavigation<HomeScreenNavigationProp>();
   const [username, setUsername] = useState('');
+
+  const [currentTheme, setCurrentTheme] = useState('padrao');
+  const [showThemeModal, setShowThemeModal] = useState(false);
+  // --- ATUALIZAÇÃO 2: Estado para armazenar os conteúdos e o carregamento ---
+  const [contents, setContents] = useState<Content[]>([]);
+  const [loading, setLoading] = useState(true);
+
   const { width } = useWindowDimensions();
 
   useEffect(() => {
-    const fetchUsername = async () => {
+    const fetchData = async () => {
+      setLoading(true);
+      // --- ATUALIZAÇÃO 3: Buscando os dados do Supabase (ou usando mock por enquanto) ---
+      // Idealmente, viria de: const { data, error } = await supabase.from('contents').select('*');
+      const mockData: Content[] = [
+        { id: '1', name: 'Geometria', color: '#731dca', icon_name: 'shapes', navigation_target: 'GeometryLessons' },
+        { id: '2', name: 'Matemática Financeira', color: '#4b843d', icon_name: 'bar-graph', navigation_target: 'MathFincLessons' },
+        { id: '3', name: 'Matemática Básica', color: '#5c1dcb', icon_name: 'division', navigation_target: 'MathBasicLessons' },
+        { id: '4', name: 'Álgebra', color: '#2c3c92', icon_name: 'square-root-alt', navigation_target: 'AlgebraLessons' },
+      ];
+      setContents(mockData);
+
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
-        const { data } = await supabase
+        const { data: profileData } = await supabase
           .from('profiles')
           .select('username')
           .eq('id', user.id)
           .single();
-        if (data) setUsername(data.username);
+        if (profileData) setUsername(profileData.username);
+      }
+      setLoading(false);
+    };
+
+    fetchUsername();
+
+    // Carregar tema salvo
+    const loadTheme = async () => {
+      try {
+        const savedTheme = await AsyncStorage.getItem('home_theme');
+        if (savedTheme && themes[savedTheme as keyof typeof themes]) {
+          setCurrentTheme(savedTheme);
+        }
+      } catch (error) {
+        console.log('Erro ao carregar tema:', error);
       }
     };
-    fetchUsername();
+    loadTheme();
   }, []);
 
-  // calculate dynamic box size
-  const boxWidth = width > 500 ? 400 : width * 0.9; // max width 400, otherwise 90% of screen
+  const changeTheme = async (themeKey: string) => {
+    setCurrentTheme(themeKey);
+    setShowThemeModal(false);
+    try {
+      await AsyncStorage.setItem('home_theme', themeKey);
+    } catch (error) {
+      console.log('Erro ao salvar tema:', error);
+    }
+  };
+
+  const theme = themes[currentTheme as keyof typeof themes];
+  const boxWidth = width > 500 ? 400 : width * 0.9;
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}
-          showsHorizontalScrollIndicator={false}>
-      
+    <View style={[styles.container, { backgroundColor: theme.background }]}>
+      <ScrollView 
+        style={{ flex: 1 }}
+        contentContainerStyle={styles.scrollContent} 
+        showsVerticalScrollIndicator={false}
+        showsHorizontalScrollIndicator={false}
+      >
+        
+        <View style={styles.header}>
+          <Text style={[styles.title, { color: theme.text }]}>MathCore</Text>
+          <TouchableOpacity 
+            style={styles.themeButton}
+            onPress={() => setShowThemeModal(true)}
+          >
+            <Ionicons name="color-palette" size={28} color={theme.text} />
+          </TouchableOpacity>
+        </View>
+
+        <Text style={[styles.prompt, { color: theme.textSecondary }]}>
+          O que vamos aprender hoje, {username}?
+        </Text>
+
+        <View style={styles.verticalGrid}>
+          {/* Geometria */}
+          <TouchableOpacity
+            style={[styles.box, { backgroundColor: theme.boxes[0], width: boxWidth, height: 200 }]}
+            onPress={() => navigation.navigate('GeometryLessons')}
+          >
+            <Text style={styles.textBox}>Geometria</Text>
+            <Ionicons name="shapes" size={80} color="#000000ff" style={{ marginTop: 10 }} />
+            <View style={styles.progress}>
+              <LinearGradient
+                colors={['#219d40', '#FFFFFF']}
+                locations={[0.25, 0.01]}
+
+    fetchData();
+  }, []);
+
+  // Mapeia o nome do ícone para o componente de ícone real
+  const renderIcon = (iconName: string) => {
+    switch (iconName) {
+      case 'shapes': return <Ionicons name="shapes" size={80} style={{ marginTop: 10 }} />;
+      case 'bar-graph': return <Entypo name="bar-graph" size={80} style={{ marginTop: 10 }} />;
+      case 'division': return <MaterialCommunityIcons name="division" size={80} style={{ marginTop: 10 }} />;
+      case 'square-root-alt': return <FontAwesome5 name="square-root-alt" size={80} style={{ marginTop: 10 }} />;
+      default: return null;
+    }
+  };
+
+  const boxWidth = width > 500 ? 400 : width * 0.9;
+
+  if (loading) {
+    return <View style={[styles.container, { justifyContent: 'center' }]}><ActivityIndicator size="large" color="#FFFFFF" /></View>;
+  }
+
+  return (
+    <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false} showsHorizontalScrollIndicator={false}>
       <Text style={styles.title}>MathCore</Text>
       <Text style={styles.prompt}>O que vamos aprender hoje, {username}?</Text>
 
+      {/* --- ATUALIZAÇÃO 4: Renderizando a lista de conteúdos dinamicamente --- */}
       <View style={styles.verticalGrid}>
-        {/* Geometria */}
-        <TouchableOpacity
-          style={[styles.box, { backgroundColor: '#731dca', width: boxWidth, height: 200 }]}
-          onPress={() => navigation.navigate('GeometryLessons')}
-        >
-          <Text style={styles.textBox}>Geometria</Text>
-          <Ionicons name="shapes" size={80} style={{ marginTop: 10 }} />
-          <View style={styles.progress}>
-            <LinearGradient
-              colors={['#219d40', '#FFFFFF']}
-              locations={[0.25, 0.01]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={StyleSheet.absoluteFill}
-            />
-            <Text style={styles.progressText}>25%</Text>
-          </View>
-        </TouchableOpacity>
+        {contents.map((content) => (
+          <TouchableOpacity
+            key={content.id}
+            style={[styles.box, { backgroundColor: content.color, width: boxWidth, height: 200 }]}
+            onPress={() => navigation.navigate(content.navigation_target)}
+          >
+            <Text style={styles.textBox}>{content.name}</Text>
+            {renderIcon(content.icon_name)}
+            <View style={styles.progress}>
+              <LinearGradient
+                colors={['#219d40', '#FFFFFF']}
+                locations={[0.25, 0.01]} // Exemplo, isso também pode vir do DB
 
-        {/* Matemática Financeira */}
-        <TouchableOpacity
-          style={[styles.box, { backgroundColor: '#4b843d', width: boxWidth, height: 200 }]}
-          onPress={() => navigation.navigate('MathFincLessons')}
-        >
-          <Text style={styles.textBox}>Matemática Financeira</Text>
-          <Entypo name="bar-graph" size={80} style={{ marginTop: 10 }} />
-          <View style={styles.progress}>
-            <LinearGradient
-              colors={['#219d40', '#FFFFFF']}
-              locations={[1, 0.01]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={StyleSheet.absoluteFill}
-            />
-            <Text style={styles.progressText}>100%</Text>
-          </View>
-        </TouchableOpacity>
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={StyleSheet.absoluteFill}
+              />
+              <Text style={styles.progressText}>25%</Text>
+            </View>
+          </TouchableOpacity>
 
-        {/* Matemática Básica */}
-        <TouchableOpacity
-          style={[styles.box, { backgroundColor: '#5c1dcb', width: boxWidth, height: 200 }]}
-          onPress={() => navigation.navigate('MathBasicLessons')}
-        >
-          <Text style={styles.textBox}>Matemática Básica</Text>
-          <MaterialCommunityIcons name="division" size={80} style={{ marginTop: 10 }} />
-          <View style={styles.progress}>
-            <LinearGradient
-              colors={['#219d40', '#FFFFFF']}
-              locations={[0.37, 0.01]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={StyleSheet.absoluteFill}
-            />
-            <Text style={styles.progressText}>37%</Text>
-          </View>
-        </TouchableOpacity>
 
-        {/* Álgebra */}
-        <TouchableOpacity
-          style={[styles.box, { backgroundColor: '#2c3c92', width: boxWidth, height: 200 }]}
-          onPress={() => navigation.navigate('AlgebraLessons')}
+          {/* Matemática Financeira */}
+          <TouchableOpacity
+            style={[styles.box, { backgroundColor: theme.boxes[1], width: boxWidth, height: 200 }]}
+            onPress={() => navigation.navigate('MathFincLessons')}
+          >
+            <Text style={styles.textBox}>Matemática Financeira</Text>
+            <Entypo name="bar-graph" size={80} color="#000000ff" style={{ marginTop: 10 }} />
+            <View style={styles.progress}>
+              <LinearGradient
+                colors={['#219d40', '#FFFFFF']}
+                locations={[1, 0.01]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={StyleSheet.absoluteFill}
+              />
+              <Text style={styles.progressText}>100%</Text>
+            </View>
+          </TouchableOpacity>
+
+          {/* Matemática Básica */}
+          <TouchableOpacity
+            style={[styles.box, { backgroundColor: theme.boxes[2], width: boxWidth, height: 200 }]}
+            onPress={() => navigation.navigate('MathBasicLessons')}
+          >
+            <Text style={styles.textBox}>Matemática Básica</Text>
+            <MaterialCommunityIcons name="division" size={80} color="#000000ff" style={{ marginTop: 10 }} />
+            <View style={styles.progress}>
+              <LinearGradient
+                colors={['#219d40', '#FFFFFF']}
+                locations={[0.37, 0.01]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={StyleSheet.absoluteFill}
+              />
+              <Text style={styles.progressText}>37%</Text>
+            </View>
+          </TouchableOpacity>
+
+          {/* Álgebra */}
+          <TouchableOpacity
+            style={[styles.box, { backgroundColor: theme.boxes[3], width: boxWidth, height: 200 }]}
+            onPress={() => navigation.navigate('AlgebraLessons')}
+          >
+            <Text style={styles.textBox}>Álgebra</Text>
+            <FontAwesome5 name="square-root-alt" size={80} color="#000000ff" style={{ marginTop: 10 }} />
+            <View style={styles.progress}>
+              <LinearGradient
+                colors={['#219d40', '#FFFFFF']}
+                locations={[0, 0.01]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={StyleSheet.absoluteFill}
+              />
+              <Text style={styles.progressText}>0%</Text>
+            </View>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+
+      {/* Modal de seleção de tema */}
+      <Modal
+        visible={showThemeModal}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowThemeModal(false)}
+      >
+        <TouchableOpacity 
+          style={styles.modalOverlay}
+          activeOpacity={1}
+          onPress={() => setShowThemeModal(false)}
         >
-          <Text style={styles.textBox}>Álgebra</Text>
-          <FontAwesome5 name="square-root-alt" size={80} style={{ marginTop: 10 }} />
-          <View style={styles.progress}>
+          <View style={[styles.modalContent, { backgroundColor: theme.background }]}>
+            <Text style={[styles.modalTitle, { color: theme.text }]}>Escolha um Tema</Text>
             
-            <LinearGradient
-              colors={['#219d40', '#FFFFFF']}
-              locations={[0, 0.01]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={StyleSheet.absoluteFill}
-            />
-            <Text style={styles.progressText}>0%</Text>
+            <ScrollView style={styles.themeList}>
+              {Object.entries(themes).map(([key, themeOption]) => (
+                <TouchableOpacity
+                  key={key}
+                  style={[
+                    styles.themeOption,
+                    { 
+                      backgroundColor: themeOption.background,
+                      borderColor: currentTheme === key ? '#219d40' : 'transparent',
+                    }
+                  ]}
+                  onPress={() => changeTheme(key)}
+                >
+                  <Text style={[styles.themeName, { color: themeOption.text }]}>
+                    {themeOption.name}
+                  </Text>
+                  <View style={styles.colorPreview}>
+                    {themeOption.boxes.map((color, index) => (
+                      <View 
+                        key={index}
+                        style={[styles.colorSwatch, { backgroundColor: color }]}
+                      />
+                    ))}
+                  </View>
+                  {currentTheme === key && (
+                    <Ionicons name="checkmark-circle" size={24} color="#219d40" />
+                  )}
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => setShowThemeModal(false)}
+            >
+              <Text style={styles.closeButtonText}>Fechar</Text>
+            </TouchableOpacity>
           </View>
         </TouchableOpacity>
+      </Modal>
+    </View>
+
+        ))}
       </View>
     </ScrollView>
+
   );
 };
 
+// Estilos permanecem os mesmos...
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0F172A',
   },
   scrollContent: {
     padding: 20,
     paddingBottom: 90,
     alignItems: 'center',
   },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '100%',
+    marginBottom: 10,
+  },
   title: {
-    textAlign: 'center',
     fontSize: 32,
     fontWeight: 'bold',
-    color: '#FFFFFF',
+  },
+  themeButton: {
+    padding: 8,
   },
   prompt: {
     fontSize: 20,
-    color: '#94A3B8',
     textAlign: 'center',
     marginVertical: 10,
   },
@@ -156,7 +391,7 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   textBox: {
-    color: '#FFFFFF',
+    color: '#000000ff',
     fontSize: 20,
     marginTop: 10,
     textAlign: 'center',
@@ -179,6 +414,63 @@ const styles = StyleSheet.create({
     width: '100%',
     zIndex: 1,
     fontSize: 18,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    width: '85%',
+    maxHeight: '80%',
+    borderRadius: 20,
+    padding: 20,
+  },
+  modalTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  themeList: {
+    maxHeight: 400,
+  },
+  themeOption: {
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 12,
+    borderWidth: 3,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  themeName: {
+    fontSize: 16,
+    fontWeight: '600',
+    flex: 1,
+  },
+  colorPreview: {
+    flexDirection: 'row',
+    gap: 6,
+    marginRight: 10,
+  },
+  colorSwatch: {
+    width: 20,
+    height: 20,
+    borderRadius: 4,
+  },
+  closeButton: {
+    backgroundColor: '#219d40',
+    padding: 16,
+    borderRadius: 12,
+    marginTop: 16,
+  },
+  closeButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
 });
 
