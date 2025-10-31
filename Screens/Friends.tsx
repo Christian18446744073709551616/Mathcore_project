@@ -37,6 +37,15 @@ const updateLastActive = async () => {
     .eq('id', session.user.id);
 };
 
+
+
+const getFontSize = (name: string) => {
+  if (name.length > 15) return 12;
+  if (name.length > 10) return 14;
+  return 16;
+};
+
+
 const UserCard = ({
   user,
   navigation,
@@ -47,53 +56,76 @@ const UserCard = ({
   navigation: any;
   showChatChallenge?: boolean;
   onAccept?: () => void;
-}) => (
-  <View style={styles.friendCard}>
-    <View style={styles.friendLeft}>
-      <AvatarView size={45} url={user.avatar_url} />
-      <Text style={styles.friendName}>{user.username}</Text>
-    </View>
+}) => {
+  // Função para ajustar tamanho da fonte com base no comprimento do nome
+  const getFontSize = (name: string) => {
+    if (name.length > 18) return 12;
+    if (name.length > 12) return 14;
+    return 16;
+  };
 
-    {showChatChallenge ? (
-      <View style={styles.friendButtons}>
+  return (
+    <View style={styles.friendCard}>
+      <View style={styles.friendLeft}>
+        <AvatarView size={45} url={user.avatar_url} />
+
+        <Text
+          style={[
+            styles.friendName,
+            { fontSize: getFontSize(user.username) },
+          ]}
+          numberOfLines={1}
+          ellipsizeMode="tail"
+        >
+          {user.username}
+        </Text>
+      </View>
+
+      {showChatChallenge ? (
+        <View style={styles.friendButtons}>
+          <TouchableOpacity
+            style={styles.chatButton}
+            onPress={() =>
+              navigation.navigate('ChatScreen', {
+                friendId: user.id,
+                friendName: user.username,
+              })
+            }
+          >
+            <Ionicons name="chatbubbles" size={16} color="#fff" />
+            <Text style={styles.btnText}>Conversar</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.challengeButton}
+            onPress={() => console.log('Desafiar', user.username)}
+          >
+            <Ionicons name="flash" size={16} color="#fff" />
+            <Text style={styles.btnText}>Desafiar</Text>
+          </TouchableOpacity>
+        </View>
+      ) : onAccept ? (
+        <TouchableOpacity style={styles.chatButton} onPress={onAccept}>
+          <Text style={styles.btnText}>Aceitar</Text>
+        </TouchableOpacity>
+      ) : (
         <TouchableOpacity
           style={styles.chatButton}
           onPress={() =>
-            navigation.navigate('ChatScreen', {
-              friendId: user.id,
-              friendName: user.username,
-            })
+            navigation.navigate('FriendDripRoast', { userId: user.id })
           }
         >
-          <Ionicons name="chatbubbles" size={16} color="#fff" />
-          <Text style={styles.btnText}>Conversar</Text>
+          <Text style={styles.btnText}>Ver Perfil</Text>
         </TouchableOpacity>
+      )}
+    </View>
+  );
+};
 
-        <TouchableOpacity
-          style={styles.challengeButton}
-          onPress={() => console.log('Desafiar', user.username)}
-        >
-          <Ionicons name="flash" size={16} color="#fff" />
-          <Text style={styles.btnText}>Desafiar</Text>
-        </TouchableOpacity>
-      </View>
-    ) : onAccept ? (
-      <TouchableOpacity style={styles.chatButton} onPress={onAccept}>
-        <Text style={styles.btnText}>Aceitar</Text>
-      </TouchableOpacity>
-    ) : (
-      <TouchableOpacity
-        style={styles.chatButton}
-        onPress={() => navigation.navigate('FriendDripRoast', { userId: user.id })}
-      >
-        <Text style={styles.btnText}>Ver Perfil</Text>
-      </TouchableOpacity>
-    )}
-  </View>
-);
 
 const FriendsTab = ({ friends, navigation }: { friends: UserProfile[]; navigation: any }) => (
   <FlatList
+    showsVerticalScrollIndicator={false}
     data={friends}
     keyExtractor={(item) => item.id}
     contentContainerStyle={{ paddingBottom: 30 }}
@@ -196,7 +228,7 @@ const Friends = () => {
       <View style={styles.searchContainer}>
         <Ionicons name="search" size={20} color="#fff" style={{ marginLeft: 10 }} />
         <TextInput
-         style={[styles.searchInput, { borderWidth: 0, outlineStyle: 'none' }]}
+          style={[styles.searchInput, { borderWidth: 0, outlineStyle: 'none' }]}
           placeholder="Encontre seus amigos"
           placeholderTextColor="#ccc"
           value={searchQuery}
@@ -212,6 +244,7 @@ const Friends = () => {
 
       {searchActive ? (
         <FlatList
+          showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: 30 }}
           data={recentSearches}
           keyExtractor={(item) => item.id}
@@ -231,6 +264,7 @@ const Friends = () => {
           <View style={styles.modalContainer}>
             <Text style={styles.modalTitle}>Pedidos Pendentes</Text>
             <FlatList
+              showsVerticalScrollIndicator={false}
               data={pendingRequests}
               keyExtractor={(item) => item.id}
               renderItem={({ item }) => (
@@ -253,7 +287,7 @@ const Friends = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#1d2033', padding: 20 },
+  container: { flex: 1, backgroundColor: '#1d2033', padding: 20, paddingBottom: 90 },
   header: { fontSize: 24, fontWeight: '900', color: '#fff', marginBottom: 15 },
   searchContainer: {
     flexDirection: 'row',
