@@ -1,8 +1,21 @@
 {
-    "lessonTitle": "Noções da função",
-    "formulas": [
-      {
+    "lessonTitle": "Introdução da Função Afim",
+    "fundamentals": "Dada duas variáveis x e y, em que x é a variável independente e y a variável dependente de x, se para cada valor de x é possível associar um único valor de y, então y está em função de x.\n\nUma função f é uma lei que faz cada elemento x de um conjunto A corresponder a um único elemento y de um conjunto B.",
+      
+    "formulas": [{
+       "name": "São válidas as notações a seguir",
+        "formula": "\nf:A→Bouf:A→fB\nUma função pode ser entendida de duas maneiras: como uma relação que leva, ou como uma relação que transforma ou produz\n ", 
         "teste": "ExemploNocoesFuncao.jpg"
+      },
+       {
+       "name": "Relação que leva",
+        "formula": "\nTodos os elementos de Np estão associados a algum elemento de N.\n\nCada elemento de Np está associado a um único elemento de N.\n\nEssa relação f é uma função que leva cada elemento dos números pares a um único elemento do conjunto dos números naturais.\n "
+        
+      },
+       {
+       "name": "Relação que transforma ou produz",
+        "formula": "\nSuponha que exista uma máquina que aceita na entrada números naturais e como saída é produzido o triplo desses números.\n\nO número que sai depende do número que entra.\n\nAssim, a máquina representa uma função f que, a partir de x, produz y.\n\nTambém pode ser dito que representa uma função f que transforma cada número x em um número y tal que y = 3x."
+       
       }
     ]
 }

@@ -1,27 +1,27 @@
 {
     "lessonTitle": "Triângulos",
-    "fundamentals": "Um triângulo é um polígono de três lados, três vértices e três ângulos.Eles podem ser classificados de duas formas:",
+    "fundamentals": "Um triângulo é um polígono de três lados, três vértices e três ângulos. Eles podem ser classificados de duas formas:",
     "formulas": [
       {
         "name": "Pelo Ângulo",
-        "formula": "Acutângulo: Todos os seus ângulos internos agudos; Retângulo: Um dos seus ângulos internos é reto; Obtusângulo: Um de seus ângulos internos é obtuso.",
+        "formula": "Acutângulo: Todos os seus ângulos internos agudos; \nRetângulo: Um dos seus ângulos internos é reto;\nObtusângulo: Um de seus ângulos internos é obtuso.",
         "teste": "ExemploTriangulo.jpg"
       },
       {
         "name": "Pelos Lados",
-        "formula": "Escaleno: Todos os lados possuem medidas diferentes; Isósceles: Dois lados que possuem mesma medida; Equilátero: Todos os lados são congruentes."
+        "formula": "Escaleno: Todos os lados possuem medidas diferentes;\nIsósceles: Dois lados que possuem mesma medida; Equilátero: Todos os lados são congruentes."
       },
       {
         "name": "Propriedades",
-        "formula": "Não possui diagonal. Possui três ângulos externos em que a soma é sempre igual a 360º. A soma dos ângulos internos (Si) é sempre igual a 180º. A soma de dois lados quaisquer é sempre maior que o terceiro lado."
+        "formula": "Não possui diagonal. Possui três ângulos externos em que a soma é sempre igual a 360º.\nA soma dos ângulos internos (Si) é sempre igual a 180º.\nA soma de dois lados quaisquer é sempre maior que o terceiro lado."
       },
       {
         "name": "Área",
-        "formula": "A: área b: base h: altura"
+        "formula": "A: área \n b: base \n h: altura"
       },
       {
         "name": "Área do Triângulo Equilátero",
-        "formula": "A: área b: base"
+        "formula": "A: área \n b: base"
       }
     ],
     "examples": [

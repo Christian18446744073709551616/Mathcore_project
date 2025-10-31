@@ -1,11 +1,21 @@
 {
     "lessonTitle": "Paralelogramos",
-    "fundamentals": "Um paralelogramo é um quadrilátero onde os lados opostos são paralelos.",
+    "fundamentals": "Quadriláteros são figuras planas, poligonais e formadas por quatro lados.\nOutros: Não possuem lados paralelos.\nTrapézios: Possuem um par de lados paralelos.\nParalelogramos: Possuem dois pares de lados paralelos.",
     "formulas": [
       {
-        "name": "Área",
-        "formula": "A = base * altura",
+        "name": "Classificação dos Paralelogramos",
+        "formula": "Retângulo: Quatro ângulos retos e lados diferentes.\nQuadrado: Quatro ângulos retos e lados iguais.\nLosango: Ângulos agudos e obtusos e lados iguais.",
         "teste": "ExemploParalelogramo.jpg"
+      },
+      {
+        "name": "Quadrilátero",
+        "formula": "Diagonais: \nDiagonal de um quadrilátero é o segmento de reta que une dois vértices não consecutivos.O quadrilátero possui 2 diagonais.\nBase:\nA base de um paralelogramo é um de seus lados, normalmente o maior lado. A base de um trapézio é um de seus lados paralelos, normalmente o maior.\nAltura:\nA altura de um quadrilátero é a distância entre dois lados paralelos.",
+        
+      },
+      {
+        "name": "Área",
+        "formula": "Quadrado: A área de um quadrado é igual ao produto das medidas de dois lados.\nRetângulo: A área de um retângulo é igual ao produto das medidas de dois lados.\nLosango: A área de um losango é igual à metade do produto das diagonais.",
+        
       }
     ],
     "examples": [

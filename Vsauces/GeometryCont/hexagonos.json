@@ -1,12 +1,17 @@
 {
     "lessonTitle": "Hexágonos",
-    "fundamentals": "Um hexágono é um polígono com seis lados.",
+    "fundamentals": "O hexágono é um polígono com 6 lados e 6 vértices.\nO hexágono regular possui todos os lados e ângulos (internos e externos) com a mesma medida.",
     "formulas": [
       {
-        "name": "Soma dos ângulos internos",
-        "formula": "S = 4 * 180 = 720 graus",
+        "name": "Área",
+        "formula": "A = 6 × (L² × √3) / 4\nÁrea= 6 × (Lado do hexágono² × √3) / 4",
         "teste": "ExemploHexagono.jpg"
-      }
+      },
+      {
+        "name": "Hexágono Regular e Triângulos Regulares",
+        "formula": "O hexágono é um polígono com 6 lados e 6 vértices.",
+      },
+      
     ],
     "examples": [
       {

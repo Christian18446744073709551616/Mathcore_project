@@ -1,165 +1,68 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../types';
 import { supabase } from '../lib/supabase';
-import { AntDesign, MaterialIcons, Entypo, FontAwesome, FontAwesome5, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { MaterialIcons, Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import { allTopics, Topic } from '../data/topicsData';
-
-// Importando dados das lições
-import quadradosData from '../Vsauces/GeometryCont/quadrados.json';
-import triangulosData from '../Vsauces/GeometryCont/triangulos.json';
-import retangulosData from '../Vsauces/GeometryCont/retangulos.json';
-import losangosData from '../Vsauces/GeometryCont/losangos.json';
-import trapeziosData from '../Vsauces/GeometryCont/trapezios.json';
-import paralelogramosData from '../Vsauces/GeometryCont/paralelogramos.json';
-
-import hexagonosData from '../Vsauces/GeometryCont/hexagonos.json';
-
-import poligonosData from '../Vsauces/GeometryCont/poligonos.json';
-
-import angulosData from '../Vsauces/GeometryCont/angulos.json';
-
-
-
 
 type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'GeometryLessons'>;
 
+const { width } = Dimensions.get('window');
 
 function Accordion() {
   const [open, setOpen] = useState(false);
-  const navigation = useNavigation<any>();
-  
-  // --- Lendo os tópicos de Geometria (ID '1') ---
-  const geometryTopics = allTopics['1'];
+  const navigation = useNavigation<HomeScreenNavigationProp>();
 
-  // Função para renderizar os botões em pares
-  const renderTopicRows = (topics: Topic[]) => {
-    const rows = [];
-    for (let i = 0; i < topics.length; i += 2) {
-      rows.push(
-        <View style={styles.row} key={`row-${i}`}>
-          <TouchableOpacity
-            style={styles.lessonBox}
-            onPress={() => navigation.navigate('Lesson', { lessonTitle: topics[i].name })}
-          >
-            <Text style={styles.lessonTitle}>{topics[i].name}</Text>
-          </TouchableOpacity>
-          {topics[i + 1] ? (
-            <TouchableOpacity
-              style={styles.lessonBox}
-              onPress={() => navigation.navigate('Lesson', { lessonTitle: topics[i + 1].name })}
-            >
-              <Text style={styles.lessonTitle}>{topics[i + 1].name}</Text>
-            </TouchableOpacity>
-          ) : <View style={{flex: 1, marginHorizontal: 30}} /> /* Espaço vazio para alinhar */}
-        </View>
-      );
-    }
-    return rows;
-  };
+  const lessons = [
+    ['Quadrados', 'Triângulos'],
+    ['Retângulos', 'Losangos'],
+    ['Trapézios', 'Paralelogramos'],
+    ['Hexágonos', 'Ângulos'],
+    ['Polígonos'],
+  ];
 
   return (
-    <View style={styles.container}>
-      
-      <View style={styles.SobreBox}>
-        <TouchableOpacity style={styles.GeometriaPlana} onPress={() => setOpen(!open)}>
-          <Text style={styles.title}>Geometria Plana</Text>
-          <MaterialIcons name={open ? "keyboard-arrow-down" : "keyboard-arrow-up"} size={85} color="black" style={{ marginEnd: 30 }} />
-        </TouchableOpacity>
+    <View style={styles.accordionContainer}>
+      <TouchableOpacity
+        style={styles.accordionHeader}
+        onPress={() => setOpen(!open)}
+        activeOpacity={0.8}
+      >
+        <Text style={styles.accordionTitle}>Geometria Plana</Text>
+        <MaterialIcons
+          name={open ? "keyboard-arrow-up" : "keyboard-arrow-down"}
+          size={40}
+          color="#fff"
+        />
+      </TouchableOpacity>
 
-        {open && (
-          <ScrollView style={styles.scrollLesson} showsVerticalScrollIndicator={false}
-          showsHorizontalScrollIndicator={false}>
-          <View style={styles.content}>
-            <View style={styles.lessonContainer}>
-              {renderTopicRows(geometryTopics)}
-              </View>
-            <View style={styles.lessonContainer}>
-              <View style={styles.row}>
-                {/* ✅ Quadrados agora vai direto para Lesson */}
+      {open && (
+        <ScrollView
+          style={styles.accordionContent}
+          showsVerticalScrollIndicator={false}
+          showsHorizontalScrollIndicator={false}
+        >
+          {lessons.map((row, rowIndex) => (
+            <View key={rowIndex} style={styles.row}>
+              {row.map((lesson) => (
                 <TouchableOpacity
+                  key={lesson}
                   style={styles.lessonBox}
-                  onPress={() => navigation.navigate('Lesson', { lessonTitle: 'Quadrados' })}
+                  activeOpacity={0.8}
+                  onPress={() => navigation.navigate('Lesson', { lessonTitle: lesson })}
                 >
-                  <Text style={styles.lessonTitle}>Quadrados</Text>
+                  <Text style={styles.lessonText}>{lesson}</Text>
                 </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={styles.lessonBox}
-                  onPress={() => navigation.navigate('Lesson', { lessonTitle: 'Triângulos' })}
-                >
-                  <Text style={styles.lessonTitle}>Triângulos</Text>
-                </TouchableOpacity>
-              </View>
-
-              <View style={styles.row}>
-                <TouchableOpacity
-                  style={styles.lessonBox}
-                  onPress={() => navigation.navigate('Lesson', { lessonTitle: 'Retângulos' })}
-                >
-                  <Text style={styles.lessonTitle}>Retângulos</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.lessonBox}
-                  onPress={() => navigation.navigate('Lesson', { lessonTitle: 'Losangos' })}
-                >
-                  <Text style={styles.lessonTitle}>Losangos</Text>
-                </TouchableOpacity>
-              </View>
-
-              <View style={styles.row}>
-                <TouchableOpacity
-                  style={styles.lessonBox}
-                  onPress={() => navigation.navigate('Lesson', { lessonTitle: 'Trapézios' })}
-                >
-                  <Text style={styles.lessonTitle}>Trapézios</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.lessonBox}
-                  onPress={() => navigation.navigate('Lesson', { lessonTitle: 'Paralelogramos' })}
-                >
-                  <Text style={styles.lessonTitle}>Paralelogramos</Text>
-                </TouchableOpacity>
-              </View>
-
-              <View style={styles.row}>
-                <TouchableOpacity
-                  style={styles.lessonBox}
-                  onPress={() => navigation.navigate('Lesson', { lessonTitle: 'Hexágonos' })}
-                >
-                  <Text style={styles.lessonTitle}>Hexágonos</Text>
-                </TouchableOpacity>
-                 <TouchableOpacity
-                  style={styles.lessonBox}
-                  onPress={() => navigation.navigate('Lesson', { lessonTitle: 'Ângulos' })}
-                >
-                  <Text style={styles.lessonTitle}>Ângulos</Text>
-                </TouchableOpacity>
-              </View>
-
-              <View style={styles.row}>
-                <TouchableOpacity
-                  style={styles.lessonBox}
-                  onPress={() => navigation.navigate('Lesson', { lessonTitle: 'Polígonos' })}
-                >
-                  <Text style={styles.lessonTitle}>Polígonos</Text>
-                </TouchableOpacity>
-              </View>
-
-              <View style={styles.row}>
-              </View>
+              ))}
             </View>
-          </View>
-          </ScrollView>
-        )}
-      </View>
+          ))}
+        </ScrollView>
+      )}
     </View>
   );
 }
-
 
 const HomeScreen = () => {
   const navigation = useNavigation<HomeScreenNavigationProp>();
@@ -167,117 +70,133 @@ const HomeScreen = () => {
 
   useEffect(() => {
     const fetchUsername = async () => {
-      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      const { data: { user } } = await supabase.auth.getUser();
       if (user) {
-        const { data, error } = await supabase
+        const { data } = await supabase
           .from('profiles')
           .select('username')
           .eq('id', user.id)
           .single();
         if (data) setUsername(data.username);
-        if (error) console.error(error);
       }
-      if (userError) console.error(userError);
     };
     fetchUsername();
   }, []);
 
   return (
-    <View style={{ flex: 1 }}>
-      <LinearGradient
-        colors={['#242948', '#5C6494']}
-        locations={[0.65, 0.30]}
-        start={{ x: 1, y: 1 }}
-        end={{ x: 0.85, y: 0.4 }}
-        style={{ flex: 1, padding: 20 }}
+    <LinearGradient
+      colors={['#242948', '#5C6494']}
+          locations={[0.65, 0.30]}
+          start={{ x: 1, y: 1 }}
+          end={{ x: 0.85, y: 0.4 }}
+          style={{ flex: 1, padding: 20 }}
+    >
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+        showsHorizontalScrollIndicator={false}
       >
-        <ScrollView
-          style={styles.container}
-          showsVerticalScrollIndicator={false}
-          showsHorizontalScrollIndicator={false}
-        >
-          <View style={styles.headerRow}>
-            <Text style={styles.title}>GEOMETRIA</Text>
-            <TouchableOpacity
-              style={styles.returnButton}
-              onPress={() => navigation.navigate('Home2')}
-            >
-              <Ionicons name="arrow-back-circle-outline" size={80} color="black" style={{ fontWeight: 'bold' }} />
-            </TouchableOpacity>
-          </View>
-          <Accordion />
-        </ScrollView>
-      </LinearGradient>
-    </View>
+        <View style={styles.header}>
+          <Text style={styles.headerTitle}>GEOMETRIA</Text>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => navigation.navigate('Home2')}
+          >
+            <Ionicons name="arrow-back-circle-outline" size={40} color="#fff" />
+          </TouchableOpacity>
+        </View>
+
+        <Text style={styles.subtitle}>O que vamos aprender hoje, {username}?</Text>
+
+        <Accordion />
+      </ScrollView>
+    </LinearGradient>
   );
 };
 
 const styles = StyleSheet.create({
-  GeometriaPlana: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    backgroundColor: "#BDC4EE",
-    padding: 10,
-    borderRadius: 30,
-    alignItems: "center",
-  },
-  scrollLesson: {
-    maxHeight: 500,
-    marginTop: 10,
-    borderRadius: 40,
-  },
-  SobreBox: {
-    padding: 20,
-    borderRadius: 40,
-    backgroundColor: "#707DCB",
-  },
-  content: {
-    borderRadius: 30,
-    backgroundColor: "#5C6494"
-  },
   container: {
-    padding: 20,
+    flex: 1,
+    paddingTop: 50,
+    paddingHorizontal: 20,
   },
-  title: {
-    marginStart: 30,
-    fontSize: 50,
-    fontWeight: 'bold',
-    color: '#000000ff',
+  scrollContent: {
+    paddingBottom: 100,
   },
-  returnButton: {
-    width: 80,
-    height: 80,
-    borderRadius: 100,
-    backgroundColor: '#D9D9D9',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  headerRow: {
+  header: {
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 50,
+    alignItems: 'center',
+    marginBottom: 30,
   },
-  lessonContainer: {
-    marginVertical: 20,
+  headerTitle: {
+    fontSize: 36,
+    fontWeight: 'bold',
+    color: '#fff',
+  },
+  backButton: {
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    borderRadius: 50,
+    padding: 5,
+  },
+  subtitle: {
+    fontSize: 20,
+    color: '#CFCFCF',
+    marginBottom: 20,
+  },
+  accordionContainer: {
+    borderRadius: 25,
+    overflow: 'hidden',
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    marginBottom: 20,
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowRadius: 15,
+    shadowOffset: { width: 0, height: 5 },
+    elevation: 5,
+  },
+  accordionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: '#707ecbff',
+    paddingVertical: 20,
+    paddingHorizontal: 25,
+    borderTopLeftRadius: 25,
+    borderTopRightRadius: 25,
+  },
+  accordionTitle: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#fff',
+  },
+  accordionContent: {
+    padding: 20,
+    backgroundColor: '#4d547cff',
   },
   row: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 20,
+    justifyContent: 'space-around',
+    marginBottom: 15,
   },
   lessonBox: {
     flex: 1,
-    marginHorizontal: 30,
-    padding: 30,
-    backgroundColor: '#D9D9D9',
-    borderRadius: 25,
+    marginHorizontal: 10,
+    paddingVertical: 25,
+    borderRadius: 20,
+    backgroundColor: '#BDC4EE',
     alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOpacity: 0.15,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 5 },
+    elevation: 4,
   },
-  lessonTitle: {
+  lessonText: {
+    fontSize: 22,
     fontWeight: 'bold',
-    fontSize: 30,
-    color: '#000000',
+    color: '#242948',
   },
 });
 

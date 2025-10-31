@@ -1,15 +1,19 @@
 {
     "lessonTitle": "Retângulos",
-    "fundamentals": "Um retângulo possui quatro lados, sendo os opostos de igual comprimento, e ângulos retos.",
+    "fundamentals": "O retângulo é uma figura plana que tem os lados opostos do mesmo tamanho, os ângulos internos são todos de 90°.",
     "formulas": [
       {
-        "name": "Área",
-        "formula": "A = base * altura",
+        "name": "Propriedades",
+        "formula": "As diagonais são iguais; \n O retângulo tem dois eixos de simetria; \n As diagonais cortam-se no ponto médio que é um centro de simetria.",
         "teste": "ExemploRetangulo.jpg"
       },
       {
-        "name": "Perímetro",
-        "formula": "P = 2 * (base + altura)"
+        "name": "PeríÁrea de um retângulometro",
+        "formula": "A área de um retângulo é igual à multiplicação das medidas de dois lados:\nA = b × h"
+      },
+      {
+        "name": "Perímetro de um retângulo",
+        "formula": "O perímetro P de um retângulo de lado L é a soma dos quatro lados, o que resulta na fórmula:\nP = 2(b+ h)"
       }
     ],
     "examples": [

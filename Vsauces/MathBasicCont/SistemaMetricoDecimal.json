@@ -1,8 +1,51 @@
 {
     "lessonTitle": "Sistema Métrico Decimal",
+    "fundamentals": "Objetivo do aluno: entender quando a ordem dos números muda o resultado e quando não muda; somar e subtrair com segurança usando passos simples.",
     "formulas": [
       {
-        "teste": "ExemploSistemaMetricoDecimal.jpg"
-      }
+      "name": "O que você já sabe",
+      "formula": "\n· Medimos coisas do dia a dia: tamanho, peso, quantidade de líquido e tempo.\n Símbolos comuns: m (metro), L (litro), kg (quilograma), s (segundo).",
+      "teste": "ExemploSistemMetricoDecimal.jpg"
+    },
+    {
+      "name": "Ideia central (Concreto > Pictórico > Abstrato)",
+      "formula": "· Concreto: use régua/fita métrica, garrafa de 1 L, pacotinho de 1 kg de arroz, cronômetro.\n. Pictorico: linha de unidades com 'casinhas' para pular de uma unidade a outra.\n. Abstrato: aplicar a regra de 'andar casas' multiplicando ou dividindo por 10, 100 ou 1.000 conforme a grandeza."
+    },
+    {
+      "name": "Unidade padrão",
+      "formula": "· Comprimento: metro (m)\n· Massa: quilograma (kg)\n. Capacidade: litro (L)\n· Tempo: segundo (s)Tempo (relações principais):\n. 1 min = 60 s\n. 1 h = 60 min = 3.600 s"
+    },
+    {
+      "name": "Conversões - como pensar",
+      "formula": "· Comprimento (km, hm, dam, m, dm, cm, mm): '1 casa = x10' ao descer; '1 casa = +10' ao subir. \nEx .: 3 m = 300 cm (desce 2 casas: x10 x10).\nEx .: 450 cm = 4,5 m (sobe 2 casas: +10 +10).\n\n· Área (km2, hm2, dam2, m2, dm2, cm2, mm2): '1 casa = x100' ao descer; '1 casa = +100' ao subir.\nEx .: 5 m2 = 50.000 cm2 (desce 2 casas: x100 x100).\nEx .: 300.000 cm2 = 30 m2 (sobe 2 casas: +100 100).\n\n· Volume (km3, hm3, dam3, m3, dm3, cm3, mm3): '1 casa = x1.000' ao \ndescer; '1 casa = +1.000' ao subir.\nEx .: 2 m3 = 2.000.000 cm3 (desce 2 casas: x1.000 x1.000).\nEx .: 1.500.000 cm3 = 1,5 m3 (sobe 2 casas: +1.000 +1.000).\n\nIntuicão: a área mede 'superfície' (2 dimensões), por isso cada passo vale 10 x 10 = 100. O volume mede 'espaço' (3 dimensões), cada passo vale 10 × 10 × 10 = 1.000."
+    },
+    {
+      "name": "Passos práticos (checklist)",
+      "formula": "1. Identifique a grandeza: comprimento, área ou volume (ou tempo).\n2. Encontre a posição das unidades na 'linha de casinhas'.\n3. Conte quantas casas vai andar e a direção (subir ou descer).\n4. Aplique o fator: x10/100/1.000 ao descer; +10/100/1.000 ao subir.\n5. Reescreva o número com zeros/ponto decimal conforme necessário."
+    },
+    {
+      "name": "Exemplos resolvidos",
+      "formula": "· Comprimento: 7,5 m para cm \nm > cm: desce 2 casas > x100 > 7,5 x 100 = 750 cm.\n· Área: 3 m2 para cm2 \nm2 > cm2: desce 2 casas > x100 x100 = x10.000 > 3 x 10.000 = 30.000 cm2. \n· Volume: 0,8 m3 para cm3 \nm3 > cm3: desce 2 casas > x1.000 x1.000 = x1.000.000 > 0,8 x 1.000.000 = 800.000 cm3.\n . Tempo: 2 h para s\n1h = 3.600 s > 2 x 3.600 = 7.200 s."
+    },
+    {
+      "name": "Prática guiada",
+      "formula": ". a) 4 m =_ cm \n. b) 250 cm =_ m \n· c) 6 m2 =_ cm2 \n· d) 1,2 m3 =_ cm3 \n· e) 90 min =_ h"
+    },
+    {
+      "name": "Prática independente",
+      "formula": ". f) 5 km =_ m\n· g) 320 dm =_ m\n· h) 50.000 cm2 = _m2\n. i) 2.400 s =_ min\n. j) 3 h =_ s"
+    },
+    {
+      "name": "Cuidado!",
+      "formula": "· Usar o mesmo fator para tudo: lembre que comprimento usa 10, área usa 100, volume usa 1.000 por casa.\n· Esquecer a direção: descer aumenta (multiplica); subir diminui (divide).\n. Pular o passo de contar casas: sempre conte as casas com o dedo na linha de unidades."
+    },
+    {
+      "name": "Dica de metacognição",
+      "formula": ". 'Como conferir?' Faça o caminho inverso: se desceu 2 casas x100, suba 2 casas +100 e veja se volta ao numero inicial."
+    },
+    {
+      "name": "Glossário visual",
+      "formula": "· Múltiplo/submúltiplo: unidades maiores/menores que a unidade padrão.\nConversão: trocar a unidade mantendo a mesma quantidade.\n. Linha de unidades: sequência KM > HM > DAM > M > DM > CM\n> MM (e versões com 2 e 3)."
+    }
     ]
 }

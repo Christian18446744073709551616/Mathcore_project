@@ -1,8 +1,77 @@
 {
     "lessonTitle": "Conceitos Básicos de Probabilidade",
-    "formulas": [
-      {
-        "teste": "ExemploConceitosBasicosProbabilidade.jpg"
-      }
-    ]
+    "fundamentals": "Objetivo do aluno: entender o que é probabilidade como 'chance de acontecer', usar a fórmula básica, reconhecer o espaço amostral e representar resultados em fração, decimal e porcentagem.",
+  "formulas": [
+    {
+      "name": "O que você já sabe",
+      "formula": ". Usamos 'chance' no dia a dia: 'é provável chover', 'pouca chance de sair 6'.\n. Números entre 0 e 1 (ou 0% a 100%) indicam quanta chance algo tem.",
+      "teste": "ExemploConceitosBasicosProbabilidade.jpg"
+    },
+    {
+      "name": "Ideia principal (Concreto > Pictórico > Abstrato)",
+      "formula": ". Concreto: use uma sacola com tampinhas coloridas; sorteie uma sem olhar.\n\n. Pictorico: desenhe o conjunto de possibilidades e circule as favoráveis.\n\n. Abstrato: aplique a formula P(A) = casos favoráveis + casos possíveis e escreva em fraçao, decimal e %."
+    },
+    {
+      "name": "Fórmula básica",
+      "formula": ". P(A) = Número de casos favoráveis + Número de casos possíveis.\n· Interpretação:\n· O significa 'impossível'. e 1 (ou 100%) significa 'certo'.\n. Valores no meio indicam 'grau de chance'."
+    },
+    {
+      "name": "Representação (três formas equivalentes)",
+      "formula": "· Exemplo: 2/5 = 0,4 = 40%.\nFracao: partes sobre o total. Decimal: divisao feita.\nPorcentagem: 'de cada 100'."
+    },
+    {
+      "name": "Espaço amostral",
+      "formula": ". Definicao: conjunto de todos os resultados possíveis de um experimento aleatório.\n. Dado comum (1 a 6): E = {1, 2, 3, 4, 5, 6}.\n. Moeda: E = {cara, coroa}.\n. Sacola com 3 vermelhas e 2 azuis: E = {V, A} com total 5 objetos."
+    },
+    {
+      "name": "Distribuição de frequência",
+      "formula": ". Mostra 'quantas vezes' cada valor ou classe aparece nos dados.\n\n. Partes comuns:\nClasse (ou categoria/faixa): o 'nome' do grupo (ex .: idades 7- 8, 9-10; ou cores).\nFrequência absoluta (f): quantas ocorrências.\nFrequência relativa (fr): a porcentagem do total.\n\n· Leitura básica:\nIdentifique as classes.\nOlhe a frequência absoluta (contagem).\nSe houver porcentagem, verifique a frequência relativa."
+    },
+    {
+      "name": "Amplitude da amostral",
+      "formula": "Adicão (use conte a partir do maior):\n8+3=\n9+4=\n25+14 =\n\n· Subtração (pense tirar):\n13-5 =\n30-12 =\n42-19 ="
+    },
+    {
+      "name": "Experimento aleatório (exemplo com dados)",
+      "formula": ". 'Aleatório' porque o resultado depende apenas do acaso (sem controle).\n· Evento A: 'sair par' no dado.\nFavoráveis: {2, 4, 6} (3 resultados).\nPossíveis: {1, 2, 3, 4, 5, 6} (6 resultados).\nP(A) = 3/6 = 1/2 = 0,5 = 50%."
+    },
+    {
+      "name": "Exemplos resolvidos",
+      "formula": ". Exemplo 1 (moeda): A = 'sair cara'.\nFavoráveis: 1; Possíveis: 2 > P(A) = 1/2 = 50%.\n\n. Exemplo 2 (sacola): 3 bolinhas vermelhas, 2 azuis.\nA= 'sair vermelha': P(A) = 3/5 = 0,6 = 60%.\n\n. Exemplo 3 (dado): B = 'sair maior que 4'.\nFavoráveis: {5, 6} = 2; Possíveis: 6 > P(B) = 2/6 = 1/3 ~ 33,3%."
+    },
+    {
+      "name": "Passos práticos",
+      "formula": "1. Descreva o experimento (o que será sorteado/lançado).\n2. Liste o espaço amostral E (todos os resultados possíveis).\n3. Defina o evento A (o que queremos que aconteça).\n4. Conte favoráveis e possíveis.\n5. Calcule P(A) e escreva em fracao -> decimal -> porcentagem."
+    },
+    {
+      "name": "Prática guiada",
+      "formula": ". a) Dado: A = 'sair numero impar'. P(A) =\n. b) Moeda: B = 'sair coroa'. P(B) =\n. c) Sacola: 4 verdes e 6 amarelas; C = 'sair verde'. P(C) ="
+    },
+    {
+      "name": "Prática independente",
+      "formula": ". d) Dado: D = 'sair 1 ou 2'. P(D) =\n· e) Sacola: 2 vermelhas, 1 azul, 1 amarela; E = 'não sair\n. f) Baralho simplificado: 10 cartas, 3 são estrelas; F = 'sair estrela'. P(F) ="
+    },
+    {
+      "name": "Cuidado!",
+      "formula": ". Esquecer de contar todas as possibilidades do espaço amostral.\n. Confundir 'favoráveis' com 'possíveis'.\n· Não simplificar frações (quando apropriado).\n. Esquecer que porcentagens precisam somar 100% quando\ndividimos o todo."
+    },
+    {
+      "name": "Dica de metacognição",
+      "formula": ". 'Como conferir?' Refaca a contagem do espaco amostral e dos favoráveis. Verifique se a fraçao convertida para decimal e % bate com o valor."
+    },
+    {
+      "name": "Glossário visual",
+      "formula": ". Experimento aleatório: situacão em que o resultado é incerto (depende do acaso).\n· Espaço amostral (E): todos os resultados possíveis.\n. Evento: o que queremos observar (um subconjunto de E).\n. Probabilidade: medida da chance de o evento ocorrer."
+    }
+  ],
+  "examples": [
+    {
+      "question": "Qual é o resultado de 37 + 25?",
+      "solution": "37 + 25 = 62"
+    },
+    {
+      "question": "Quanto é 58 - 34?",
+      "solution": "58 - 34 = 24"
+    }
+  ]
 }

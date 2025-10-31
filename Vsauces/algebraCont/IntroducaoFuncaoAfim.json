@@ -1,8 +1,31 @@
 {
     "lessonTitle": "Introdução da Função Afim",
-    "formulas": [
-      {
+    "fundamentals": "Uma função f:IR->IR é quando existem dois números reais a e b de forma que:\nf (x) = ax + b, para todo x E IR.\n\nEssa é a fórmula que representa uma função afim.\nf(x) = ax + b",
+    "formulas": [{
+       "name": "Definição da Função Afim",
+        "formula": "Toda e qualquer função pode ser representada por F(x).\n\nA expressão y = ax + b também é chamada de função do 1º grau.\n\nUma função f: R R é chamada de função afim.\n\nIsso significa que:\nO domínio (D) e o contradomínio (CD) são conjuntos dos números reais (R).\n\nOu seja, podem fazer parte:\n\nNúmeros positivos e negativos\nFrações\nDízimas periódicas\nRaízes não exatas\nQualquer número real\n ",
+      
         "teste": "ExemploIntroducaoFuncaoAfim.jpg"
+      },
+       {
+       "name": "Estrutura da Função Afim",
+        "formula": "\nA fórmula é f(x) = ax + b, composta por dois termos:\n\nax contém a variável x.\nb não contém variável."
+        
+      },
+       {
+       "name": "Coeficientes",
+        "formula": "\no a eb são números reais, chamados de coeficientes.\n\nA é dependente da variável x, pois muda conforme o valor de x.\n\no bé independente de x, ou seja, não muda mesmo que x varie."
+       
+      },
+      {
+       "name": "Termo Independente",
+        "formula": "\nO termo que não acompanha uma variável é sempre O termo independente.\nNo caso da função afim, o termo independente é b."
+        
+      },
+       {
+       "name": "Dependência da Variável x",
+        "formula": "x é chamado de variável porque seu valor pode variar.\nQuando x muda, o valor de ax também muda, mesmo que a permaneça o mesmo.\no Já o valor de b não muda, independentemente do valor de x."
+       
       }
     ]
 }

@@ -1,0 +1,55 @@
+{
+  "lessonTitle": "Média, Moda e Mediana",
+  "fundamentals": "Objetivo do aluno: entender tres jeitos simples de 'resumir' um conjunto de números: a média (valor médio), a moda (o que mais aparece) e a mediana (o valor do meio).",
+    "formulas": [
+    {
+      "name": "O que você já sabe",
+      "formula": "· Contamos e comparamos números (idades, pontos, tamanhos).\n. Em listas de números, podemos escolher um valor que 'representa' o grupo.",
+      "teste": "ExemploMediaModaMediana.jpg"
+    },
+    {
+      "name": "Ideia central (Concreto > Pictorico > Abstrato)",
+      "formula": ". Concreto: represente numeros com tampinhas/bloquinhos; junte, conte, e separe em grupos para descobrir 'o do meio'.\n. Pictorico: use retas numéricas com pontos e diagramas de caixas simples (para visualizar o meio).\n. Abstrato: aplique as regras de média, moda e mediana na lista de valores."
+    },
+    {
+      "name": "Média (valor médio de uma distribuição)",
+      "formula": "· Significado: 'repartir de forma justa'. Some tudo e divida pela quantidade de números.\n. Regra: média = soma dos valores + numero de elementos.\n. Exemplo (simples): 4, 6, 10 > soma = 20; quantidade = 3 > média = 20 + 3 ~ 6,7.\n. Intuicão concreta: junte todas as tampinhas e depois distribua igualmente entre 3 potes."
+    },
+    {
+      "name": "Moda (o valor que mais aparece)",
+      "formula": "· Significado: o número mais frequente.\n\n. Exemplo: [1, 2, 2, 2, 3] > moda = 2 (aparece mais vezes).\n\nObservações:\nPode nao haver moda (se todos aparecem igual).\nPode haver mais de uma moda (ex .: duas quantidades empatadas no topo)."
+    },
+    {
+      "name": "Mediana (valor central do conjunto)",
+      "formula": ". Passo 1: coloque os numeros em ordem do menor para o maior.\n\nPasso 2:\n. Se a quantidade for ímpar > a mediana é o valor do meio.\n\n. Se for par > a mediana e a média dos dois valores do meio.\n\n. Mini-exemplos:\nImpar: [1, 3, 4, 10, 12] > meio = 4 > mediana = 4.\nPar: [3, 7, 9, 12] > meio está entre 7 e 9 > mediana = (7 + 9) + 2 = 8.\n\n. Dica visual: marque os extremos e 'feche' em direcao ao centro até sobrar o meio."
+    },
+    {
+      "name": "Quando usar cada uma",
+      "formula": ". Media: quando cada valor 'contribui' igualmente e nao ha valores muito 'fora da curva'.\n. Moda: quando queremos saber o mais comum (ex .: cor preferida, tamanho mais escolhido).\n. Mediana: quando ha valores extremos que podem 'puxar' a média (mediana é mais robusta)."
+    },
+    {
+      "name": "Passos práticos",
+      "formula": "1. Escreva os números e verifique se estao completos (sem faltar nenhum dado).\n2. Para moda: conte as repetições e ache o(s) mais frequente(s).\n3. Para mediana: ordene e identifique o meio (ou faça a média dos dois do meio).\n4. Para média: some tudo e divida pela quantidade.\n5. Compare os três resultados: qual 'representa melhor' a situaçao?"
+    },
+    {
+      "name": "Prática guiada",
+      "formula": ". a) Conjunto: 5, 7, 7, 2, 10\nModa = ; Mediana = ; Media =\n\n· b) Conjunto: 3, 3, 4, 8\nModa = ; Mediana = ; Media =\n\n. c) Explique: quando a mediana é melhor que a média?"
+    },
+    {
+      "name": "Prática independente",
+      "formula": ". d) Colete 5 idades na família (ou números de páginas lidas). Calcule moda, mediana e média.\n\n· e) Monte um conjunto com um valor 'muito grande' (ex .: 2, 3, 3, 4, 50). Compare media e mediana: o que mudou?"
+    },
+    {
+      "name": "Cuidado!",
+      "formula": ". Esquecer de ordenar antes de calcular a mediana.\n. Confundir média com moda (media usa soma e divisão; moda é contagem do mais frequente).\n· Dividir pela quantidade errada (use o número total de valores).\n. Em listas pares, esquecer que a mediana é a média dos dois do meio."
+    },
+    {
+      "name": "Dica de metacognição",
+      "formula": ".'Como conferir?'\nRecalcule a soma para a média;\nRefaça a contagem para a moda;\nReordene para checar a mediana."
+    },
+    {
+      "name": "Glossário visual",
+      "formula": "· Média: soma + quantidade (valor médio).\n. Moda: valor mais comum.\n. Mediana: valor central (após ordenar)."
+    }
+  ]
+}

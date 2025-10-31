@@ -1,8 +1,51 @@
 {
     "lessonTitle": "Frações",
+    "fundamentals": "Objetivo do aluno: compreender como somar, multiplicar e dividir fraçoes com passos simples e previsíveis, usando exemplos do cotidiano.",
     "formulas": [
       {
-        "teste": "ExemploFracoes.jpg"
-      }
+      "name": "O que você já sabe",
+      "formula": "· Fração mostra 'quantas partes' de um todo: numerador é a parte 'de cima', denominador é a parte 'de baixo'.\n· Sinais: + somar; x multiplicar; + dividir; = igual.",
+      "teste": "ExemploFracoes.jpg"
+    },
+    {
+      "name": "Ideia principal (Concreto > Pictórico > Abstrato)",
+      "formula": "· Concreto: use pizzas/cartões divididos em partes iguais. Pinte as partes que vamos usar.\n· Pictórico: desenhe retângulos/pizzas com o mesmo número de partes para comparar, somar ou repartir.\n· Abstrato: escreva a conta com frações e siga a regra correta para cada operação."
+    },
+    {
+      "name": "Soma de frações",
+      "formula": ". Regra com mesmo denominador: 'Mantém o denominador e soma os numeradores.'\nExemplo resolvido: 2/7 + 3/7\n1. Denominadores iguais? Sim (7).\n2. Some os numeradores: 2 + 3 = 5.\n3. Resultado: 5/7.\n\n. Regra com denominadores diferentes: 'Ache o MMC para igualar os denominadores.'\nExemplo resolvido: 2/3 + 3/4\n1. MMC(3,4) = 12 > transforme: 2/3 = 8/12; 3/4 = 9/12.\n2. Some numeradores: 8/12 + 9/12 = 17/12.\n3. Se der fração imprópria, você pode manter 17/12 ou escrever 1 5/12 (forma mista).\n\n\nDica de verificacao: desenhe dois retangulos com 12 partes iguais; pinte 8 e 9; conte as 17 partes."
+    },
+    {
+      "name": "Multiplicação de frações",
+      "formula": "· Regra: 'Multiplica o de cima com o de cima e o de baixo com o de baixo.'\nExemplo resolvido: 4/5 x 2/7\n1. Numeradores: 4 x 2 = 8.\n2. Denominadores: 5 x 7 = 35.\n3. Resultado: 8/35.\n\n· Observação útil: simplifique antes se houver fatores comuns (quando apropriado ao nível).\nEx .: 2/6 x 3/4 > simplifique 2/6 para 1/3 > 1/3 x 3/4 = 3/12 = 1/4.\n\n\nSignificado concreto: 'grupos de frações' - pegue 2/7 de uma barra e repita 4/5 vezes (para criancas, mantenha a ideia de 'parte de parte' com desenhos)."
+    },
+    {
+      "name": "Divisão de frações",
+      "formula": "· Regra: 'Mantém o primeiro e multiplica pelo inverso do segundo.'\nExemplo resolvido: 4/3 = 2/3\n1. Inverta a segunda: 2/3 > 3/2.\n2. Multiplique: 4/3 x 3/2 = 12/6 = 2.\n\n· Quando usar: 'Quantas vezes cabe uma fração dentro da outra?' ou 'repartir em partes fracionárias iguais'.\n\n\n Verificacao: multiplique o resultado pelo divisor e confira se volta ao dividendo."
+    },
+    {
+      "name": "Exemplos resolvidos",
+      "formula": "· Soma: \n1. Os denominadores sao iguais? Se sim, some os numeradores.\n2. Se não, ache o MMC e transforme.\n3. Some os numeradores e mantenha o denominador comum.\n4. Simplifique, se possível.\n\n· Multiplicação:\n1. Multiplique numeradores.\n2. Multiplique denominadores.\n3. Simplifique, se possível.\n\n· Divisão:\n1. Mantenha a primeira fração.\n2. Inverta a segunda.\n3. Multiplique e simplifique."
+    },
+    {
+      "name": "Prática guiada",
+      "formula": "· Soma (mesmo denominador):\na) 1/6+ 3/6 =\n\n· Soma (denominadores diferentes):\nb) 1/2 + 1/3 =\n\n· Multiplicacão:\nC) 3/4 x 2/5 =\n\n· Divisão:\nd) 5/6 + 1/3 ="
+    },
+    {
+      "name": "Prática independente",
+      "formula": ". e) 2/5 + 1/5 =\n· f) 3/8 + 1/4 =\n. g) 2/3 x 3/5 =\n· h) 7/9 + 2/3 ="
+    },
+    {
+      "name": "Cuidado!",
+      "formula": ". Soma: tentar somar denominadores. Lembre: na soma, iguale denominadores e some apenas os numeradores.\n· Multiplicacao: esquecer de multiplicar numerador com numerador e denominador com denominador.\n· Divisão: inverter a fração errada (sempre a segunda) ou esquecer de inverter.\n. Esquecer de simplificar quando há fator comum (se for trabalhado na série)."
+    },
+    {
+      "name": "Checagem rápida",
+      "formula": "· Verdadeiro ou falso:\ni) Na soma 3/7 + 2/7, o denominador fica 14.\nii) Dividir por 2/3 e o mesmo que multiplicar por 3/2.\n\n· Resolva:\niii) 1/4 + 2/4 =\niv) 2/5 x 1/2 ="
+    },
+    {
+      "name": "Glossário visual",
+      "formula": "· Numerador: número de partes consideradas.\n. Denominador: total de partes em que o todo foi dividido.\n· MMC (mínimo múltiplo comum): o menor número múltiplo dos dois denominadores.\n· Inverso: troca numerador pelo denominador (exceto zero)."
+    }
     ]
 }

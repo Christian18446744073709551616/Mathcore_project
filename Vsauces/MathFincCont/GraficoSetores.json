@@ -1,8 +1,55 @@
 {
     "lessonTitle": "Média, Moda e Mediana",
+    "fundamentals": "Objetivo do aluno: entender o que é um gráfico de setores (pizza), quando usar, como construir e como interpretar percentuais e ângulos.",
     "formulas": [
-      {
-        "teste": "ExemploGraficoSetores.jpg"
-      }
-    ]
+    {
+      "name": "O que você já sabe",
+      "formula": "· Contamos quantidades por categoria (ex .: frutas preferidas).\n· 100% representa o 'todo' (o inteiro).",
+      "teste": "ExemploGraficoSetores.jpg"
+    },
+    {
+      "name": "Ideia principal (Concreto > Pictórico > Abstrato)",
+      "formula": ". Concreto: use uma pizza de papel dividida em fatias; cada fatia representa uma parte do todo.\n. Pictórico: desenhe um círculo e separe em setores proporcionais às partes.\n\n. Abstrato: represente com porcentagens e ângulos; o círculo completo é 100% = 360°."
+    },
+    {
+      "name": "O que é e quando usar",
+      "formula": ". O gráfico de setores mostra como um total se divide em partes (categorias) - útil quando:\nQueremos ver a composição do todo.\nAs categorias são poucas e exclusivas (sem sobreposição).\nAs porcentagens somam 100%."
+    },
+    {
+      "name": "Como construir",
+      "formula": "1. Obtenha os dados e calcule as porcentagens de cada categoria.\n2. Converta porcentagens em ângulos: ângulo = porcentagem x 360° / 100.\n3. No círculo, trace cada setor com o ângulo calculado. Rotule com nome e percentual. Dica prática: use régua e transferidor; para 25% use 90°; para 50% use 80°."
+    },
+    {
+      "name": "Exemplo resolvido",
+      "formula": "· Cenário: pesquisa com três resultados.\nCandidato A: 50% > angulo 180° (metade do crculo).\nCandidato B: 25% > ângulo 90°.\nBrancos, nulos e outros: 25% > ângulo 90°.\n. Interpretacao: a metade do todo ficou com A; B e 'outros' dividem igualmente a outra metade."
+    },
+    {
+      "name": "Leitura e interpretação",
+      "formula": "· Verifique:\nSe as porcentagens somam 100%.\nSe os rótulos e as cores/texturas distinguem as categorias.\nO tamanho relativo dos setores (maior setor = maior parte do todo).\n. Compare setores para responder 'qual é maior/menor?' e 'quanto maior?' (diferença de porcentagem)."
+    },
+    {
+      "name": "Passos práticos",
+      "formula": "1. Liste categorias e suas contagens.\n2. Calcule percentuais (parte + total x 100).\n3. Verifique se totaliza 100%.\n4. Transforme percentuais em ângulos.\n5. Desenhe o círculo e marque os setores na ordem (use cores/ texturas).\n6. Adicione título e legenda."
+    },
+    {
+      "name": "Prática guiada",
+      "formula": "· a) Dados: 20 preferências - maçã 8, banana 6, laranja 6.\nCalcule % e ângulos; desenhe o gráfico.\n\n· b) Em um gráfico, identifique qual setor representa 30% e explique por quê."
+    },
+    {
+      "name": "Prática independente",
+      "formula": ". Coletar dados de 4-5 categorias (ex .: brincadeiras favoritas), calcular porcentagens e construir o gráfico.\n· Transforme 10%, 25%, 40%, 25% em ângulos e confira se somam 360°."
+    },
+    {
+      "name": "Cuidado!",
+      "formula": "· Categorias demais: dificulta a leitura (prefira poucas).\n. Porcentagens que não somam 100%.\n. Cores sem legenda ou dependência apenas de cor (use também rótulos/ texturas)."
+    },
+    {
+      "name": "Dica de metacognição",
+      "formula": ". 'Como conferir?' Some as porcentagens; depois some ângulos. Verifique rotulos e se o maior setor corresponde à maior porcentagem."
+    },
+    {
+      "name": "Glossário visual",
+      "formula": ". Setor: 'fatia' do círculo que representa uma parte do total.\n· Porcentagem: parte de 100.\n· Ângulo central: abertura que determina o tamanho do setor; 360° é o círculo inteiro."
+    }
+  ]
 }

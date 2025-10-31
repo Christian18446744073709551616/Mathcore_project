@@ -1,0 +1,73 @@
+{
+  "lessonTitle": "MDC",
+  "fundamentals": "Objetivo do aluno: entender o que é o Máximo Divisor Comum e calcular o MDC de dois ou três números usando fatoração por divisores comuns, com passos previsíveis e exemplos concretos.",
+  "formulas": [
+    {
+      "name": "O que você já sabe",
+      "formula": "· Divisor: número que 'cabe certinho' (sem resto) em outro número.\n· Múltiplo: resultado de uma multiplicação (ex.: múltiplos de 3: 3, 6, 9, 12 ...).",
+      "teste": "ExemploMDC.jpg"
+    },
+    {
+      "name": "Ideia central (Concreto > Pictórico > Abstrato)",
+      "formula": "· Concreto: pense em compartilhar igualmente objetos entre grupos (ex.: dividir 12 tampinhas em grupos do mesmo tamanho).\n· Pictórico: arrume objetos em fileiras iguais; o maior tamanho de fileira que funciona para todos os números é o MDC.\n· Abstrato: use divisões sucessivas ou fatoração para encontrar o maior número que divide todos sem resto."
+    },
+    {
+      "name": "Conceito",
+      "formula": "· O Máximo Divisor Comum (MDC) entre dois ou mais números é o maior número inteiro que divide todos eles ao mesmo tempo."
+    },
+    {
+      "name": "Propriedades importantes",
+      "formula": "· Se os números são primos entre si (não têm fatores comuns além de 1), então o MDC = 1.\n· Se 'a' divide 'b', então MDC(a, b) = a.\n· O MDC é sempre um divisor de cada número envolvido."
+    },
+    {
+      "name": "Como calcular (Regra: fatoração por linhas)",
+      "formula": "Passo a passo:\n1. Escreva os números lado a lado.\n2. Divida todos os que 'derem' pelo mesmo número primo (comece por 2, depois 3, 5, 7 ...).\n3. Cada vez que um primo dividir todos ao mesmo tempo, registre esse primo na 'linha de fatores comuns'.\n4. Pare quando não houver mais primo que divida todos ao mesmo tempo.\n5. O produto dos primos que dividiram todos simultaneamente é o MDC.\n\nDica visual: 'linha inteira' quer dizer que aquele fator dividiu todos os números da linha na mesma etapa."
+    },
+    {
+      "name": "Exemplos resolvidos",
+      "formula": "Exemplo 1: MDC(12, 18)\n· 12 e 18 são pares → dividem por 2: 12 → 6; 18 → 9 (2 dividiu os dois)\n· Agora 6 e 9 → ambos divisíveis por 3: 6 → 2; 9 → 3 (3 dividiu os dois)\n· Não há outro primo que divida 2 e 3 ao mesmo tempo.\n→ MDC = 2 x 3 = 6.\n\nExemplo 2: MDC(8, 24)\n· 8 e 24 → por 2: 8 → 4; 24 → 12\n· De novo por 2: 4 → 2; 12 → 6\n· De novo por 2: 2 → 1; 6 → 3\n· Parou (não há primo que divida 1 e 3 simultaneamente)\n→ MDC = 2 x 2 x 2 = 8.\n\nExemplo 3: primos entre si, MDC(9, 10)\n· 9 = 3 x 3; 10 = 2 x 5 → não há fator primo comum → MDC = 1."
+    },
+    {
+      "name": "Interpretação concreta (significado)",
+      "formula": "· O MDC representa o maior tamanho de grupo possível para dividir quantidades sem sobrar.\n· Exemplo: 12 e 18 lápis em kits iguais → tamanho máximo do kit sem sobrar é 6."
+    },
+    {
+      "name": "Passos práticos (checklist)",
+      "formula": "1. Liste os números.\n2. Teste divisões por primos na mesma linha (2, 3, 5, 7 ...).\n3. Registre apenas os fatores que dividiram todos os números da linha.\n4. Multiplique os fatores comuns encontrados.\n5. Verifique: o resultado divide todos os números originais sem resto?"
+    },
+    {
+      "name": "Prática guiada",
+      "formula": "a) MDC(15, 25) = ?\n b) MDC(14, 21) = ?\n c) MDC(18, 24, 30) = ?"
+    },
+    {
+      "name": "Prática independente",
+      "formula": "d) MDC(20, 28) = ?\n e) MDC(27, 36) = ?\n f) MDC(16, 40, 56) = ?"
+    },
+    {
+      "name": "Cuidado! (erros comuns)",
+      "formula": "· Misturar fatores que não dividem todos ao mesmo tempo (isso serve ao MMC, não ao MDC).\n· Parar cedo: verifique se ainda há algum primo comum possível.\n· Confundir MDC com MMC: MDC 'junta' apenas os fatores comuns; MMC 'junta' tudo que for necessário."
+    },
+    {
+      "name": "Dica de metacognição (como conferir)",
+      "formula": "· Divida todos os números pelo valor encontrado: se todos ficarem inteiros (sem resto) e não existir divisor maior que faça isso, seu MDC está correto."
+    },
+    {
+      "name": "Glossário visual",
+      "formula": "· Divisor: número que divide outro sem resto.\n· Primo: número com dois divisores (1 e ele mesmo).\n· Primos entre si: números cujo MDC é 1.\n· Fatoração por linhas: dividir simultaneamente por primos e registrar os comuns."
+    }
+  ],
+  "examples": [
+    {
+      "question": "Exemplo prático 1",
+      "solution": "MDC(12, 18) → 2 e 3 são fatores comuns → MDC = 2 x 3 = 6."
+    },
+    {
+      "question": "Exemplo prático 2",
+      "solution": "MDC(8, 24) → fatores comuns 2, 2 e 2 → MDC = 8."
+    },
+    {
+      "question": "Exemplo prático 3",
+      "solution": "MDC(9, 10) → sem fatores comuns → MDC = 1."
+    }
+  ]
+}

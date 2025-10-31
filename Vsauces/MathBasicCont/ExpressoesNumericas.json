@@ -1,8 +1,59 @@
 {
     "lessonTitle": "Expressões Numéricas",
+    "fundamentals": "Objetivo do aluno: resolver expressões numéricas simples seguindo a ordem correta das operações e dos símbolos, com passos previsíveis e pouca carga cognitiva",
     "formulas": [
       {
-        "teste": "ExemploExpressoesNumericas.jpg"
-      }
+      "name": "O que você já sabe",
+      "formula": ". Sinais: + somar, - subtrair, x multiplicar, + dividir.\n· Leitura de símbolos: parênteses (), colchetes [ ], chaves { }.",
+      "teste": "ExemploExpressoesNumericas.jpg"
+    },
+    {
+      "name": "Ideia principal (Concreto > Pictórico > Abstrato)",
+      "formula": "· Concreto: use fichas/bolinhas para representar partes da expressão em etapas.\n· Pictórico: destaque com cores diferentes os blocos dentro de (), [ ],\n· Abstrato: aplique regras de prioridade de forma sequencial."
+    },
+    {
+      "name": "Ordem das Operações",
+      "formula": "· 1. Potência ou raiz (se aparecerem).\n· 2. Multiplicação e divisão (da esquerda para a direita).\n· 3. Soma e subtração (da esquerda para a direita)."
+    },
+    {
+      "name": "Subtração: tire uma parte e veja o que sobra",
+      "formula": "Para subtrair, comece com um número e retire outro menor.\nExemplo: 45 - 23.\n1. Subtraia as unidades: 5 - 3 = 2.\n2. Subtraia as dezenas: 40 - 20 = 20.\n3. Junte: 20 + 2 = 22.\n\n\nDica de fluência: pense em 'MDAS' (Multiplica/Divide antes; depois Soma/Subtrai), sempre varrendo da esquerda para a direita dentro do mesmo nível."
+    },
+    {
+      "name": "Ordem dos Símbolos (de dentro para fora)",
+      "formula": "· 1. Parênteses () · 2. Colchetes [ ] . 3. Chaves { }\nRegra prática: resolva o bloco mais 'interno' primeiro. Depois, suba um nível por vez."
+    },
+    {
+      "name": "Exemplos resolvidos",
+      "formula": "· Exemplo 1 (sem parênteses):\n5+3-3x4+2\nMultiplicação e divisão primeiro, da esquerda para a direita:\n. 3 x 4 = 12 > fica 5 + 3 - 12 + 2\n. 12= 2= 6 > fica 5 + 3 - 6\nSoma e subtraçao:\n. 5+3=8>8-6=2\nResultado: 2\n\n· Exemplo 2 (com símbolos aninhados):\n4+{3x [15-(3+2×4)] -2}\nDentro dos parênteses: (3 + 2 x 4)\n. 2x 4= 8 > (3 + 8) = 11\nColchetes: [15 - 11] = 4\nChaves: {3 x 4 - 2} = 12 - 2 = 10\nFinal: 4 + 10 = 14\n\n\nMetacogniçao: 'Como conferir?' Refaça cada nível lentamente. Use marca-texto ou sublinhado para o trecho que voce esta resolvendo naquele momento."
+    },
+    {
+      "name": "Passos práticos",
+      "formula": "1. Procure parênteses () e resolva-os. Depois passe para [ ] e depois {\n2. Em cada nível, faça primeiro todas as multiplicações e divisões da esquerda para a direita.\n3. Em seguida, faça as somas e subtrações da esquerda para a direita.\n4. Reescreva a expressao a cada passo para manter a clareza.\n5. Verifique ao final se nao deixou nenhum simbolo sem fechar."
+    },
+    {
+      "name": "Prática guiada",
+      "formula": "· Resolva seguindo o checklist:\na) +6- 3x 2 =\nb) 20 -4 x 3 + 2 =\nc) [12-(2 × 5)] + 9 ="
+    },
+    {
+      "name": "Prática independente!",
+      "formula": ". d) 7x 3-8 + 2 =\n. e) {18= [3+ (1x 2)]} + 4 =\n. f) 30-[10-(6= 3)] ="
+    },
+    {
+      "name": "Cuidado!",
+      "formula": "· Fazer soma antes de multiplicação: sempre aplique multiplicaçao/divisao antes de soma/subtração.\n· Ignorar a direção: dentro do mesmo nível, avance da esquerda para a direita.\n· Perder um nível de símbolo: conclua () antes de [ ], e [ ] antes de { }."
+    },
+    {
+      "name": "Estratégias de apoio (neurodiversidade/TEA)",
+      "formula": ". Rotina previsível: sempre use o mesmo checklist visual ao lado da expressão.\n. Destacar o 'bloco ativo': use um marcador opaco para isolar apenas a parte sendo resolvida.\n· Pausas curtas entre níveis: valide mentalmente 'nível concluído' antes de subir."
+    },
+    {
+      "name": "Checagem rápida",
+      "formula": "· Verdadeiro ou falso:\ni) Em uma mesma linha, multiplicacao e divisao vêm antes de soma e subtraçao.\nii) Primeiro resolvemos { }, depois [ ], depois ( ).\n· Resolva:\niii) 10 - 2 x 3 ="
+    },
+     {
+      "name": "Glossário visual",
+      "formula": "· Expressão numérica: conta com vários sinais e, às vezes, símbolos.\n. Parênteses/Colchetes/Chaves: 'caixinhas' que mostram o que resolver antes.\n. Prioridade: a ordem correta para nao errar o resultado."
+    }
     ]
 }

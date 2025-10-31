@@ -1,12 +1,17 @@
 {
     "lessonTitle": "Trapézios",
-    "fundamentals": "Um trapézio é um polígono com pelo menos dois lados paralelos.",
+    "fundamentals": "São quadriláteros (figuras de quatro lados) que possuem apenas um par de lados opostos paralelos.\nNão é um paralelogramo.",
     "formulas": [
       {
-        "name": "Área",
-        "formula": "A = ((base maior + base menor) * altura) / 2",
+        "name": "Classificação",
+        "formula": "Escaleno: Todos os lados de tamanho diferente;\nRetângulo: Tem um ângulo de 90°;\nIsósceles: Dois lados congruentes.",
         "teste": "ExemploTrapezio.jpg"
-      }
+      },
+      {
+        "name": "Área",
+        "formula": "A = ((B + b) × h) / 2\n(Área) = ((base maior + base menor) * altura) / 2",
+        
+      },
     ],
     "examples": [
       {
