@@ -1,8 +1,73 @@
 {
-    "lessonTitle": "Noções Básicas",
-    "formulas": [
-      {
-        "teste": "ExemploNocoesBasicas.jpg"
-      }
-    ]
+  "lessonTitle": "Noções Básicas",
+  "fundamentals": "Objetivo do aluno: entender o que é estatística, diferenciar população e amostra, reconhecer tipos de variáveis, ler uma distribuição de frequências simples e calcular a amplitude.",
+  "formulas": [
+    {
+      "name": "O que você já sabe",
+      "formula": "· Contamos e comparamos coisas no dia a dia (idades, alturas, preferências).\n· Números ajudam a resumir e organizar informações.",
+      "teste": "ExemploNocoesBasicas.jpg"
+    },
+    {
+      "name": "Ideia principal (Concreto > Pictórico > Abstrato)",
+      "formula": ". Concreto: colecione dados simples da turma (ex .: idade, altura de bonequinhos, cor de cabelo em cartões).\n· Pictórico: agrupe por categorias ou faixas (potes/caixinhas, tabelas com bolinhas).\n· Abstrato: preencha uma tabela de frequências, calcule medidas simples (como amplitude)."
+    },
+    {
+      "name": "O que é estatística",
+      "formula": "· Estatística é o conjunto de métodos para coletar, organizar e analisar dados, para tirar conclusoes ou responder perguntas."
+    },
+    {
+      "name": "População e Amostra",
+      "formula": "· População: o grupo completo que queremos estudar.\nEx .: todos os alunos da escola.\n\n· Amostra: uma parte da populacao usada para estudar e representar o todo.\nEx .: uma turma escolhida para responder um questionario.\n\n· Dica prática: ao desenhar, mostre um grupo grande (população) e um grupo menor destacado (amostra)."
+    },
+    {
+      "name": "Variáveis estatísticas",
+      "formula": "· Variável: aquilo que medimos em cada pessoa/objeto.\n\n· Exemplos:\nCategórica (qualitativa): cor do cabelo, cor dos olhos, time favorito.\nNumérica (quantitativa): idade, altura, número de irmãos.\n\n. Para o Fundamental I, foque em classificar se é 'nome/etiqueta' (categórica) ou 'número' (numérica)."
+    },
+    {
+      "name": "Distribuição de frequência",
+      "formula": ". Mostra 'quantas vezes' cada valor ou classe aparece nos dados.\n\n. Partes comuns:\nClasse (ou categoria/faixa): o 'nome' do grupo (ex .: idades 7- 8, 9-10; ou cores).\nFrequência absoluta (f): quantas ocorrências.\nFrequência relativa (fr): a porcentagem do total.\n\n· Leitura básica:\nIdentifique as classes.\nOlhe a frequência absoluta (contagem).\nSe houver porcentagem, verifique a frequência relativa."
+    },
+    {
+      "name": "Amplitude da amostra",
+      "formula": "Adicão (use conte a partir do maior):\n8+3=\n9+4=\n25+14 =\n\n· Subtração (pense tirar):\n13-5 =\n30-12 =\n42-19 ="
+    },
+    {
+      "name": "Exemplos práticos",
+      "formula": "· Populacão x Amostra: Pergunta: 'Qual e a fruta preferida dos alunos da escola?' Populaçao: todos os alunos da escola.\nAmostra: uma turma de cada série (escolhida com critério).\n\n· Variável: 'Altura' > numerica; 'Cabelo' > categorica.\n\n· Frequência (mini-exemplo):\nDados de cor de cabelo em uma turma: castanho, castanho, preto, loiro, castanho.\nFrequência absoluta: castanho = 3, preto = 1, loiro = 1.\nFrequência relativa: castanho = 3/5 = 60%, preto = 20%, loiro = 20%.\n\n· Amplitude:\nDados de idades: 7, 8, 8, 9, 10 > maior = 10, menor = 7 > amplitude = 3."
+    },
+    {
+      "name": "Passos práticos",
+      "formula": "1. Defina a pergunta (o que quer descobrir).\n2. Diga quem é a populacao e escolha uma amostra simples.\n3. Decida a variável e como medir (categoria ou número).\n4. Colete os dados e organize em tabela (classe/categoria e contagens).\n5. Calcule frequências e a amplitude (maior - menor).\n6. Interprete: o que os numeros dizem sobre a pergunta?"
+    },
+    {
+      "name": "Prática guiada",
+      "formula": "· Classifique a variável:\na) Cor dos olhos >\nb) Numero de irmaos >\n\n· Complete a tabela de frequência (dados de 6 alunos: A, A, B, A, C\nB): Classes: A, B, C -> Frequência absoluta:\n\n · Amplitude:\nIdades: 7, 9, 8, 10, 7 > maior ; menor amplitude"
+    },
+    {
+      "name": "Prática independente",
+      "formula": ". Colete a cor de cabelo de 8 colegas (ou familiares) e monte uma tabela de frequência com contagem e porcentagem.\n· Meça alturas (ou use medidas de palitos) de 5 objetos e calcule a amplitude."
+    },
+    {
+      "name": "Cuidado!",
+      "formula": "· Confundir população com amostra: população é o todo; amostra é parte.\n· Somar porcentagens sem checar o total.\n· Esquecer de usar o mesmo critério de medida para todos (mesma régua/forma de perguntar)."
+    },
+    {
+      "name": "Checagem rápida",
+      "formula": "· Verdadeiro ou falso:\ni) A amostra é sempre igual à população.\nii) Amplitude e maior - menor.\n\n· Resolva:\niii) Idades: 6, 6, 7, 9 > amplitude ="
+    },
+    {
+      "name": "Glossário visual",
+      "formula": "· População: grupo completo estudado.\n. Amostra: parte do grupo, usada para representar o todo.\n· Variável: o que medimos em cada elemento (pessoa/objeto).\n· Frequência: quantas vezes aparece.\n. Amplitude: diferença entre maior e menor valor."
+    }
+  ],
+  "examples": [
+    {
+      "question": "Qual é o resultado de 37 + 25?",
+      "solution": "37 + 25 = 62"
+    },
+    {
+      "question": "Quanto é 58 - 34?",
+      "solution": "58 - 34 = 24"
+    }
+  ]
 }

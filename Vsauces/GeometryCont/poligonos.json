@@ -1,11 +1,21 @@
 {
     "lessonTitle": "Polígonos",
-    "fundamentals": "Um polígono é uma figura geométrica fechada com três ou mais lados.",
+    "fundamentals": "Uma figura plana é uma forma geométrica que podemos fazer em um plano.\nAlgumas figuras planas recebem nomes especiais, como círculos, retângulos, quadrados, trapézios, etc.",
     "formulas": [
       {
-        "name": "Soma dos ângulos internos",
-        "formula": "S = (n - 2) * 180",
+        "name": "Triângulos",
+        "formula": "São figuras planas com três lados.0",
         "teste": "ExemploPoligono.jpg"
+      },
+       {
+        "name": "Retângulo",
+        "formula":"Ele tem um ângulo de 90°.\nA área de um triângulo retângulo pode ser calculada dividindo a área do retângulo por 2."
+        
+      },
+       {
+        "name": "Triângulos",
+        "formula": "São figuras planas com três lados.0"
+        
       }
     ],
     "examples": [

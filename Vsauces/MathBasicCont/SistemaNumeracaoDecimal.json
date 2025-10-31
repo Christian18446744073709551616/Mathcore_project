@@ -1,8 +1,55 @@
 {
     "lessonTitle": "Sistema de Numeração Decimal",
+    "fundamentals": "Objetivo do aluno: entender que cada algarismo tem um valor que depende da posição (unidades, dezenas, centenas, milhares) e saber decompor números em valores posicionais.",
     "formulas": [
       {
-        "teste": "ExemploSistemaNumeracaoDecimal.jpg"
-      }
+      "name": "O que você já sabe",
+      "formula": "· Números servem para contar, ordenar e medir.\n· Algarismos: 0, 1, 2, 3, 4, 5, 6, 7, 8, 9.",
+      "teste": "ExemploSistemaNumeracaoDecimal.jpg"
+    },
+    {
+      "name": "Ideia central (Concreto > Pictórico > Abstrato)",
+      "formula": ". Concreto: use blocos base-10 (cubinhos = unidade, barrinhas = dezena, placas = centena, cubo grande = milhar).\n. Pictórico: desenhe tabelas com colunas 'UM | DEZ | CEM | MIL'.\n· Abstrato: escreva o número e identifique o valor de cada posição (valor posicional)."
+    },
+    {
+      "name": "Para que serve?",
+      "formula": ". Para contar e organizar em grupos de 10:\n10 unidades = 1 dezena\n10 dezenas = 1 centena\n10 centenas = 1 milhar"
+    },
+    {
+      "name": "Estrutura (valor posicional)",
+      "formula": "· Posições (da direita para a esquerda):\nUnidades (U)\nDezenas (D)\nCentenas (C)\nUnidades de milhar (M)\n· Cada posicao vale 10 vezes a anterior.\n\nRegra prática: se você 'anda' uma casa para a esquerda, multiplica por 10; se 'anda' para a direita, divide por 10."
+    },
+    {
+      "name": "Exemplo resolvido (decomposição)",
+      "formula": ". Número: 4.382\n1. Milhares: 4 > 4.000\n2. Centenas: 3 -> 300\n3. Dezenas: 8 > 80\n4. Unidades: 2 > 2\n\n. Decomposição: 4.382 = 4.000 + 300 + 80 + 2\n\n\nDica concreta: represente com blocos base-10 (4 cubos de mil, 3 placas de 100, 8 barrinhas de 10, 2 cubinhos)."
+    },
+    {
+      "name": "Valor de posição",
+      "formula": "· O algarismo vale 'algarismo x posição':\nEx .: em 2.354, o '2' vale 2.000 (milhar); o '3' vale 300 (centena); o '5' vale 50 (dezena); o '4' vale 4 (unidade)."
+    },
+    {
+      "name": "Passos práticos",
+      "formula": "1. Escreva o número com pontos de milhar (se preciso) para facilitar a leitura.\n2. Marque as casas: U, D, C, M (e assim por diante, se existir).\n3. Multiplique cada algarismo pelo valor da casa.\n4. Some os valores para conferir a decomposição.\n5. Leia o número em voz alta (ex .: 'quatro mil, trezentos e oitenta e dois')."
+    },
+    {
+      "name": "Prática guiada",
+      "formula": ". a) Decomponha 2.305 = +_+ +\n. b) Quanto vale o algarismo 7 em 7.412?\n· c) Escreva em forma desenvolvida: 1.208 ="
+    },
+    {
+      "name": "Prática independente",
+      "formula": ". d) 3.506 =+ ++\n. e) Em 9.764, quanto valem: 9 ; 7 ; 6 ; 4\n. f) Leia e decomponha: 5.030 ="
+    },
+    {
+      "name": "Cuidado!",
+      "formula": "· Inverter a direção de leitura: lembre que a casa mais à direita é unidades.\n· Confundir algarismo com valor posicional: '8' pode valer 8, 80, 800, 8.000 - depende da casa.\n· Esquecer o zero como marcador de posição: em 5.030 não há 'centenas', mas a posição existe e vale 0."
+    },
+    {
+      "name": "Checagem rápida",
+      "formula": "· Verdadeiro ou falso:\ni) 10 dezenas = 1 centena.\nii) Em 4.382, o '8' vale 8.\n· Resolva:\niii) Decomponha 7.140 ="
+    },
+    {
+      "name": "Glossário visual",
+      "formula": "· Algarismo: símbolo de 0 a 9.\n· Valor posicional: valor que um algarismo tem por causa da posição.\n· Decomposicao: escrever um número como soma dos valores de cada posição."
+    }
     ]
 }

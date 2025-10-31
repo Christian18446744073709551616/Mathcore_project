@@ -1,0 +1,65 @@
+{
+  "lessonTitle": "MMC",
+  "fundamentals": "Objetivo do aluno: entender o que e o Minimo Multiplo Comum e calcula-lo por decomposição em fatores primos (regra por linhas), interpretando quando o maior numero ja e o MMC e como conferir o resultado.",
+  "formulas": [
+    {
+      "name": "O que você já sabe",
+      "formula": "· Múltiplo: resultado de uma multiplicação (ex .: múltiplos de 6: 6, 12, 18, 24 ... )\n· Fator primo: numero que so tem dois divisores (1 e ele mesmo), como 2, 3, 5, 7, 11 ...",
+      "teste": "ExemploMMC.jpg"
+    },
+    {
+      "name": "Conceito",
+      "formula": "O Minimo Multiplo Comum (MMC) de dois ou mais numeros é o menor inteiro positivo que e multiplo de todos eles ao mesmo tempo."
+    },
+    {
+      "name": "Propriedades importantes",
+      "formula": ". Para números primos distintos, o MMC é o produto deles.\nEx .: MMC{3, 7} = 21.\n. Se, entre os numeros, um e multiplo de todos os outros, entao esse maior e o MMC.\nEx .: MMC{6, 8, 24} = 24."
+    },
+    {
+      "name": "Como calcular (Regra: decomposição/fatoração por linhas)",
+      "formula": "Ideia: decompor todos os números em fatores primos e 'juntar' tudo o que for necessario para reconstruir cada numero.\n\nPasso a passo:\n1. Escreva os numeros lado a lado.\n2. Divida todos que puderem por um mesmo primo (2, 3, 5, 7 ... ) e desça os resultados.\n3. Se algum numero nao dividir, apenas 'desce igual'.\n4. Repita com os proximos primos ate chegar a todos 1.\n5. O MMC e o produto de todos os primos usados (tanto os que dividiram alguns quanto os que dividiram todos).\n\nDica visual: ao contrario do MDC (que multiplica apenas os fatores que dividiram todo mundo na mesma linha), o MMC multiplica todos os fatores usados na decomposição até zerar (chegar a 1)."
+    },
+    {
+      "name": "Exemplos resolvidos (worked examples)",
+      "formula": "Exemplo 1: MMC(12, 18, 30)\n· Decomposição típica por linhas inclui: 2, 2, 3, 3 e 5.\nProduto: 2 x 2 x 3 x 3 x 5 = 180.\nLogo, MMC(12, 18, 30) = 180.\n\nExemplo 2: MMC(6, 8, 24)\n24 já é múltiplo de 6 e de 8 → MMC = 24.\n\nExemplo 3: MMC(3, 7)\nPrimos distintos → produto direto: 21."
+    },
+    {
+      "name": "Interpretação concreta (significado)",
+      "formula": "O MMC representa o menor tamanho de lote que serve para todos os numeros ao mesmo tempo.\nExemplo: caixas que comportem igualmente itens empacotados de 12, 18 e 30 unidades - o menor lote que 'encaixa' todas as contagens é 180."
+    },
+    {
+      "name": "Passos práticos (checklist)",
+      "formula": "1. Liste os numeros.\n2. Decomponha por primos, linha a linha, ate todos virarem 1.\n3. Multiplique todos os fatores usados.\n4. Verifique: o resultado é multiplo de cada numero inicial?\n5. Existe multiplo menor que sirva a todos? Se nao, voce achou o MMC."
+    },
+    {
+      "name": "Prática guiada",
+      "formula": "a) MMC(8, 12) =\nb) MMC(10, 15, 20) =\nc) MMC(9, 6) ="
+    },
+    {
+      "name": "Prática independente",
+      "formula": "d) MMC(14, 21) =\ne) MMC(16, 24, 40) =\nf) MMC(5, 6, 7) ="
+    },
+    {
+      "name": "Cuidado! (erros comuns)",
+      "formula": ". Confundir MMC com MDC: no MMC, multiplique todos os fatores da decomposicao; no MDC, apenas os comuns a todos numa mesma linha.\n. Parar a fatoracao antes de chegar a 1 em todos os numeros.\n. Esquecer um fator primo usado em alguma etapa (isso cresce o resultado errado ou o torna pequeno demais)."
+    },
+    {
+      "name": "Dica de metacognição (como conferir)",
+      "formula": "Divida o MMC encontrado por cada numero inicial: o quociente deve ser inteiro em todos os casos.\nCompare com multiplos menores para checar se nao havia um 'lote' ainda menor que servisse a todos."
+    },
+    {
+      "name": "Glossário visual",
+      "formula": "· Multiplo comum: numero que esta na tabuada de todos os envolvidos.\n· Menor multiplo comum: o menor desses multiplos compartilhados.\n· Decomposicao em primos: quebrar o numero em fatores apenas primos (2, 3, 5, 7 ... )."
+    }
+  ],
+  "examples": [
+    {
+      "question": "Qual é o MMC de 6 e 8?",
+      "solution": "MMC(6, 8) = 24"
+    },
+    {
+      "question": "Calcule o MMC de 12, 18 e 30.",
+      "solution": "MMC(12, 18, 30) = 180"
+    }
+  ]
+}

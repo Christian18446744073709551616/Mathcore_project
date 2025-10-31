@@ -1,11 +1,21 @@
 {
     "lessonTitle": "Losangos",
-    "fundamentals": "Um losango é um polígono com quatro lados iguais e ângulos opostos iguais.",
+    "fundamentals": "São figuras geométricas de quatro lados, formadas por retas de mesma medida que se encontram apenas em seus extremos.",
     "formulas": [
       {
-        "name": "Área",
-        "formula": "A = (diagonal maior * diagonal menor) / 2",
+        "name": "Diagonais",
+        "formula": "São retas que ligam dois vértices de um polígono e que, ao mesmo tempo, não são lados dele. O losango apresenta duas diagonais.",
         "teste": "ExemploLosango.jpg"
+      },
+      {
+        "name": "Área",
+        "formula": "A área do losango é dada pelas suas diagonais:\nD = diagonal maior e d = diagonal menor.",
+        
+      },
+      {
+        "name": "Perímetro",
+        "formula": "A soma das medidas de todos os lados de um polígono é igual ao seu perímetro.\nPara o losango, como todos os lados têm o mesmo comprimento, basta multiplicar a medida de um deles por quatro.\nAssim, a fórmula a seguir pode ser usada para calcular o perímetro (P) de um losango:\nP = 4L",
+        
       }
     ],
     "examples": [

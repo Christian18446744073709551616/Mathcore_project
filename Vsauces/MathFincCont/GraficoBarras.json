@@ -1,8 +1,55 @@
 {
     "lessonTitle": "Gráfico de Barras",
+    "fundamentals": "Objetivo do aluno: entender o que é um gráfico de barras, quando usar, e como ler/comparar categorias em versões simples, agrupadas e empilhadas.",
     "formulas": [
-      {
-        "teste": "ExemploGraficoBarras.jpg"
-      }
-    ]
+    {
+      "name": "O que você já sabe",
+      "formula": "· Contamos 'quantas vezes' algo acontece (frequência) em diferentes categorias (ex .: frutas, cores, brinquedos).\n\n. Um gráfico ajuda a ver rapidamente qual tem mais ou menos.",
+      "teste": "ExemploGraficoBarra.jpg"
+    },
+    {
+      "name": "Ideia principal (Concreto > Pictórico > Abstrato)",
+      "formula": "· Concreto: organize objetos por categoria em potes (ex .: 5 carrinhos, 3 bonecas, 2 bolas).\n. Pictórico: desenhe barras com alturas proporcionais às quantidades.\n· Abstrato: leia o eixo das categorias (base) e o eixo das quantidades (lado), compare alturas."
+    },
+    {
+      "name": "O que é um gráfico de barras",
+      "formula": ". Forma de resumir dados categóricos usando barras de mesma largura.\n· Cada barra representa uma categoria; a altura (ou comprimento, se horizontal) mostra a quantidade."
+    },
+    {
+      "name": "Tipos de gráfico de barras",
+      "formula": "· População: o grupo completo que queremos estudar.\nEx .: todos os alunos da escola.\n\n· Amostra: uma parte da populacao usada para estudar e representar o todo.\nEx .: uma turma escolhida para responder um questionario.\n\n· Dica prática: ao desenhar, mostre um grupo grande (população) e um grupo menor destacado (amostra)."
+    },
+    {
+      "name": "Como ler e interpretar",
+      "formula": "· Eixos:\nHorizontal (categorias) e vertical (quantidade). Em gráficos horizontais, invertem-se os papéis.\n· Rótulos e legenda:\nVerifique nomes das categorias, unidades de contagem e, se houver, legenda das cores.\n\n· Comparação:\nVeja qual barra é mais alta/baixa (ou mais longa/curta).\nEm agrupadas, compare barras da mesma cor entre categorias.\nEm empilhadas, compare o total e as partes."
+    },
+    {
+      "name": "Exemplos do cotidiano",
+      "formula": "· Simples: contagem de frutas vendidas (maçã, banana, laranja). Qual tem mais vendas?\n· Agrupadas: preferência por brincadeiras por turma (Turma A vs. Turma B) para cada categoria.\n· Empilhadas: tempo de atividades diárias (sono, escola, lazer) em um dia - cada segmento compoe o total."
+    },
+    {
+      "name": "Passos práticos",
+      "formula": "1. Escolha as categorias e conte os itens (frequência).\n2. Decida o tipo de gráfico (simples, agrupado ou empilhado).\n3. Defina a escala do eixo das quantidades (0, 1, 2, 3 ... ).\n4. Desenhe barras com mesma largura e espaços iguais.\n5. Adicione rótulos, título e legenda (se houver cores/variáveis).\n6. Revise: as alturas batem com as contagens?"
+    },
+    {
+      "name": "Prática guiada",
+      "formula": "· a) Faça um gráfico simples das cores favoritas da sala (3-5 cores).\n. b) Faça um gráfico agrupado: meninos x meninas para cada cor.\n· c) Faça um gráfico empilhado: horas do dia (sono, escola, lazer) em um dia da turma."
+    },
+    {
+      "name": "Prática independente",
+      "formula": "· Coletar: conte brinquedos em casa por tipo (3-4 categorias) e crie um gráfico simples.\n. Agrupado: compare 'dias uteis x fim de semana' para cada atividade (ler, brincar, TV).\n· Empilhado: mostre a composição do lanche (fruta, sanduíche, bebida) por dia."
+    },
+    {
+      "name": "Cuidado!",
+      "formula": "· Barras com larguras diferentes (distorcem a leitura).\n· Eixo de quantidades sem escala regular.\n· Falta de rótulos/legenda, tornando difícil interpretar cores e categorias."
+    },
+    {
+      "name": "Dica de metacognição",
+      "formula": ". 'Como conferir?' Conte novamente os itens e veja se as altitudes das barras correspondem. Verifique se as cores batem com a legenda."
+    },
+    {
+      "name": "Glossário visual",
+      "formula": "· Categoria: o 'tipo' (ex .: fruta, cor).\n. Frequência: quantas vezes apareceu.\n. Legenda: explica o que cada cor/estilo representa.\n. Barra empilhada: barra com segmentos que formam o total."
+    }
+  ]
 }

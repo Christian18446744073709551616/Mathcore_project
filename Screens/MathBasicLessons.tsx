@@ -1,108 +1,67 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../types';
 import { supabase } from '../lib/supabase';
-import { AntDesign, MaterialIcons, Entypo, FontAwesome, FontAwesome5, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { MaterialIcons, Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-
-// Importando dados das lições
-import AdicaoSubtracao from '../Vsauces/MathBasicCont/AdicaoSubtracao.json';
-import ExpressoesNumericas from '../Vsauces/MathBasicCont/ExpressoesNumericas.json';
-import Fracoes from '../Vsauces/MathBasicCont/Fracoes.json';
-import MmcMdc from '../Vsauces/MathBasicCont/MmcMdc.json';
-import MultiplicacaoDivisao from '../Vsauces/MathBasicCont/MultiplicacaoDivisao.json';
-import SistemaDeNumeracaoDecimal from '../Vsauces/MathBasicCont/SistemaDeNumeracaoDecimal.json';
-import SistemaMetricoDecimal from '../Vsauces/MathBasicCont/SistemaMetricoDecimal.json';
 
 type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'MathBasicLessons'>;
 
+const { width } = Dimensions.get('window');
 
 function Accordion() {
-  const [openOperSistmNum, setOpenOperSistmNum] = useState(false);
+  const [open, setOpen] = useState(false);
   const navigation = useNavigation<HomeScreenNavigationProp>();
 
+  const lessons = [
+    ['Adição e Subtração', 'Multiplicação e Divisão'],
+    ['Expressões Numéricas', 'Frações'],
+    ['Sistema de Numeração Decimal', 'Sistema Métrico Decimal'],
+    ['MDC', 'MMC'],
+  ];
+
   return (
-    <View style={styles.container}>
-      
-      <View style={styles.SobreBox}>
-        <TouchableOpacity style={styles.Estatistica} onPress={() => setOpenOperSistmNum(!openOperSistmNum)}>
-  <Text style={styles.title}>Operações e Sistemas Numéricos</Text>
-  <MaterialIcons name={openOperSistmNum ? "keyboard-arrow-down" : "keyboard-arrow-up"} size={85} color="black" style={{ marginEnd: 30 }} />
-</TouchableOpacity>
+    <View style={styles.accordionContainer}>
+      <TouchableOpacity
+        style={styles.accordionHeader}
+        onPress={() => setOpen(!open)}
+        activeOpacity={0.8}
+      >
+        <Text style={styles.accordionTitle}>Operações e Sistemas Numéricos</Text>
+        <MaterialIcons
+          name={open ? "keyboard-arrow-up" : "keyboard-arrow-down"}
+          size={40}
+          color="#fff"
+        />
+      </TouchableOpacity>
 
-{openOperSistmNum && (
-          <ScrollView style={styles.scrollLesson} showsVerticalScrollIndicator={false}
-          showsHorizontalScrollIndicator={false}>
-          <View style={styles.content}>
-            <View style={styles.lessonContainer}>
-              <View style={styles.row}>
-                {/* ✅ Quadrados agora vai direto para Lesson */}
+      {open && (
+        <ScrollView
+          style={styles.accordionContent}
+          showsVerticalScrollIndicator={false}
+          showsHorizontalScrollIndicator={false}
+        >
+          {lessons.map((row, rowIndex) => (
+            <View key={rowIndex} style={styles.row}>
+              {row.map((lesson) => (
                 <TouchableOpacity
+                  key={lesson}
                   style={styles.lessonBox}
-                  onPress={() => navigation.navigate('Lesson', { lessonTitle: 'Adição e Subtração' })}
+                  activeOpacity={0.8}
+                  onPress={() => navigation.navigate('Lesson', { lessonTitle: lesson })}
                 >
-                  <Text style={styles.lessonTitle}>Adição e Subtração</Text>
+                  <Text style={styles.lessonText}>{lesson}</Text>
                 </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={styles.lessonBox}
-                  onPress={() => navigation.navigate('Lesson', { lessonTitle: 'Multiplicação e Divisão' })}
-                >
-                  <Text style={styles.lessonTitle}>Multiplicação e Divisão</Text>
-                </TouchableOpacity>
-              </View>
-
-              <View style={styles.row}>
-                <TouchableOpacity
-                  style={styles.lessonBox}
-                  onPress={() => navigation.navigate('Lesson', { lessonTitle: 'Expressões Numéricas' })}
-                >
-                  <Text style={styles.lessonTitle}>Expressões Numéricas</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.lessonBox}
-                  onPress={() => navigation.navigate('Lesson', { lessonTitle: 'Frações' })}
-                >
-                  <Text style={styles.lessonTitle}>Frações</Text>
-                </TouchableOpacity>
-              </View>
-
-              <View style={styles.row}>
-                <TouchableOpacity
-                  style={styles.lessonBox}
-                  onPress={() => navigation.navigate('Lesson', { lessonTitle: 'Sistema de Numeração Decimal' })}
-                >
-                  <Text style={styles.lessonTitle}>Sistema de Numeração Decimal</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.lessonBox}
-                  onPress={() => navigation.navigate('Lesson', { lessonTitle: 'Sistema Métrico Decimal'})}
-                >
-                  <Text style={styles.lessonTitle}>Sistema Métrico Decimal</Text>
-                </TouchableOpacity>
-              </View>
-              <View style={styles.row}>
-                <TouchableOpacity
-                  style={styles.lessonBox}
-                  onPress={() => navigation.navigate('Lesson', { lessonTitle: 'Retângulos' })}
-                >
-                  <Text style={styles.lessonTitle}>MMC e MDC</Text>
-                </TouchableOpacity>
-              </View>
+              ))}
             </View>
-          </View>
-          </ScrollView>
-        )}
-      </View>     
-
+          ))}
+        </ScrollView>
+      )}
     </View>
-
-    
   );
 }
-
 
 const HomeScreen = () => {
   const navigation = useNavigation<HomeScreenNavigationProp>();
@@ -110,119 +69,134 @@ const HomeScreen = () => {
 
   useEffect(() => {
     const fetchUsername = async () => {
-      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      const { data: { user } } = await supabase.auth.getUser();
       if (user) {
-        const { data, error } = await supabase
+        const { data } = await supabase
           .from('profiles')
           .select('username')
           .eq('id', user.id)
           .single();
         if (data) setUsername(data.username);
-        if (error) console.error(error);
       }
-      if (userError) console.error(userError);
     };
     fetchUsername();
   }, []);
 
   return (
-    <View style={{ flex: 1 }}>
-      <LinearGradient
-        colors={['#242948', '#5C6494']}
-        locations={[0.65, 0.30]}
-        start={{ x: 1, y: 1 }}
-        end={{ x: 0.85, y: 0.4 }}
-        style={{ flex: 1, padding: 20 }}
+    <LinearGradient
+      colors={['#242948', '#5C6494']}
+          locations={[0.65, 0.30]}
+          start={{ x: 1, y: 1 }}
+          end={{ x: 0.85, y: 0.4 }}
+          style={{ flex: 1, padding: 20 }}
+    >
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+        showsHorizontalScrollIndicator={false}
       >
-        <ScrollView
-          style={styles.container}
-          showsVerticalScrollIndicator={false}
-          showsHorizontalScrollIndicator={false}
-        >
-          <View style={styles.headerRow}>
-            <Text style={styles.title}>Matemática Básica</Text>
-            <TouchableOpacity
-              style={styles.returnButton}
-              onPress={() => navigation.navigate('Home2')}
-            >
-              <Ionicons name="arrow-back-circle-outline" size={80} color="black" style={{ fontWeight: 'bold' }} />
-            </TouchableOpacity>
-          </View>
-          <Accordion />
-        </ScrollView>
-      </LinearGradient>
-    </View>
+        <View style={styles.header}>
+          <Text style={styles.headerTitle}>Matemática Básica</Text>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => navigation.navigate('Home2')}
+          >
+            <Ionicons name="arrow-back-circle-outline" size={50} color="#fff" />
+          </TouchableOpacity>
+        </View>
+
+        <Text style={styles.subtitle}>O que vamos aprender hoje, {username}?</Text>
+
+        <Accordion />
+      </ScrollView>
+    </LinearGradient>
   );
 };
 
 const styles = StyleSheet.create({
-  Estatistica: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    backgroundColor: "#BDC4EE",
-    padding: 10,
-    borderRadius: 30,
-    alignItems: "center",
+  container: {
+    flex: 1,
+    paddingTop: 50,
+    paddingHorizontal: 20,
   },
-  scrollLesson: {
-    maxHeight: 500,
-    marginTop: 10,
-    borderRadius: 40,
+  scrollContent: {
+    paddingBottom: 100,
   },
-  SobreBox: {
-    padding: 20,
-    borderRadius: 40,
-    backgroundColor: "#707DCB",
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     marginBottom: 30,
   },
-  content: {
-    borderRadius: 30,
-    backgroundColor: "#5C6494"
-  },
-  container: {
-    padding: 20,
-
-  },
-  title: {
-    marginStart: 30,
-    fontSize: 50,
+  headerTitle: {
+    fontSize: 36,
     fontWeight: 'bold',
-    color: '#000000ff',
+    color: '#fff',
   },
-  returnButton: {
-    width: 80,
-    height: 80,
-    borderRadius: 100,
-    backgroundColor: '#D9D9D9',
-    justifyContent: 'center',
-    alignItems: 'center',
+  backButton: {
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    borderRadius: 50,
+    padding: 5,
   },
-  headerRow: {
+  subtitle: {
+    fontSize: 20,
+    color: '#CFCFCF',
+    marginBottom: 20,
+  },
+  accordionContainer: {
+    borderRadius: 25,
+    overflow: 'hidden',
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    marginBottom: 20,
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowRadius: 15,
+    shadowOffset: { width: 0, height: 5 },
+    elevation: 5,
+  },
+  accordionHeader: {
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 50,
+    alignItems: 'center',
+    backgroundColor: '#707DCB',
+    paddingVertical: 20,
+    paddingHorizontal: 25,
+    borderTopLeftRadius: 25,
+    borderTopRightRadius: 25,
   },
-  lessonContainer: {
-    marginVertical: 20,
+  accordionTitle: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#fff',
+  },
+  accordionContent: {
+    padding: 20,
+    backgroundColor: '#4d547cff',
   },
   row: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 20,
+    justifyContent: 'space-around',
+    marginBottom: 15,
   },
   lessonBox: {
     flex: 1,
-    marginHorizontal: 30,
-    padding: 30,
-    backgroundColor: '#D9D9D9',
-    borderRadius: 25,
+    marginHorizontal: 10,
+    paddingVertical: 25,
+    borderRadius: 20,
+    backgroundColor: '#BDC4EE',
     alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOpacity: 0.15,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 5 },
+    elevation: 4,
   },
-  lessonTitle: {
+  lessonText: {
+    fontSize: 22,
     fontWeight: 'bold',
-    fontSize: 30,
-    color: '#000000',
+    color: '#242948',
+    textAlign: 'center',
   },
 });
 

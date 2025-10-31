@@ -1,8 +1,65 @@
 {
   "lessonTitle": "Adição e Subtração",
-    "formulas": [
-      {
-        "teste": "ExemploAdicaoSubtracao.jpg"
-      }
-    ]
+  "fundamentals": "Objetivo do aluno: entender quando a ordem dos números muda o resultado e quando não muda; somar e subtrair com segurança usando passos simples.",
+  "formulas": [
+    {
+      "name": "O que você já sabe",
+      "formula": "Contar para frente e para trás até 100. Reconhecer sinais: + é somar; - é tirar; = é o resultado.",
+      "teste": "ExemploAdicaoSubtracao.jpg"
+    },
+    {
+      "name": "Ideia principal (Concreto > Pictórico > Abstrato)",
+      "formula": "Concreto:\n· Adição: junte dois grupos de objetos. Conte todos.\n· Subtração: comece com um grupo. Tire uma parte. Conte o que ficou.\n\nPictórico:\n· Desenhe bolinhas. Para somar, una os desenhos. Para subtrair, risque a parte que 'sai'.\n\nAbstrato:\n· Adição: escreva como A + B.\n· Subtração: escreva como A - B."
+    },
+    {
+      "name": "Adição: a ordem não muda o resultado",
+      "formula": "Ideia-chave: A posição dos números não altera o resultado. Nome disso: propriedade comutativa. Exemplo: A + B = B + A.\n\nExemplo resolvido (24 + 32):\n1. Escreva os números: 24 e 32.\n2. Some as unidades: 4 + 2 = 6.\n3. Some as dezenas: 20 + 30 = 50.\n4. Junte: 50 + 6 = 56.\n\nOutro jeito rápido: comece do maior e conte para frente — 32, 33, 34, 35, 36, 37, 38, 39, 40... até somar 24 (uso quando os números são pequenos)."
+    },
+    {
+      "name": "Subtração: tire uma parte e veja o que sobra",
+      "formula": "Para subtrair, comece com um número e retire outro menor.\nExemplo: 45 - 23.\n1. Subtraia as unidades: 5 - 3 = 2.\n2. Subtraia as dezenas: 40 - 20 = 20.\n3. Junte: 20 + 2 = 22."
+    },
+    {
+      "name": "Exemplos e não-exemplos",
+      "formula": "· Adição:\no Exemplo: 7 + 5 = 12 e 5 + 7 = 12 (mesmo resultado). o Não-exemplo: dizer que 7 + 5 é diferente de 5 + 7 (isso está errado).\n· Subtração:\no Exemplo: 15 - 6 = 9. \no Nao-exemplo: trocar e fazer 6 - 15 para dar o mesmo (vai dar outro resultado e pode ficar negativo)."
+    },
+    {
+      "name": "Passos práticos",
+      "formula": "Para somar:\n1. Some as unidades.\n2. Some as dezenas.\n3. Se passar de 10 unidades, troque por\n4. Escreva o resultado.\n\nPara subtrair:\n1. Subtraia as unidades.\n2. Se não der, troque 1 dezena por 10 u\n3. Subtraia as dezenas.\n4. Escreva o resultado."
+    },
+    {
+      "name": "Prática guiada",
+      "formula": "Adicão (use conte a partir do maior):\n8+3=\n9+4=\n25+14 =\n\n· Subtração (pense tirar):\n13-5 =\n30-12 =\n42-19 ="
+    },
+    {
+      "name": "Prática independente",
+      "formula": "· Adição:\n6+6=\n17+5=\n28+13 =\n\n· Subtração:\n10-7=\n27-9=\n61-25 ="
+    },
+    {
+      "name": "Cuidado!",
+      "formula": "· Adição:\nRecomecar a contagem no 1. Prefira contar a partir do maior.\nEsquecer de trocar 10 unidades por 1 dezena quandonecessário.\n\n· Subtração:\nInverter as posicoes (fazer B - A quando o exercício é A - B).\nTentar subtrair unidades 'maiores' sem fazer a troca (emprestar)."
+    },
+    {
+      "name": "Checagem rápida",
+      "formula": "· Verdadeiro ou falso:\na) 4+9 =9 +4.\nb) 18-7 = 7 - 18.\n\n· Resolva:\nc) 24 + 32 =\nd) 89 - 72 ="
+    },
+    {
+      "name": "Dica de metacognição",
+      "formula": "· 'Como eu sei que está certo?'\nRefaça a adição trocando a ordem dos números.\nNa subtração, verifique com a operação inversa: some o resultado com o subtraendo e veja se volta ao minuendo (ex: 17 + 72 = 89)."
+    },
+    {
+      "name": "Glossário visual",
+      "formula": "· Somar (adição): juntar partes para formar um total.\n· Subtrair (subtração): tirar uma parte de um todo.\n· Unidades/Dezenas: lugar dos números (posição).\n. Troca (ou 'emprestar'): transformar 1 dezena em 10 unidades quando necessário."
+    }
+  ],
+  "examples": [
+    {
+      "question": "Qual é o resultado de 37 + 25?",
+      "solution": "37 + 25 = 62"
+    },
+    {
+      "question": "Quanto é 58 - 34?",
+      "solution": "58 - 34 = 24"
+    }
+  ]
 }

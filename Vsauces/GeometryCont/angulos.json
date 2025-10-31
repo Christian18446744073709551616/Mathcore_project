@@ -1,15 +1,23 @@
 {
     "lessonTitle": "Ângulos",
-    "fundamentals": "Ângulos são a medida da abertura entre duas semirretas que partem de um mesmo ponto.",
+    "fundamentals": "A abertura formada por duas semirretas que partem do mesmo ponto.",
     "formulas": [
       {
-        "name": "Soma dos Ângulos Internos de um Triângulo",
-        "formula": "S = 180 graus",
+        "name": "Ângulo Reto:",
+        "formula": "É formado por duas linhas verticais formando um ângulo de 90°.\nEle é representado como um quadrado com um ponto no meio, conforme mostrado na figura abaixo.",
         "teste": "ExemploAngulo.jpg"
       },
       {
-        "name": "Soma dos Ângulos Internos de um Polígono",
-        "formula": "S = (n - 2) * 180"
+        "name": "Ângulo Agudo:",
+        "formula": "Ângulo Reto: É formado por duas linhas verticais formando um ângulo de 90°.\nEle é representado como um quadrado com um ponto no meio, conforme mostrado na figura abaixo."
+      },
+      {
+        "name": "Ângulo Obtuso:",
+        "formula": "Ângulos maiores que 90° são chamados de ângulos obtusos."
+      },
+      {
+        "name": "Ângulo Raso:",
+        "formula": "São ângulos de exatamente 180°."
       }
     ],
     "examples": [

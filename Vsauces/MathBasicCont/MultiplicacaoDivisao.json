@@ -1,8 +1,55 @@
 {
-  "lessonTitle": "Multiplicação e Divisão",
+    "lessonTitle": "Expressões Numéricas",
+    "fundamentals": "Objetivo do aluno: entender quando a ordem dos números muda o resultado e quando não muda; somar e subtrair com segurança usando passos simples.",
     "formulas": [
       {
-        "teste": "ExemploMultiplicacaoDivisao.jpg"
-      }
+      "name": "O que você já sabe",
+      "formula": "\n· Contar de 2 em 2, 5 em 5 e 10 em 10.\n. Reconhecer os sinais: x significa 'vezes'; '+' ou ':'significa 'dividir';= é 'igual a'.",
+      "teste": "ExemploMultiplicacaoDivisao.jpg"
+    },
+    {
+      "name": "Ideia central (Concreto > Pictórico > Abstrato)",
+      "formula": "Concreto:\n· Multiplicação: formar grupos iguais com objetos (ex: tampinhas).\n· Divisão: repartir objetos igualmente entre pessoas/caixinhas.\n\n Pictórico:\n· Desenhar fileiras (arranjos) ou grupos com a mesma quantidade.\n\nAbstrato:\n· Multiplicacao: escrever como A x B. Divisao: escrever como A + B."
+    },
+    {
+      "name": "Multiplicaçao: adiçao repetida e regularidades",
+      "formula": "Significado: A x B é somar A, B vezes (ou somar B, A vezes).\n· Propriedade comutativa: A x B = B x A (a ordem dos fatores não muda o produto).\n\n· Exemplo resolvido (concreto > pictórico > abstrato): 1. Concreto: 3 saquinhos com 4 bolinhas cada. 2. Pictórico: desenhe 3 grupos de 4 '3. Abstrato: 3 x 4 = 12 (igual a 4 + 4 + 4).\n\n· Padrões úteis:\nx2: dobrar; x10: acrescentar um zero (para números inteiros).\nx5: contar de 5 em 5."
+    },
+    {
+      "name": "Sinais e contexto (nota de professor)",
+      "formula": ". Para o Fundamental I, foque em quantidades positivas (objetos,pessoas, medidas).\n· A regra 'sinais iguais dão positivo; diferentes dão negativo' éconceito avançado; mantenha como observaçao para materiais do 5º ano em transicao, sem explorar contas com negativos neste nível."
+    },
+    {
+      "name": "Exemplos e não-exemplos",
+      "formula": "· · Multiplicação: \nExemplo: 4 x 3 = 12 e 3 x 4 = 12 (mesmo resultado).\nNão-exemplo: agrupar com tamanhos diferentes (3, 4 e 5 no mesmo grupo).\n· Divisão:\nExemplo: 15 + 3 = 5 (repartir 15 em 3 partes iguais).\nNão-exemplo: repartir deixando sobras sem mencionar o que fazer com elas (no início, use casos 'exatos')."
+    },
+    {
+      "name": "Passos práticos",
+      "formula": "· Para multiplicar (com grupos pequenos):\n1. Monte grupos iguais (concreto ou desenho).\n2. Conte quantos grupos há.\n3. Conte quantos itens há em cada grupo.\n4. Some repetido ou use contagem em saltos (ex .: de 4 em 4).\n5. Escreva A x B = resultado.· Para dividir (sem sobra):\n1. Separe o total em B grupos.\n2. Distribua 1 a 1 até acabar.\n3. Conte quanto ficou em cada grupo.\n4. Escreva A + B = resultado."
+    },
+    {
+      "name": "Prática guiada",
+      "formula": "Multiplicacao (use grupos ou contagem em saltos):\na) 3 x 5 =\nb) 2 x 7 =\nc) 4 x 4 =\n\n. Divisao (repartir em partes iguais):\nd) 12 + 3 =\ne) 20 + 5 =\nf) 18+ 2 ="
+    },
+    {
+      "name": "Prática independente",
+      "formula": "· Multiplicação:\ng) 5 x 5 =\nh) 6 x 3 =\ni) 9 x 2 =\n\n· Divisão:\nj) 15 + 3 =\nk) 16 + 4 =\nl) 21 + 7 ="
+    },
+    {
+      "name": "Cuidado!",
+      "formula": "· Multiplicação:\nConfundir 'quantidade de grupos' com 'itens por grupo'. Decida primeiro: A x B = 'A grupos de B' (ou 'B grupos de A'). Perder a contagem em saltos: mantenha os dedos como marcador de grupos.\n\n· Divisão:\no Distribuir em grupos de tamanhos diferentes: todos os grupos devem ter a mesma quantidade.\n Esquecer que é a operação inversa da multiplicação: valide multiplicando de volta."
+    },
+    {
+      "name": "Checagem rápida",
+      "formula": "· · Verdadeiro ou falso:\nm) 3 x 4 = 4 x 3.\nn) 12 + 4 = 2 (verifique multiplicando 2 x 4).\n\n· Resolva:\n0) 15+5 =\np) 2× 8 ="
+    },
+    {
+      "name": "Dica de metacognição",
+      "formula": "· 'Como conferir meu resultado?'\nMultiplicacao: recontar em saltos e também por adição repetida.\n\nDivisao: multiplicar o quociente pelo divisor para ver se volta ao total."
+    },
+    {
+      "name": "Glossário visual",
+      "formula": "· Grupo: conjunto com mesma quantidade.\n· Fator: número que multiplicamos (ex .: em 3 x 4, 3 e 4 são fatores).\n· Produto: resultado de uma multiplicação.\n· Divisor: número de partes (ou tamanho do grupo) na divisão.\n· Quociente: resultado de uma divisão."
+    }
     ]
 }
