@@ -30,9 +30,9 @@ const themes = {
   padrao: {
     name: 'Padrão',
     gradient: ['#242948', '#5C6494'],
-    title: '#000000ff',
-    container: '#707DCB',
-    button: '#FFF9E0',
+    title: '#ffffffff',
+    container: '#4d547cff',
+    button: '#e0dbc7ff',
     buttonBorder: '#000000',
     buttonText: '#000000',
   },

@@ -42,11 +42,6 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
           <Text style={styles.groupName}>{groupName}</Text>
         </View>
       </View>
-
-      <TouchableOpacity style={styles.challengeButton} onPress={onChallengePress}>
-        <Ionicons name="flash" size={16} color="#fff" />
-        <Text style={styles.challengeText}>Desafiar</Text>
-      </TouchableOpacity>
     </View>
   );
 };

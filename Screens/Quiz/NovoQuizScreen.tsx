@@ -762,7 +762,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 42,
     fontWeight: 'bold',
-    color: '#000000ff',
+    color: '#ffffffff',
     flex: 1,
   },
   backButton: {
@@ -776,7 +776,7 @@ const styles = StyleSheet.create({
   workspace: {
     flex: 1,
     flexDirection: 'row',
-    backgroundColor: '#707DCB',
+    backgroundColor: '#4d547cff',
     borderRadius: 20,
     padding: 20,
     overflow: 'hidden',
@@ -790,7 +790,7 @@ const styles = StyleSheet.create({
     width: 70,
     height: 70,
     paddingVertical: 10,
-    backgroundColor: '#FFF9E0',
+    backgroundColor: '#e0dbc7ff',
     borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
@@ -837,7 +837,7 @@ const styles = StyleSheet.create({
   inviteModalContainer: {
     width: '80%',
     maxWidth: 400,
-    backgroundColor: '#FFF9E0',
+    backgroundColor: '#e0dbc7ff',
     borderRadius: 20,
     padding: 20,
     alignItems: 'center',
@@ -845,7 +845,7 @@ const styles = StyleSheet.create({
   qrModalContainer: {
     width: '80%',
     maxWidth: 400,
-    backgroundColor: '#FFF9E0',
+    backgroundColor: '#e0dbc7ff',
     borderRadius: 20,
     padding: 20,
     alignItems: 'center',
@@ -911,11 +911,12 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   editorArea: {
+    borderRadius: 20,
     flex: 1,
   },
   editorBackground: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: '#FFF9E0',
+    backgroundColor: '#8287a8ff',
     borderRadius: 20,
   },
   editorContent: {

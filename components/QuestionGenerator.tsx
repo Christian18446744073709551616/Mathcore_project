@@ -173,7 +173,9 @@ export default function QuestionGenerator() {
 
   return (
     <View style={{ flex: 1 }}>
-      <ScrollView style={styles.container}>
+      <ScrollView style={styles.container}
+      showsVerticalScrollIndicator={false}
+        showsHorizontalScrollIndicator={false}>
         <Text style={styles.title}>Exercícios</Text>
 
         {/* Conteúdos */}

@@ -17,8 +17,6 @@ import UltramenuScreen from './Screens/UltramenuScreen';
 import FriendDripRoast from './Screens/FriendDripRoast';
 import Lobby from './Screens/Lobby';
 import ChatScreen from './Screens/ChatScreen';
-import ExerciciosScreen from './Screens/ExerciciosScreen';
-import DesempenhoScreen from './Screens/DesempenhoScreen';
 import FlashcardsScreen from './Screens/Flashcards/FlashcardsScreen';
 import CreateFlashcardScreen from './Screens/Flashcards/CreateFlashcardScreen';
 import ReviewFlashcardScreen from './Screens/Flashcards/ReviewFlashcardScreen';
@@ -33,7 +31,6 @@ import QuizInviteNotification from './components/QuizInviteNotification';
 
 import ChangePassword from './Screens/ChangePassword';
 import AudioScreen from './Screens/Audio';
-import AreaTEAScreen from './Screens/AreaTEA';
 import QuestionGenerator from './components/QuestionGenerator';
 
 
@@ -120,7 +117,6 @@ const Tabs: React.FC<{ session: Session }> = ({ session }) => (
     <Tab.Screen name="MathFincLessons" children={() => <HomeStack session={session} />} />
     <Tab.Screen name="Friends" children={() => <FriendsStack session={session} />} />
     <Tab.Screen name="Exercicios" children={SimpleStack(QuestionGenerator, session)} />
-    <Tab.Screen name="Desempenho" children={SimpleStack(DesempenhoScreen, session)} />
     <Tab.Screen name="Quiz" children={() => <QuizStack session={session} />} />
     <Tab.Screen name="Flashcards" component={FlashcardsStack} />
     <Tab.Screen name="Configuracoes" children={SimpleStack(ConfiguracoesScreen, session)} />
@@ -146,7 +142,6 @@ const Cornhub: React.FC<CornhubProps> = ({ session }) => (
       <RootStack.Screen name="QuizResultsScreen" component={QuizResultsScreen} />
       <RootStack.Screen name="ChangePassword" component={ChangePassword} initialParams={{ session }} />
       <RootStack.Screen name="Audio" component={AudioScreen} initialParams={{ session }} />
-      <RootStack.Screen name="AreaTEA" component={AreaTEAScreen} initialParams={{ session }} />
     </RootStack.Navigator>
 
     <QuizInviteNotification userId={session.user.id} />

@@ -83,15 +83,7 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigat
             >
               <QuizIconSecundario size={24} color="#1f1f1fff" />
               <Text style={styles.menuText}>Quiz</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.menuItem}
-              onPress={() => handleMenuNavigation('Desempenho')}
-            >
-              <DesempenhoIcon size={24} color="#1f1f1fff" />
-              <Text style={styles.menuText}>Desempenho</Text>
-            </TouchableOpacity>           
+            </TouchableOpacity>          
             
             <View style={styles.separator} />
 
@@ -174,11 +166,11 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigat
 
           <TouchableOpacity
             style={styles.tab}
-            onPress={() => navigation.navigate('Desempenho')}
+            onPress={() => navigation.navigate('Flashcards')}
           >
-            <DesempenhoIcon 
+            <FlashcardsIcon 
               size={34} 
-              color={isRouteActive('Desempenho') ? '#1f1f1fff' : '#cfd8dc'}
+              color={isRouteActive('Flashcards') ? '#1f1f1fff' : '#cfd8dc'}
             />
           </TouchableOpacity>
 

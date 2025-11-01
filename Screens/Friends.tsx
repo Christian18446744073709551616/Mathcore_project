@@ -160,13 +160,6 @@ const UserCard = ({
           <Text style={styles.btnText}>Conversar</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={[styles.challengeButton, { backgroundColor: theme.buttonPrimary }]}
-          onPress={() => console.log('Desafiar', user.username)}
-        >
-          <Ionicons name="flash" size={16} color="#fff" />
-          <Text style={styles.btnText}>Desafiar</Text>
-        </TouchableOpacity>
       </View>
     ) : onAccept ? (
       <TouchableOpacity style={[styles.chatButton, { backgroundColor: theme.button }]} onPress={onAccept}>

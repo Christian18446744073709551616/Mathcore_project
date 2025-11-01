@@ -7,9 +7,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const themes = {
   padrao: {
     name: 'Padrão',
-    background: '#5b6b85',
-    card: '#c5d0e6',
-    text: '#1e293b',
+    background: '#2E2F47',
+    card: '#4A4C70',
+    text: '#9db2d3ff',
     primary: '#3B82F6',
   },
   roxo: {
@@ -108,12 +108,6 @@ export default function ConfiguracoesScreen({ navigation }: any) {
       label: 'Áudio',
       screen: 'Audio',
     },
-    {
-      IconComponent: MaterialIcons,
-      iconName: 'assignment',
-      label: 'Área TEA',
-      screen: 'AreaTEA',
-    },
   ];
 
   return (
@@ -126,7 +120,7 @@ export default function ConfiguracoesScreen({ navigation }: any) {
         <Ionicons name="color-palette" size={28} color={theme.text} />
       </TouchableOpacity>
 
-      <Text style={[styles.title, { color: 'black' }]}>Configurações</Text>
+      <Text style={[styles.title, { color: 'white' }]}>Configurações</Text>
       
       <View style={styles.menuContainer}>
         {menuItems.map((item, index) => {
