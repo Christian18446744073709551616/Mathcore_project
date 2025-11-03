@@ -112,162 +112,168 @@ const Home2Screen = () => {
   const boxWidth = width > 500 ? 400 : width * 0.9;
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.background }]}>
-      <ScrollView
+    <View style={{ flex: 1 }}>
+      <LinearGradient
+        colors={['#242948', '#5C6494']}
+        locations={[0.65, 0.30]} 
+        start={{ x: 1, y: 1 }}
+        end={{ x: 0.85, y: 0.4 }}
         style={{ flex: 1 }}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-        showsHorizontalScrollIndicator={false}
       >
-
-        <View style={styles.header}>
-          <View style={{ flex: 1 }} />
-          <Text style={[styles.title, { color: theme.text }]}>MathCore</Text>
-          <TouchableOpacity onPress={() => setShowThemeModal(true)} style={{ flex: 1, alignItems: 'flex-end' }}>
-            <Ionicons name="color-palette" size={28} color={theme.text} />
-          </TouchableOpacity>
-        </View>
-
-
-
-        <Text style={[styles.prompt, { color: theme.textSecondary }]}>
-          O que vamos aprender hoje, {username}?
-        </Text>
-
-        <View style={styles.verticalGrid}>
-          {/* Geometria */}
-          <TouchableOpacity
-            style={[styles.box, { backgroundColor: theme.boxes[0], width: boxWidth, height: 200 }]}
-            onPress={() => navigation.navigate('GeometryLessons')}
-          >
-            <Text style={styles.textBox}>Geometria</Text>
-            <Ionicons name="shapes" size={80} color="#000000ff" style={{ marginTop: 10 }} />
-            <View style={styles.progress}>
-              <LinearGradient
-                colors={['#219d40', '#FFFFFF']}
-                locations={[0.25, 0.01]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-                style={StyleSheet.absoluteFill}
-              />
-              <Text style={styles.progressText}>25%</Text>
-            </View>
-          </TouchableOpacity>
-
-          {/* Matemática Financeira */}
-          <TouchableOpacity
-            style={[styles.box, { backgroundColor: theme.boxes[1], width: boxWidth, height: 200 }]}
-            onPress={() => navigation.navigate('MathFincLessons')}
-          >
-            <Text style={styles.textBox}>Matemática Financeira</Text>
-            <Entypo name="bar-graph" size={80} color="#000000ff" style={{ marginTop: 10 }} />
-            <View style={styles.progress}>
-              <LinearGradient
-                colors={['#219d40', '#FFFFFF']}
-                locations={[1, 0.01]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-                style={StyleSheet.absoluteFill}
-              />
-              <Text style={styles.progressText}>100%</Text>
-            </View>
-          </TouchableOpacity>
-
-          {/* Matemática Básica */}
-          <TouchableOpacity
-            style={[styles.box, { backgroundColor: theme.boxes[2], width: boxWidth, height: 200 }]}
-            onPress={() => navigation.navigate('MathBasicLessons')}
-          >
-            <Text style={styles.textBox}>Matemática Básica</Text>
-            <MaterialCommunityIcons name="division" size={80} color="#000000ff" style={{ marginTop: 10 }} />
-            <View style={styles.progress}>
-              <LinearGradient
-                colors={['#219d40', '#FFFFFF']}
-                locations={[0.37, 0.01]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-                style={StyleSheet.absoluteFill}
-              />
-              <Text style={styles.progressText}>37%</Text>
-            </View>
-          </TouchableOpacity>
-
-          {/* Álgebra */}
-          <TouchableOpacity
-            style={[styles.box, { backgroundColor: theme.boxes[3], width: boxWidth, height: 200 }]}
-            onPress={() => navigation.navigate('AlgebraLessons')}
-          >
-            <Text style={styles.textBox}>Álgebra</Text>
-            <FontAwesome5 name="square-root-alt" size={80} color="#000000ff" style={{ marginTop: 10 }} />
-            <View style={styles.progress}>
-              <LinearGradient
-                colors={['#219d40', '#FFFFFF']}
-                locations={[0, 0.01]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-                style={StyleSheet.absoluteFill}
-              />
-              <Text style={styles.progressText}>0%</Text>
-            </View>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
-
-      {/* Modal de seleção de tema */}
-      <Modal
-        visible={showThemeModal}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setShowThemeModal(false)}
-      >
-        <TouchableOpacity
-          style={styles.modalOverlay}
-          activeOpacity={1}
-          onPress={() => setShowThemeModal(false)}
+        <ScrollView
+          style={{ flex: 1 }}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+          showsHorizontalScrollIndicator={false}
         >
-          <View style={[styles.modalContent, { backgroundColor: theme.background }]}>
-            <Text style={[styles.modalTitle, { color: theme.text }]}>Escolha um Tema</Text>
 
-            <ScrollView style={styles.themeList}>
-              {Object.entries(themes).map(([key, themeOption]) => (
-                <TouchableOpacity
-                  key={key}
-                  style={[
-                    styles.themeOption,
-                    {
-                      backgroundColor: themeOption.background,
-                      borderColor: currentTheme === key ? '#219d40' : 'transparent',
-                    }
-                  ]}
-                  onPress={() => changeTheme(key)}
-                >
-                  <Text style={[styles.themeName, { color: themeOption.text }]}>
-                    {themeOption.name}
-                  </Text>
-                  <View style={styles.colorPreview}>
-                    {themeOption.boxes.map((color, index) => (
-                      <View
-                        key={index}
-                        style={[styles.colorSwatch, { backgroundColor: color }]}
-                      />
-                    ))}
-                  </View>
-                  {currentTheme === key && (
-                    <Ionicons name="checkmark-circle" size={24} color="#219d40" />
-                  )}
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
-
-            <TouchableOpacity
-              style={styles.closeButton}
-              onPress={() => setShowThemeModal(false)}
-            >
-              <Text style={styles.closeButtonText}>Fechar</Text>
+          <View style={styles.header}>
+            <View style={{ flex: 1 }} />
+            <Text style={[styles.title, { color: theme.text }]}>MathCore</Text>
+            <TouchableOpacity onPress={() => setShowThemeModal(true)} style={{ flex: 1, alignItems: 'flex-end' }}>
+              <Ionicons name="color-palette" size={28} color={theme.text} />
             </TouchableOpacity>
           </View>
-        </TouchableOpacity>
-      </Modal>
+
+          <Text style={[styles.prompt, { color: '#FFFFFF' }]}>
+            O que vamos aprender hoje, {username}?
+          </Text>
+
+          <View style={styles.verticalGrid}>
+            {/* Geometria */}
+            <TouchableOpacity
+              style={[styles.box, { backgroundColor: theme.boxes[0], width: boxWidth, height: 200 }]}
+              onPress={() => navigation.navigate('GeometryLessons')}
+            >
+              <Text style={styles.textBox}>Geometria</Text>
+              <Ionicons name="shapes" size={80} color="#000000ff" style={{ marginTop: 10 }} />
+              <View style={styles.progress}>
+                <LinearGradient
+                  colors={['#219d40', '#FFFFFF']}
+                  locations={[0.25, 0.01]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  style={StyleSheet.absoluteFill}
+                />
+                <Text style={styles.progressText}>25%</Text>
+              </View>
+            </TouchableOpacity>
+
+            {/* Matemática Financeira */}
+            <TouchableOpacity
+              style={[styles.box, { backgroundColor: theme.boxes[1], width: boxWidth, height: 200 }]}
+              onPress={() => navigation.navigate('MathFincLessons')}
+            >
+              <Text style={styles.textBox}>Matemática Financeira</Text>
+              <Entypo name="bar-graph" size={80} color="#000000ff" style={{ marginTop: 10 }} />
+              <View style={styles.progress}>
+                <LinearGradient
+                  colors={['#219d40', '#FFFFFF']}
+                  locations={[1, 0.01]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  style={StyleSheet.absoluteFill}
+                />
+                <Text style={styles.progressText}>100%</Text>
+              </View>
+            </TouchableOpacity>
+
+            {/* Matemática Básica */}
+            <TouchableOpacity
+              style={[styles.box, { backgroundColor: theme.boxes[2], width: boxWidth, height: 200 }]}
+              onPress={() => navigation.navigate('MathBasicLessons')}
+            >
+              <Text style={styles.textBox}>Matemática Básica</Text>
+              <MaterialCommunityIcons name="division" size={80} color="#000000ff" style={{ marginTop: 10 }} />
+              <View style={styles.progress}>
+                <LinearGradient
+                  colors={['#219d40', '#FFFFFF']}
+                  locations={[0.37, 0.01]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  style={StyleSheet.absoluteFill}
+                />
+                <Text style={styles.progressText}>37%</Text>
+              </View>
+            </TouchableOpacity>
+
+            {/* Álgebra */}
+            <TouchableOpacity
+              style={[styles.box, { backgroundColor: theme.boxes[3], width: boxWidth, height: 200 }]}
+              onPress={() => navigation.navigate('AlgebraLessons')}
+            >
+              <Text style={styles.textBox}>Álgebra</Text>
+              <FontAwesome5 name="square-root-alt" size={80} color="#000000ff" style={{ marginTop: 10 }} />
+              <View style={styles.progress}>
+                <LinearGradient
+                  colors={['#219d40', '#FFFFFF']}
+                  locations={[0, 0.01]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  style={StyleSheet.absoluteFill}
+                />
+                <Text style={styles.progressText}>0%</Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+
+        {/* Modal de seleção de tema */}
+        <Modal
+          visible={showThemeModal}
+          transparent
+          animationType="fade"
+          onRequestClose={() => setShowThemeModal(false)}
+        >
+          <TouchableOpacity
+            style={styles.modalOverlay}
+            activeOpacity={1}
+            onPress={() => setShowThemeModal(false)}
+          >
+            <View style={[styles.modalContent, { backgroundColor: theme.background }]}>
+              <Text style={[styles.modalTitle, { color: theme.text }]}>Escolha um Tema</Text>
+
+              <ScrollView style={styles.themeList}>
+                {Object.entries(themes).map(([key, themeOption]) => (
+                  <TouchableOpacity
+                    key={key}
+                    style={[
+                      styles.themeOption,
+                      {
+                        backgroundColor: themeOption.background,
+                        borderColor: currentTheme === key ? '#219d40' : 'transparent',
+                      }
+                    ]}
+                    onPress={() => changeTheme(key)}
+                  >
+                    <Text style={[styles.themeName, { color: themeOption.text }]}>
+                      {themeOption.name}
+                    </Text>
+                    <View style={styles.colorPreview}>
+                      {themeOption.boxes.map((color, index) => (
+                        <View
+                          key={index}
+                          style={[styles.colorSwatch, { backgroundColor: color }]}
+                        />
+                      ))}
+                    </View>
+                    {currentTheme === key && (
+                      <Ionicons name="checkmark-circle" size={24} color="#219d40" />
+                    )}
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+
+              <TouchableOpacity
+                style={styles.closeButton}
+                onPress={() => setShowThemeModal(false)}
+              >
+                <Text style={styles.closeButtonText}>Fechar</Text>
+              </TouchableOpacity>
+            </View>
+          </TouchableOpacity>
+        </Modal>
+      </LinearGradient>
     </View>
   );
 };

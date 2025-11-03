@@ -15,12 +15,14 @@ import { Input, Button, Icon } from '@rneui/themed'
 import { supabase } from '../lib/supabase'
 import { Ionicons } from '@expo/vector-icons'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { LinearGradient } from 'expo-linear-gradient' // --- IMPORTAÇÃO ADICIONADA ---
+import { useNavigation } from '@react-navigation/native' // --- IMPORTAÇÃO ADICIONADA ---
 
-// --- DEFINIÇÃO DOS TEMAS ---
+// --- DEFINIÇÃO DOS TEMAS (ALTERADO: background virou gradient) ---
 const themes = {
     padrao: {
         name: 'Padrão',
-        background: '#40466e',
+        gradient: ['#2d3354', '#40466e'], // Antes era background: '#40466e'
         card: '#858dbbff',
         text: '#000000ff',
         textSecondary: '#666666',
@@ -30,7 +32,7 @@ const themes = {
     },
     roxo: {
         name: 'Roxo',
-        background: '#1d2033',
+        gradient: ['#1d2033', '#30345a'], // Antes era background: '#1d2033'
         card: '#30345a',
         text: '#FFFFFF',
         textSecondary: '#a0a0a0',
@@ -40,7 +42,7 @@ const themes = {
     },
     azulClaro: {
         name: 'Azul Claro',
-        background: '#5b6b85',
+        gradient: ['#5b6b85', '#93a5c5'], // Antes era background: '#5b6b85'
         card: '#c5d0e6',
         text: '#1e293b',
         textSecondary: '#64748b',
@@ -50,7 +52,7 @@ const themes = {
     },
     altoContraste: {
         name: 'Alto Contraste',
-        background: '#000000',
+        gradient: ['#000000', '#1a1a1a'], // Antes era background: '#000000'
         card: '#2a2a2a',
         text: '#FFFFFF',
         textSecondary: '#CCCCCC',
@@ -60,7 +62,7 @@ const themes = {
     },
     deuteranopia: {
         name: 'Deuteranopia',
-        background: '#e8e6e0',
+        gradient: ['#d0cec8', '#e8e6e0'], // Antes era background: '#e8e6e0'
         card: '#0077b6',
         text: '#2c2c2c',
         textSecondary: '#5a5a5a',
@@ -70,7 +72,7 @@ const themes = {
     },
     protanopia: {
         name: 'Protanopia',
-        background: '#d9dce0',
+        gradient: ['#c1c4c8', '#d9dce0'], // Antes era background: '#d9dce0'
         card: '#0466c8',
         text: '#212529',
         textSecondary: '#495057',
@@ -80,7 +82,7 @@ const themes = {
     },
     tritanopia: {
         name: 'Tritanopia',
-        background: '#f0f0f0',
+        gradient: ['#d8d8d8', '#f0f0f0'], // Antes era background: '#f0f0f0'
         card: '#e63946',
         text: '#1e1e1e',
         textSecondary: '#4a4a4a',
@@ -91,6 +93,7 @@ const themes = {
 }
 
 export default function ChangePassword() {
+    const navigation = useNavigation() // --- HOOK DE NAVEGAÇÃO ADICIONADO ---
     const [currentPassword, setCurrentPassword] = useState('')
     const [newPassword, setNewPassword] = useState('')
     const [confirmPassword, setConfirmPassword] = useState('')
@@ -108,7 +111,6 @@ export default function ChangePassword() {
     const [currentTheme, setCurrentTheme] = useState('padrao')
     const [showThemeModal, setShowThemeModal] = useState(false)
 
-    // Carregar tema salvo
     useEffect(() => {
         const loadTheme = async () => {
             try {
@@ -228,7 +230,22 @@ export default function ChangePassword() {
             style={styles.container}
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         >
-            <View style={[styles.backgroundView, { backgroundColor: theme.background }]}>
+            {/* --- ALTERAÇÃO: View substituída por LinearGradient --- */}
+            <LinearGradient
+                colors={theme.gradient}
+                locations={[0.65, 0.30]}
+                start={{ x: 1, y: 1 }}
+                end={{ x: 0.85, y: 0.4 }}
+                style={styles.backgroundView}
+            >
+                {/* --- BOTÃO DE RETORNO ADICIONADO --- */}
+                <TouchableOpacity 
+                    onPress={() => navigation.goBack()} 
+                    style={styles.returnButton}
+                >
+                    <Ionicons name="arrow-back" size={24} color={theme.text} />
+                </TouchableOpacity>
+
                 {/* BOTÃO DE TEMA */}
                 <TouchableOpacity 
                     style={styles.themeButton}
@@ -354,7 +371,7 @@ export default function ChangePassword() {
                         </View>
                     </View>
                 </ScrollView>
-            </View>
+            </LinearGradient>
 
             {/* MODAL DE SELEÇÃO DE TEMA */}
             <Modal
@@ -388,7 +405,7 @@ export default function ChangePassword() {
                                         {themeOption.name}
                                     </Text>
                                     <View style={styles.colorPreview}>
-                                        <View style={[styles.colorSwatch, { backgroundColor: themeOption.background }]} />
+                                        <View style={[styles.colorSwatch, { backgroundColor: themeOption.gradient[0] }]} />
                                         <View style={[styles.colorSwatch, { backgroundColor: themeOption.card }]} />
                                         <View style={[styles.colorSwatch, { backgroundColor: themeOption.primary }]} />
                                     </View>
@@ -416,6 +433,16 @@ const styles = StyleSheet.create({
     container: { flex: 1 },
     backgroundView: {
         flex: 1,
+    },
+    // --- ESTILO DO BOTÃO DE RETORNO ADICIONADO ---
+    returnButton: {
+        position: 'absolute',
+        top: 50,
+        left: 20,
+        zIndex: 10,
+        padding: 8,
+        borderRadius: 25,
+        backgroundColor: 'rgba(42, 46, 77, 0.7)',
     },
     themeButton: {
         position: 'absolute',

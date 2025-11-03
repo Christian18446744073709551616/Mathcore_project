@@ -180,7 +180,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 50,
     fontWeight: 'bold',
-    color: '#000000ff',
+    color: '#ffffffff',
   },
   subtitleContainer: {
     flexDirection: 'row',

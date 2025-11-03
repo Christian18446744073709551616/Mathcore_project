@@ -144,7 +144,7 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 20,
-    color: '#CFCFCF',
+    color: '#ffffffff',
     marginBottom: 20,
   },
   accordionContainer: {

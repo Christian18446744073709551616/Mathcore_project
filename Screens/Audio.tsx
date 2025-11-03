@@ -1,12 +1,94 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, Switch, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, Switch, TouchableOpacity, Modal, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Slider from '@react-native-community/slider';
-import { useMusic } from '../components/MusicContext'; 
+import { useMusic } from '../components/MusicContext';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
-// ajuste o caminho do seu MusicContext
+import { LinearGradient } from 'expo-linear-gradient';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+// --- DEFINIÇÃO DOS TEMAS ---
+const themes = {
+  padrao: {
+    name: 'Padrão',
+    gradient: ['#242948', '#5C6494'],
+    card: '#4A456C',
+    text: '#FFFFFF',
+    textSecondary: '#B4B7D6',
+    slider: '#9D7AFF',
+    sliderDisabled: '#5E5C77',
+    separator: '#5E5C77',
+    primary: '#8f85e7',
+  },
+  roxo: {
+    name: 'Roxo',
+    gradient: ['#1d2033', '#30345a'],
+    card: '#30345a',
+    text: '#FFFFFF',
+    textSecondary: '#B4B7D6',
+    slider: '#8B5CF6',
+    sliderDisabled: '#4a4e7a',
+    separator: '#4a4e7a',
+    primary: '#9333EA',
+  },
+  azulClaro: {
+    name: 'Azul Claro',
+    gradient: ['#5b6b85', '#93a5c5'],
+    card: '#c5d0e6',
+    text: '#1e293b',
+    textSecondary: '#475569',
+    slider: '#3B82F6',
+    sliderDisabled: '#93a5c5',
+    separator: '#93a5c5',
+    primary: '#0EA5E9',
+  },
+  altoContraste: {
+    name: 'Alto Contraste',
+    gradient: ['#000000', '#1a1a1a'],
+    card: '#2a2a2a',
+    text: '#FFFFFF',
+    textSecondary: '#CCCCCC',
+    slider: '#FFFF00',
+    sliderDisabled: '#4a4a4a',
+    separator: '#FFFFFF',
+    primary: '#00FF00',
+  },
+  deuteranopia: {
+    name: 'Deuteranopia',
+    gradient: ['#d0cec8', '#e8e6e0'],
+    card: '#0077b6',
+    text: '#FFFFFF',
+    textSecondary: '#e0f7ff',
+    slider: '#0096c7',
+    sliderDisabled: '#005f8a',
+    separator: '#90e0ef',
+    primary: '#00b4d8',
+  },
+  protanopia: {
+    name: 'Protanopia',
+    gradient: ['#c1c4c8', '#d9dce0'],
+    card: '#0466c8',
+    text: '#FFFFFF',
+    textSecondary: '#caf0f8',
+    slider: '#0353a4',
+    sliderDisabled: '#023e7d',
+    separator: '#90e0ef',
+    primary: '#0077b6',
+  },
+  tritanopia: {
+    name: 'Tritanopia',
+    gradient: ['#d8d8d8', '#f0f0f0'],
+    card: '#e63946',
+    text: '#FFFFFF',
+    textSecondary: '#ffccd5',
+    slider: '#d62828',
+    sliderDisabled: '#a4161a',
+    separator: '#f77f00',
+    primary: '#f77f00',
+  },
+};
 
 // --- Tipos (Typescript) ---
 interface SettingRowProps {
@@ -16,6 +98,7 @@ interface SettingRowProps {
   isEnabled: boolean;
   onValueChange: (value: number) => void;
   onToggle: (isEnabled: boolean) => void;
+  theme: any;
 }
 
 // --- Componente de Linha de Configuração ---
@@ -26,16 +109,17 @@ const SettingRow: React.FC<SettingRowProps> = ({
   isEnabled,
   onValueChange,
   onToggle,
+  theme,
 }) => {
-  const sliderColor = isEnabled ? '#9D7AFF' : '#5E5C77';
-  const iconColor = isEnabled ? '#FFFFFF' : '#767577';
+  const sliderColor = isEnabled ? theme.slider : theme.sliderDisabled;
+  const iconColor = isEnabled ? theme.text : theme.textSecondary;
   const iconWithColor = React.cloneElement(icon as React.ReactElement, {
     color: iconColor,
   });
 
   return (
     <View style={styles.rowContainer}>
-      <Text style={styles.settingLabel}>{label}</Text>
+      <Text style={[styles.settingLabel, { color: theme.text }]}>{label}</Text>
       <View style={styles.controlsContainer}>
         {iconWithColor}
         <Slider
@@ -45,12 +129,12 @@ const SettingRow: React.FC<SettingRowProps> = ({
           value={value}
           onValueChange={onValueChange}
           minimumTrackTintColor={sliderColor}
-          maximumTrackTintColor="#5E5C77"
+          maximumTrackTintColor={theme.sliderDisabled}
           thumbTintColor={sliderColor}
           disabled={!isEnabled}
         />
         <Switch
-          trackColor={{ false: '#767577', true: '#8f85e7' }}
+          trackColor={{ false: '#767577', true: theme.primary }}
           thumbColor={isEnabled ? '#FFFFFF' : '#f4f3f4'}
           ios_backgroundColor="#767577"
           onValueChange={onToggle}
@@ -63,21 +147,47 @@ const SettingRow: React.FC<SettingRowProps> = ({
 
 // --- Tela Principal ---
 const AudioSettingsScreen: React.FC = () => {
-  // Hook do MusicContext
   const { isPlaying, volume, toggleMusic, setVolume } = useMusic();
-const navigation = useNavigation();
-  // Estados para os valores de volume (0 a 1)
+  const navigation = useNavigation();
+
   const [generalVolume, setGeneralVolume] = useState(0.5);
   const [sfxVolume, setSfxVolume] = useState(0.8);
   const [isGeneralEnabled, setIsGeneralEnabled] = useState(true);
   const [isSfxEnabled, setIsSfxEnabled] = useState(true);
 
-  // Ícones
+  const [currentTheme, setCurrentTheme] = useState('padrao');
+  const [showThemeModal, setShowThemeModal] = useState(false);
+
+  useEffect(() => {
+    const loadTheme = async () => {
+      try {
+        const savedTheme = await AsyncStorage.getItem('app_theme');
+        if (savedTheme && themes[savedTheme as keyof typeof themes]) {
+          setCurrentTheme(savedTheme);
+        }
+      } catch (error) {
+        console.log('Erro ao carregar tema:', error);
+      }
+    };
+    loadTheme();
+  }, []);
+
+  const changeTheme = async (themeKey: string) => {
+    setCurrentTheme(themeKey);
+    setShowThemeModal(false);
+    try {
+      await AsyncStorage.setItem('app_theme', themeKey);
+    } catch (error) {
+      console.log('Erro ao salvar tema:', error);
+    }
+  };
+
+  const theme = themes[currentTheme as keyof typeof themes];
+
   const generalIcon = <Icon name="volume-high" size={20} />;
   const sfxIcon = <Icon name="volume-high" size={20} />;
   const musicIcon = <Icon name="musical-note" size={20} />;
 
-  // Botão de voltar
   const handleBackPress = () => {
     console.log('Botão Voltar Pressionado!');
     navigation.goBack();
@@ -85,94 +195,182 @@ const navigation = useNavigation();
 
   return (
     <SafeAreaView style={styles.fullScreen} edges={['top']}>
-      {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>MathCore</Text>
-        <Text style={styles.screenTitle}>Áudio</Text>
-        <TouchableOpacity style={styles.backButton} onPress={handleBackPress}>
-          <Icon name="arrow-back" size={24} color="#FFFFFF" />
-        </TouchableOpacity>
+      <LinearGradient
+        colors={theme.gradient}
+        locations={[0.65, 0.30]}
+        start={{ x: 1, y: 1 }}
+        end={{ x: 0.85, y: 0.4 }}
+        style={{ flex: 1 }}
+      >
+        {/* --- HEADER ALTERADO --- */}
+        <View style={styles.header}>
+          {/* Botão de Voltar - AGORA À ESQUERDA */}
+          <TouchableOpacity style={styles.backButton} onPress={handleBackPress}>
+            <Icon name="arrow-back" size={24} color={theme.text} />
+          </TouchableOpacity>
 
-      </View>
+          {/* Título MathCore e Áudio - CENTRALIZADOS */}
+          <View style={styles.headerCenter}>
+            <Text style={[styles.headerTitle, { color: theme.text }]}>MathCore</Text>
+            <Text style={[styles.screenTitle, { color: theme.text }]}>Áudio</Text>
+          </View>
 
-      {/* Container centralizado */}
-      <View style={styles.centerContainer}>
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Áudio 🎵</Text>
-
-          {/* Som Geral */}
-          <SettingRow
-            label="Som geral"
-            icon={generalIcon}
-            value={generalVolume}
-            isEnabled={isGeneralEnabled}
-            onValueChange={setGeneralVolume}
-            onToggle={setIsGeneralEnabled}
-          />
-
-          <View style={styles.separator} />
-
-          {/* Efeitos Sonoros */}
-          <SettingRow
-            label="Efeitos sonoros"
-            icon={sfxIcon}
-            value={sfxVolume}
-            isEnabled={isSfxEnabled}
-            onValueChange={setSfxVolume}
-            onToggle={setIsSfxEnabled}
-          />
-
-          <View style={styles.separator} />
-
-          {/* Música de Fundo */}
-          <SettingRow
-            label="Música de Fundo"
-            icon={musicIcon}
-            value={volume}         // do MusicContext
-            isEnabled={isPlaying}  // ligado/desligado
-            onValueChange={setVolume}
-            onToggle={toggleMusic}
-          />
+          {/* Botão de Tema - AGORA À DIREITA */}
+          <TouchableOpacity 
+            style={styles.themeButton}
+            onPress={() => setShowThemeModal(true)}
+          >
+            <Ionicons name="color-palette" size={24} color={theme.text} />
+          </TouchableOpacity>
         </View>
-      </View>
+
+        {/* Container centralizado */}
+        <View style={styles.centerContainer}>
+          <View style={[styles.card, { backgroundColor: theme.card }]}>
+            <Text style={[styles.cardTitle, { color: theme.text }]}>Áudio 🎵</Text>
+
+            {/* Som Geral */}
+            <SettingRow
+              label="Som geral"
+              icon={generalIcon}
+              value={generalVolume}
+              isEnabled={isGeneralEnabled}
+              onValueChange={setGeneralVolume}
+              onToggle={setIsGeneralEnabled}
+              theme={theme}
+            />
+
+            <View style={[styles.separator, { backgroundColor: theme.separator }]} />
+
+            {/* Efeitos Sonoros */}
+            <SettingRow
+              label="Efeitos sonoros"
+              icon={sfxIcon}
+              value={sfxVolume}
+              isEnabled={isSfxEnabled}
+              onValueChange={setSfxVolume}
+              onToggle={setIsSfxEnabled}
+              theme={theme}
+            />
+
+            <View style={[styles.separator, { backgroundColor: theme.separator }]} />
+
+            {/* Música de Fundo */}
+            <SettingRow
+              label="Música de Fundo"
+              icon={musicIcon}
+              value={volume}
+              isEnabled={isPlaying}
+              onValueChange={setVolume}
+              onToggle={toggleMusic}
+              theme={theme}
+            />
+          </View>
+        </View>
+
+        {/* MODAL DE TEMA */}
+        <Modal
+          visible={showThemeModal}
+          transparent
+          animationType="fade"
+          onRequestClose={() => setShowThemeModal(false)}
+        >
+          <TouchableOpacity 
+            style={styles.modalOverlay}
+            activeOpacity={1}
+            onPress={() => setShowThemeModal(false)}
+          >
+            <View style={[styles.modalContent, { backgroundColor: theme.card }]}>
+              <Text style={[styles.modalTitle, { color: theme.text }]}>Escolha um Tema</Text>
+              
+              <ScrollView style={styles.themeList}>
+                {Object.entries(themes).map(([key, themeOption]) => (
+                  <TouchableOpacity
+                    key={key}
+                    style={[
+                      styles.themeOption,
+                      { 
+                        backgroundColor: themeOption.card,
+                        borderColor: currentTheme === key ? themeOption.primary : 'transparent',
+                      }
+                    ]}
+                    onPress={() => changeTheme(key)}
+                  >
+                    <Text style={[styles.themeName, { color: themeOption.text }]}>
+                      {themeOption.name}
+                    </Text>
+                    <View style={styles.colorPreview}>
+                      <View style={[styles.colorSwatch, { backgroundColor: themeOption.gradient[0] }]} />
+                      <View style={[styles.colorSwatch, { backgroundColor: themeOption.card }]} />
+                      <View style={[styles.colorSwatch, { backgroundColor: themeOption.primary }]} />
+                    </View>
+                    {currentTheme === key && (
+                      <Ionicons name="checkmark-circle" size={24} color={themeOption.primary} />
+                    )}
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+
+              <TouchableOpacity
+                style={[styles.closeButton, { backgroundColor: theme.primary }]}
+                onPress={() => setShowThemeModal(false)}
+              >
+                <Text style={styles.closeButtonText}>Fechar</Text>
+              </TouchableOpacity>
+            </View>
+          </TouchableOpacity>
+        </Modal>
+      </LinearGradient>
     </SafeAreaView>
   );
 };
 
-// --- Estilos ---
+// --- Estilos (ATUALIZADOS) ---
 const styles = StyleSheet.create({
   fullScreen: {
     flex: 1,
-    backgroundColor: '#302C4C',
   },
+  // --- HEADER ALTERADO ---
   header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     paddingHorizontal: 15,
     paddingTop: 10,
     paddingBottom: 20,
-    backgroundColor: '#302C4C',
-    position: 'relative',
+  },
+  // --- CONTAINER CENTRAL PARA TÍTULOS (NOVO) ---
+  headerCenter: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   headerTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#FFFFFF',
     textAlign: 'center',
     marginBottom: 5,
   },
   screenTitle: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#FFFFFF',
-    marginLeft: 15,
+    textAlign: 'center',
   },
+  // --- BOTÃO DE VOLTAR (ATUALIZADO - AGORA SEM POSITION ABSOLUTE) ---
   backButton: {
-    position: 'absolute',
-    top: 15,
-    right: 15,
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: '#5E5C77',
+    backgroundColor: 'rgba(94, 92, 119, 0.7)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  // --- BOTÃO DE TEMA (ATUALIZADO - AGORA SEM POSITION ABSOLUTE) ---
+  themeButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(94, 92, 119, 0.7)',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -187,7 +385,6 @@ const styles = StyleSheet.create({
     paddingVertical: 25,
     paddingHorizontal: 15,
     borderRadius: 15,
-    backgroundColor: '#4A456C',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
@@ -197,7 +394,6 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#FFFFFF',
     marginBottom: 15,
   },
   rowContainer: {
@@ -206,7 +402,6 @@ const styles = StyleSheet.create({
   },
   settingLabel: {
     fontSize: 16,
-    color: '#FFFFFF',
     fontWeight: '500',
     marginBottom: 5,
   },
@@ -223,8 +418,63 @@ const styles = StyleSheet.create({
   },
   separator: {
     height: 1,
-    backgroundColor: '#5E5C77',
     marginVertical: 5,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    width: '85%',
+    maxHeight: '70%',
+    borderRadius: 20,
+    padding: 20,
+  },
+  modalTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  themeList: {
+    maxHeight: 350,
+  },
+  themeOption: {
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 12,
+    borderWidth: 3,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  themeName: {
+    fontSize: 16,
+    fontWeight: '600',
+    flex: 1,
+  },
+  colorPreview: {
+    flexDirection: 'row',
+    gap: 6,
+    marginRight: 10,
+  },
+  colorSwatch: {
+    width: 20,
+    height: 20,
+    borderRadius: 4,
+  },
+  closeButton: {
+    padding: 16,
+    borderRadius: 12,
+    marginTop: 16,
+  },
+  closeButtonText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    color: '#fff',
   },
 });
 

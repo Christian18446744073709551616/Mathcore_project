@@ -2,54 +2,55 @@ import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Modal, ScrollView } from 'react-native';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { LinearGradient } from 'expo-linear-gradient'; // --- IMPORTAÇÃO ADICIONADA ---
 
-// --- DEFINIÇÃO DOS TEMAS (ADICIONADO) ---
+// --- DEFINIÇÃO DOS TEMAS (ALTERADO: background virou gradient) ---
 const themes = {
   padrao: {
     name: 'Padrão',
-    background: '#2E2F47',
+    gradient: ['#242948', '#5C6494'], // Antes era background: '#2E2F47'
     card: '#4A4C70',
-    text: '#9db2d3ff',
+    text: '#ddddddff',
     primary: '#3B82F6',
   },
   roxo: {
     name: 'Roxo',
-    background: '#1d2033',
+    gradient: ['#1d2033', '#30345a'], // Antes era background: '#1d2033'
     card: '#30345a',
     text: '#FFFFFF',
     primary: '#8B5CF6',
   },
   azulClaro: {
     name: 'Azul Claro',
-    background: '#93a5c5',
+    gradient: ['#5b6b85', '#93a5c5'], // Antes era background: '#93a5c5'
     card: '#e8ecf5',
     text: '#1e293b',
     primary: '#0EA5E9',
   },
   altoContraste: {
     name: 'Alto Contraste',
-    background: '#000000',
+    gradient: ['#000000', '#1a1a1a'], // Antes era background: '#000000'
     card: '#2a2a2a',
     text: '#FFFFFF',
     primary: '#FFFF00',
   },
   deuteranopia: {
     name: 'Deuteranopia',
-    background: '#e8e6e0',
+    gradient: ['#d0cec8', '#e8e6e0'], // Antes era background: '#e8e6e0'
     card: '#0077b6',
     text: '#FFFFFF',
     primary: '#0096c7',
   },
   protanopia: {
     name: 'Protanopia',
-    background: '#d9dce0',
+    gradient: ['#c1c4c8', '#d9dce0'], // Antes era background: '#d9dce0'
     card: '#0466c8',
     text: '#FFFFFF',
     primary: '#0353a4',
   },
   tritanopia: {
     name: 'Tritanopia',
-    background: '#f0f0f0',
+    gradient: ['#d8d8d8', '#f0f0f0'], // Antes era background: '#f0f0f0'
     card: '#e63946',
     text: '#1e1e1e',
     primary: '#d62828',
@@ -57,11 +58,9 @@ const themes = {
 }
 
 export default function ConfiguracoesScreen({ navigation }: any) {
-  // --- ESTADOS DO TEMA (ADICIONADO) ---
   const [currentTheme, setCurrentTheme] = useState('padrao')
   const [showThemeModal, setShowThemeModal] = useState(false)
 
-  // --- CARREGAR TEMA (ADICIONADO) ---
   React.useEffect(() => {
     const loadTheme = async () => {
       try {
@@ -76,7 +75,6 @@ export default function ConfiguracoesScreen({ navigation }: any) {
     loadTheme()
   }, [])
 
-  // --- MUDAR TEMA (ADICIONADO) ---
   const changeTheme = async (themeKey: string) => {
     setCurrentTheme(themeKey)
     setShowThemeModal(false)
@@ -110,83 +108,91 @@ export default function ConfiguracoesScreen({ navigation }: any) {
     },
   ];
 
+  // --- ALTERAÇÃO PRINCIPAL: View substituída por LinearGradient ---
   return (
-    <View style={[styles.container, { backgroundColor: theme.background }]}>
-      {/* --- BOTÃO DE TEMA (ADICIONADO) --- */}
-      <TouchableOpacity 
-        style={styles.themeButton}
-        onPress={() => setShowThemeModal(true)}
+    <View style={{ flex: 1 }}>
+      <LinearGradient
+        colors={theme.gradient} // Usando a nova propriedade gradient
+        locations={[0.65, 0.30]}
+        start={{ x: 1, y: 1 }}
+        end={{ x: 0.85, y: 0.4 }}
+        style={styles.container}
       >
-        <Ionicons name="color-palette" size={28} color={theme.text} />
-      </TouchableOpacity>
-
-      <Text style={[styles.title, { color: 'white' }]}>Configurações</Text>
-      
-      <View style={styles.menuContainer}>
-        {menuItems.map((item, index) => {
-          const Icon = item.IconComponent;
-          return (
-            <TouchableOpacity
-              key={index}
-              style={[styles.menuButton, { backgroundColor: theme.card }]}
-              onPress={() => navigation.navigate(item.screen)}
-              activeOpacity={0.7}
-            >
-              <View style={styles.iconLabelContainer}>
-                <Icon name={item.iconName as any} size={24} color={theme.text} />
-                <Text style={[styles.menuLabel, { color: theme.text }]}>{item.label}</Text>
-              </View>
-              <Text style={[styles.arrow, { color: theme.text }]}>›</Text>
-            </TouchableOpacity>
-          );
-        })}
-      </View>
-
-      {/* --- MODAL DE TEMA (ADICIONADO) --- */}
-      <Modal visible={showThemeModal} transparent animationType="fade" onRequestClose={() => setShowThemeModal(false)}>
         <TouchableOpacity 
-          style={styles.modalOverlay}
-          activeOpacity={1}
-          onPress={() => setShowThemeModal(false)}
+          style={styles.themeButton}
+          onPress={() => setShowThemeModal(true)}
         >
-          <View style={[styles.themeModalContent, { backgroundColor: theme.card }]}>
-            <Text style={[styles.modalTitle, { color: theme.text }]}>Escolha um Tema</Text>
-            
-            <ScrollView style={styles.themeList}>
-              {Object.entries(themes).map(([key, themeOption]) => (
-                <TouchableOpacity
-                  key={key}
-                  style={[
-                    styles.themeOption,
-                    { 
-                      backgroundColor: themeOption.background,
-                      borderColor: currentTheme === key ? themeOption.primary : 'transparent',
-                    }
-                  ]}
-                  onPress={() => changeTheme(key)}
-                >
-                  <Text style={[styles.themeName, { color: themeOption.text }]}>{themeOption.name}</Text>
-                  <View style={styles.colorPreview}>
-                    <View style={[styles.colorSwatch, { backgroundColor: themeOption.background }]} />
-                    <View style={[styles.colorSwatch, { backgroundColor: themeOption.card }]} />
-                    <View style={[styles.colorSwatch, { backgroundColor: themeOption.primary }]} />
-                  </View>
-                  {currentTheme === key && (
-                    <Ionicons name="checkmark-circle" size={24} color={themeOption.primary} />
-                  )}
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
-
-            <TouchableOpacity
-              style={[styles.closeButton, { backgroundColor: theme.primary }]}
-              onPress={() => setShowThemeModal(false)}
-            >
-              <Text style={styles.closeButtonText}>Fechar</Text>
-            </TouchableOpacity>
-          </View>
+          <Ionicons name="color-palette" size={28} color={theme.text} />
         </TouchableOpacity>
-      </Modal>
+
+        <Text style={[styles.title, { color: 'white' }]}>Configurações</Text>
+        
+        <View style={styles.menuContainer}>
+          {menuItems.map((item, index) => {
+            const Icon = item.IconComponent;
+            return (
+              <TouchableOpacity
+                key={index}
+                style={[styles.menuButton, { backgroundColor: theme.card }]}
+                onPress={() => navigation.navigate(item.screen)}
+                activeOpacity={0.7}
+              >
+                <View style={styles.iconLabelContainer}>
+                  <Icon name={item.iconName as any} size={24} color={theme.text} />
+                  <Text style={[styles.menuLabel, { color: theme.text }]}>{item.label}</Text>
+                </View>
+                <Text style={[styles.arrow, { color: theme.text }]}>›</Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+
+        {/* Modal de tema permanece dentro do LinearGradient */}
+        <Modal visible={showThemeModal} transparent animationType="fade" onRequestClose={() => setShowThemeModal(false)}>
+          <TouchableOpacity 
+            style={styles.modalOverlay}
+            activeOpacity={1}
+            onPress={() => setShowThemeModal(false)}
+          >
+            <View style={[styles.themeModalContent, { backgroundColor: theme.card }]}>
+              <Text style={[styles.modalTitle, { color: theme.text }]}>Escolha um Tema</Text>
+              
+              <ScrollView style={styles.themeList}>
+                {Object.entries(themes).map(([key, themeOption]) => (
+                  <TouchableOpacity
+                    key={key}
+                    style={[
+                      styles.themeOption,
+                      { 
+                        backgroundColor: themeOption.gradient[0], // Usando primeira cor do gradiente
+                        borderColor: currentTheme === key ? themeOption.primary : 'transparent',
+                      }
+                    ]}
+                    onPress={() => changeTheme(key)}
+                  >
+                    <Text style={[styles.themeName, { color: themeOption.text }]}>{themeOption.name}</Text>
+                    <View style={styles.colorPreview}>
+                      <View style={[styles.colorSwatch, { backgroundColor: themeOption.gradient[0] }]} />
+                      <View style={[styles.colorSwatch, { backgroundColor: themeOption.card }]} />
+                      <View style={[styles.colorSwatch, { backgroundColor: themeOption.primary }]} />
+                    </View>
+                    {currentTheme === key && (
+                      <Ionicons name="checkmark-circle" size={24} color={themeOption.primary} />
+                    )}
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+
+              <TouchableOpacity
+                style={[styles.closeButton, { backgroundColor: theme.primary }]}
+                onPress={() => setShowThemeModal(false)}
+              >
+                <Text style={styles.closeButtonText}>Fechar</Text>
+              </TouchableOpacity>
+            </View>
+          </TouchableOpacity>
+        </Modal>
+      </LinearGradient>
     </View>
   );
 }
@@ -199,7 +205,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     alignItems: 'center',
   },
-  // --- ESTILO DO BOTÃO DE TEMA (ADICIONADO) ---
   themeButton: {
     position: 'absolute',
     top: 50,
@@ -221,7 +226,6 @@ const styles = StyleSheet.create({
     width: '85%',
     marginTop: -50,
     marginBottom: 90,
-    
   },
   menuButton: {
     borderRadius: 16,
@@ -243,7 +247,6 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: '300',
   },
-  // --- ESTILOS DO MODAL DE TEMA (ADICIONADO) ---
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.5)',

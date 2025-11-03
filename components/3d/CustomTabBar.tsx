@@ -47,6 +47,7 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigat
 
   return (
     <View style={styles.container}>
+      {/* Modal permanece inalterado */}
       <Modal
         visible={menuVisible}
         transparent={true}
@@ -115,9 +116,7 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigat
 
             <TouchableOpacity 
               style={styles.menuItem}
-
-
-                onPress={() => supabase.auth.signOut()}
+              onPress={() => supabase.auth.signOut()}
             >
               <SairIcon size={24} color="#1f1f1fff" />
               <Text style={styles.menuText}>Sair</Text>
@@ -128,16 +127,18 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigat
 
       <View style={styles.floatingRectangle}>
         <View style={styles.tabBar}>
+          {/* BOTÃO HOME: Mantém a correção baseada no índice, que funcionou */}
           <TouchableOpacity
             style={styles.tab}
             onPress={() => navigation.navigate('Home2')}
           >
             <HomeIcon 
               size={34} 
-              color={isRouteActive('Home') ? '#1f1f1fff' : '#cfd8dc'}
+              color={state.index === 0 ? '#1f1f1fff' : '#cfd8dc'}
             />
           </TouchableOpacity>
 
+          {/* OUTROS BOTÕES: Restaurados para a lógica original que funcionava */}
           <TouchableOpacity
             style={styles.tab}
             onPress={() => navigation.navigate('Exercicios')}
@@ -183,9 +184,9 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigat
   );
 };
 
-// Estilos
+// Estilos (inalterados)
 const styles = StyleSheet.create({
-  container: {
+    container: {
     backgroundColor: 'transparent',
     position: 'absolute',
     bottom: 0,

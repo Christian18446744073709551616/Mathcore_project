@@ -14,6 +14,7 @@ import { supabase } from '../lib/supabase';
 import { useNavigation } from '@react-navigation/native';
 import { acceptFriendRequest } from '../services/Friendzone';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { LinearGradient } from 'expo-linear-gradient';
 
 interface UserProfile {
   id: string;
@@ -26,6 +27,20 @@ interface Session {
   user: {
     id: string;
   };
+}
+
+// Definição do tipo Theme
+interface Theme {
+  name: string;
+  background: string;
+  card: string;
+  searchBar: string;
+  text: string;
+  textSecondary: string;
+  button: string;
+  buttonPrimary: string;
+  badge: string;
+  modal: string;
 }
 
 // --- DEFINIÇÃO DOS TEMAS ---
@@ -126,7 +141,8 @@ const updateLastActive = async () => {
     .eq('id', session.user.id);
 };
 
-const UserCard = ({
+// Melhoria no componente UserCard com React.memo
+const UserCard = React.memo(({
   user,
   navigation,
   showChatChallenge = false,
@@ -137,7 +153,7 @@ const UserCard = ({
   navigation: any;
   showChatChallenge?: boolean;
   onAccept?: () => void;
-  theme: any;
+  theme: Theme;
 }) => (
   <View style={[styles.friendCard, { backgroundColor: theme.card }]}>
     <View style={styles.friendLeft}>
@@ -145,8 +161,10 @@ const UserCard = ({
       <Text style={[styles.friendName, { color: theme.text }]}>{user.username}</Text>
     </View>
 
+    {/* // --- ALTERAÇÃO PRINCIPAL AQUI --- */}
     {showChatChallenge ? (
       <View style={styles.friendButtons}>
+        {/* Botão de Conversar */}
         <TouchableOpacity
           style={[styles.chatButton, { backgroundColor: theme.button }]}
           onPress={() =>
@@ -160,12 +178,22 @@ const UserCard = ({
           <Text style={styles.btnText}>Conversar</Text>
         </TouchableOpacity>
 
+        {/* Botão de Ver Perfil */}
+        <TouchableOpacity
+          style={[styles.chatButton, { backgroundColor: theme.button }]} // Reutilizando estilo
+          onPress={() => navigation.navigate('FriendDripRoast', { userId: user.id })}
+        >
+          <Ionicons name="person-outline" size={16} color="#fff" />
+          <Text style={styles.btnText}>Perfil</Text>
+        </TouchableOpacity>
       </View>
     ) : onAccept ? (
+      // Botão de Aceitar (lógica inalterada)
       <TouchableOpacity style={[styles.chatButton, { backgroundColor: theme.button }]} onPress={onAccept}>
         <Text style={styles.btnText}>Aceitar</Text>
       </TouchableOpacity>
     ) : (
+      // Botão de Ver Perfil para resultados de busca (lógica inalterada)
       <TouchableOpacity
         style={[styles.chatButton, { backgroundColor: theme.button }]}
         onPress={() => navigation.navigate('FriendDripRoast', { userId: user.id })}
@@ -174,9 +202,17 @@ const UserCard = ({
       </TouchableOpacity>
     )}
   </View>
-);
+));
 
-const FriendsTab = ({ friends, navigation, theme }: { friends: UserProfile[]; navigation: any; theme: any }) => (
+const FriendsTab = React.memo(({ 
+  friends, 
+  navigation, 
+  theme 
+}: { 
+  friends: UserProfile[]; 
+  navigation: any; 
+  theme: Theme; 
+}) => (
   <FlatList
     data={friends}
     keyExtractor={(item) => item.id}
@@ -184,7 +220,7 @@ const FriendsTab = ({ friends, navigation, theme }: { friends: UserProfile[]; na
     renderItem={({ item }) => <UserCard user={item} navigation={navigation} showChatChallenge theme={theme} />}
      showsVerticalScrollIndicator={false}
   />
-);
+));
 
 const Friends = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -274,22 +310,38 @@ const Friends = () => {
 
   const handleSearchUsers = async (query: string) => {
     setSearchQuery(query);
-    if (!session?.user?.id) return;
-    if (!query || query.trim().length === 0) {
+    
+    if (!session?.user?.id || query.trim() === '') {
       setRecentSearches([]);
       setSearchActive(false);
       return;
     }
 
-    const { data } = await supabase
-      .from('profiles')
-      .select('id, username, avatar_url')
-      .ilike('username', `%${query}%`)
-      .neq('id', session.user.id);
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id, username, avatar_url')
+        .ilike('username', `%${query}%`)
+        .neq('id', session.user.id)
+        .limit(10);
 
-    setRecentSearches(data || []);
-    setSearchActive(true);
+      if (error) {
+        console.error('Erro na busca:', error);
+        return;
+      }
+
+      setRecentSearches(data || []);
+      setSearchActive(true);
+    } catch (error) {
+      console.error('Erro na busca:', error);
+    }
   };
+
+  // Otimização com useMemo para o tema atual
+  const currentThemeObject = React.useMemo(() => 
+    themes[currentTheme as keyof typeof themes],
+    [currentTheme]
+  );
 
   useEffect(() => {
     fetchSession();
@@ -306,19 +358,25 @@ const Friends = () => {
   }, [session]);
 
   return (
-    
-    <View style={[styles.container, { backgroundColor: theme.background }]}>
-      <View style={[{ flex: 1, paddingBottom: 90 }, styles.container]}>
-      {/* Botão de tema */}
-      <View style={styles.headerRow}>
-        <Text style={[styles.header, { color: theme.text }]}>Social</Text>
-        <TouchableOpacity 
-          style={styles.themeButton}
-          onPress={() => setShowThemeModal(true)}
-        >
-          <Ionicons name="color-palette" size={24} color={theme.text} />
-        </TouchableOpacity>
-      </View>
+    <View style={{ flex: 1 }}>
+      <LinearGradient
+        colors={['#242948', '#5C6494']}
+        locations={[0.65, 0.30]}
+        start={{ x: 1, y: 1 }}
+        end={{ x: 0.85, y: 0.4 }}
+        style={{ flex: 1 }}
+      >
+        <View style={[{ flex: 1, paddingBottom: 90 }, styles.container]}>
+       {/* Botão de tema */}
+       <View style={styles.headerRow}>
+         <Text style={[styles.header, { color: theme.text }]}>Social</Text>
+         <TouchableOpacity 
+           style={styles.themeButton}
+           onPress={() => setShowThemeModal(true)}
+         >
+           <Ionicons name="color-palette" size={24} color={theme.text} />
+         </TouchableOpacity>
+       </View>
 
       <View style={[styles.searchContainer, { backgroundColor: theme.searchBar }]}>
         <Ionicons name="search" size={20} color={theme.text} style={{ marginLeft: 10 }} />
@@ -431,6 +489,7 @@ const Friends = () => {
         </TouchableOpacity>
       </Modal>
     </View>
+      </LinearGradient>
     </View>
   );
 };
@@ -477,7 +536,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     marginLeft: 5,
   },
-  challengeButton: {
+  challengeButton: { // Este estilo não é mais usado na lógica principal, mas mantido para não quebrar outras partes
     flexDirection: 'row',
     alignItems: 'center',
     borderRadius: 20,

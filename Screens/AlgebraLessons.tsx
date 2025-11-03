@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 30 },
   headerTitle: { fontSize: 36, fontWeight: 'bold', color: '#fff' },
   backButton: { backgroundColor: 'rgba(255,255,255,0.2)', borderRadius: 50, padding: 5 },
-  subtitle: { fontSize: 20, color: '#CFCFCF', marginBottom: 20 },
+  subtitle: { fontSize: 20, color: '#ffffffff', marginBottom: 20 },
   accordionContainer: { borderRadius: 25, overflow: 'hidden', marginBottom: 20 },
   accordionHeader: {
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',

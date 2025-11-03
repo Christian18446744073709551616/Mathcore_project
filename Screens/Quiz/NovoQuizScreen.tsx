@@ -687,7 +687,7 @@ const QuizCreatorScreen = () => {
                   <TextInput
                     style={styles.inputTitle}
                     placeholder="Nome do Quiz"
-                    placeholderTextColor="#787878"
+                    placeholderTextColor="rgba(255, 255, 255, 0.5)"
                     value={quizTitle}
                     onChangeText={setQuizTitle}
                   />
