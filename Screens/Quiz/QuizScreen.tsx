@@ -226,6 +226,24 @@ const QuizScreen = () => {
           <View style={styles.headerRow}>
             <Text style={[styles.title, { color: theme.title }]}>Quiz</Text>
           </View>
+
+          {/* 🆕 NOVO: Botão para escanear QR Code */}
+          <TouchableOpacity 
+            style={[
+              styles.scanQRButton,
+              { 
+                backgroundColor: theme.button,
+                borderColor: theme.buttonBorder,
+              }
+            ]}
+            onPress={() => (navigation as any).navigate('QRScanner')}
+          >
+            <Ionicons name="qr-code-outline" size={32} color={theme.buttonText} />
+            <Text style={[styles.scanQRButtonText, { color: theme.buttonText }]}>
+              📷 Escanear QR Code
+            </Text>
+          </TouchableOpacity>
+
           <View style={styles.bottomContainer}>
             <View style={[styles.expandingRectangle, { backgroundColor: theme.container }]}>
               <FlatList
@@ -356,6 +374,22 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 50,
+    fontWeight: 'bold',
+  },
+  // 🆕 NOVO: Estilos do botão de escanear QR
+  scanQRButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+    borderRadius: 12,
+    borderWidth: 2,
+    marginBottom: 20,
+    gap: 12,
+  },
+  scanQRButtonText: {
+    fontSize: 18,
     fontWeight: 'bold',
   },
   bottomContainer: {

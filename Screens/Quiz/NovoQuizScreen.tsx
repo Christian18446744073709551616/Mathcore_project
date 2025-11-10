@@ -8,6 +8,7 @@ import FriendInvitePopup from '../../components/FriendInvitePopup';
 import { createQuiz, updateQuiz, deleteQuiz } from '../../services/QuizService';
 import QRCode from 'react-native-qrcode-svg';
 import * as Clipboard from 'expo-clipboard';
+import { generateQRCodeContent } from '../../utils/qrCodeUtils'; // 🆕 NOVO IMPORT
 
 // --- ESTRUTURA DE DADOS ---
 interface QuizOption { id: string; text: string; }
@@ -149,7 +150,6 @@ const QuizCreatorScreen = () => {
     }
   };
 
-  // ✅ CORRIGIDO - Funciona na web
   const handleDeleteQuestion = () => {
     console.log('🗑️ handleDeleteQuestion chamado');
     
@@ -162,7 +162,6 @@ const QuizCreatorScreen = () => {
       return;
     }
 
-    // Para web, usa window.confirm
     if (Platform.OS === 'web') {
       const confirmar = window.confirm(`Tem certeza de que deseja excluir a questão ${activeQuestionId}?`);
       
@@ -188,7 +187,6 @@ const QuizCreatorScreen = () => {
         return remainingQuestions;
       });
     } else {
-      // Para mobile, usa Alert.alert
       Alert.alert(
         'Excluir Questão',
         `Tem certeza de que deseja excluir a questão ${activeQuestionId}?`,
@@ -219,13 +217,11 @@ const QuizCreatorScreen = () => {
     }
   };
 
-  // ✅ CORRIGIDO - Funciona na web
   const handleDeleteQuiz = async () => {
     console.log('🗑️ handleDeleteQuiz chamado');
     console.log('   quizId:', quizId);
     console.log('   quizTitle:', quizTitle);
 
-    // Para web, usa window.confirm
     if (Platform.OS === 'web') {
       const confirmar = window.confirm(`Tem certeza de que deseja excluir o quiz "${quizTitle}" permanentemente?`);
       
@@ -254,7 +250,6 @@ const QuizCreatorScreen = () => {
         navigation.goBack();
       }
     } else {
-      // Para mobile, usa Alert.alert
       Alert.alert(
         'Excluir Quiz',
         `Tem certeza de que deseja excluir o quiz "${quizTitle}" permanentemente?`,
@@ -312,7 +307,6 @@ const QuizCreatorScreen = () => {
     setQuestions(prev => prev.map(q => q.id === questionId ? { ...q, correctOptionId: correctId } : q));
   };
 
-  // ✅ CORRIGIDO COM LOGS DETALHADOS
   const handleInviteFriend = async (friendId: string) => {
     console.log('👥 handleInviteFriend chamado para friendId:', friendId);
 
@@ -336,7 +330,6 @@ const QuizCreatorScreen = () => {
 
     let currentQuizId = quizId;
     
-    // Se o quiz ainda não foi salvo, salva primeiro
     if (!currentQuizId) {
       console.log('💾 Quiz não salvo, salvando primeiro...');
       const newQuiz = await createQuiz(session.user.id, quizTitle, questions);
@@ -357,7 +350,6 @@ const QuizCreatorScreen = () => {
     try {
       console.log('📤 Criando quiz_match...');
       
-      // Criar partida de quiz
       const { data: matchData, error: matchError } = await supabase
         .from('quiz_matches')
         .insert({
@@ -376,7 +368,6 @@ const QuizCreatorScreen = () => {
 
       console.log('✅ Match criado:', matchData);
 
-      // Adicionar host como participante
       console.log('📤 Adicionando host como participante...');
       const { error: participantError } = await supabase
         .from('quiz_participants')
@@ -393,7 +384,6 @@ const QuizCreatorScreen = () => {
 
       console.log('✅ Host adicionado como participante');
 
-      // Preparar dados do convite
       const inviteData = {
         quiz_id: currentQuizId,
         quiz_title: quizTitle,
@@ -405,7 +395,6 @@ const QuizCreatorScreen = () => {
       console.log('   receiver_id:', friendId);
       console.log('   inviteData:', inviteData);
 
-      // Enviar convite via messages
       const { data: messageData, error: messageError } = await supabase
         .from('messages')
         .insert({
@@ -431,7 +420,6 @@ const QuizCreatorScreen = () => {
       
       setIsInvitePopupVisible(false);
       
-      // Navegar para sala de espera
       (navigation as any).navigate('QuizWaitingRoom', {
         matchId: matchData.id,
         quizId: currentQuizId,
@@ -477,6 +465,7 @@ const QuizCreatorScreen = () => {
 
   const activeQuestion = questions.find(q => q.id === activeQuestionId);
 
+  // 🆕 MODIFICADO: Função para abrir modal de QR com URL real
   const handleOpenQrModal = async () => {
     if (!session?.user?.id) {
       if (Platform.OS === 'web') alert('Você precisa estar logado para gerar QR.');
@@ -484,7 +473,12 @@ const QuizCreatorScreen = () => {
       return;
     }
 
-    // garante quiz salvo
+    if (!quizTitle.trim()) {
+      if (Platform.OS === 'web') alert('Por favor, dê um nome ao seu quiz antes de gerar o QR.');
+      else Alert.alert('Atenção', 'Por favor, dê um nome ao seu quiz antes de gerar o QR.');
+      return;
+    }
+
     let currentQuizId = quizId;
     if (!currentQuizId) {
       const newQuiz = await createQuiz(session.user.id, quizTitle, questions);
@@ -499,8 +493,6 @@ const QuizCreatorScreen = () => {
     }
 
     try {
-      // cria match caso ainda não exista (reaproveita se já tiver)
-      // obs: evitamos criar duplicados criando sempre um novo match para o QR
       const { data: matchData, error: matchError } = await supabase
         .from('quiz_matches')
         .insert({
@@ -512,12 +504,11 @@ const QuizCreatorScreen = () => {
         .select()
         .single();
 
-      if (matchError || !matchData) {
+      if (matchError) {
         console.error('Erro ao criar match para QR:', matchError);
-        throw matchError || new Error('No match data');
+        throw matchError;
       }
 
-      // garante que o host esteja na tabela de participantes
       const { error: participantError } = await supabase
         .from('quiz_participants')
         .upsert({
@@ -527,20 +518,33 @@ const QuizCreatorScreen = () => {
         }, { onConflict: ['match_id', 'user_id'] });
 
       if (participantError) {
-        console.error('Erro ao adicionar host aos participantes (QR):', participantError);
+        console.error('Erro ao adicionar host aos participantes:', participantError);
       }
 
-      const payloadObj = {
+      // ✅ CORREÇÃO PRINCIPAL: Gera URL ao invés de JSON
+      const qrUrl = generateQRCodeContent({
         type: 'quiz_invite',
         matchId: matchData.id,
         quizId: currentQuizId,
-        quizTitle,
-      };
-      const payloadStr = JSON.stringify(payloadObj);
+        quizTitle: quizTitle,
+      });
+
+      console.log('✅ QR Code URL gerada:', qrUrl);
 
       setQrModalMatchId(matchData.id);
-      setQrPayload(payloadStr);
+      setQrPayload(qrUrl);
       setQrModalVisible(true);
+
+      // 🆕 Redireciona automaticamente para WaitingRoom após gerar QR
+      setTimeout(() => {
+        (navigation as any).navigate('QuizWaitingRoom', {
+          matchId: matchData.id,
+          quizId: currentQuizId,
+          quizTitle: quizTitle,
+          quizData: { id: currentQuizId, title: quizTitle, questions },
+        });
+      }, 500);
+
     } catch (err) {
       console.error('Erro ao gerar QR:', err);
       if (Platform.OS === 'web') alert('Erro ao gerar QR.');
@@ -548,12 +552,12 @@ const QuizCreatorScreen = () => {
     }
   };
 
-  // funçao para copiar payload/ link
+  // 🆕 MODIFICADO: Texto atualizado
   const handleCopyQrText = async () => {
     if (!qrPayload) return;
     await Clipboard.setStringAsync(qrPayload);
-    if (Platform.OS === 'web') alert('QR payload copiado');
-    else Alert.alert('Copiado', 'QR payload copiado para a área de transferência.');
+    if (Platform.OS === 'web') alert('Link copiado! Cole no navegador para entrar na sala.');
+    else Alert.alert('Link Copiado', 'Cole o link no navegador para entrar na sala do quiz.');
   };
 
   return (
@@ -603,6 +607,7 @@ const QuizCreatorScreen = () => {
           onInvite={handleInviteFriend}
         />
 
+        {/* 🆕 MODIFICADO: Modal de QR com textos atualizados */}
         <Modal
           transparent={true}
           visible={isQrModalVisible}
@@ -614,13 +619,18 @@ const QuizCreatorScreen = () => {
               <TouchableOpacity style={styles.closeModalButton} onPress={() => setQrModalVisible(false)}>
                 <Ionicons name="close-circle" size={30} color="#333" />
               </TouchableOpacity>
-              <Text style={styles.modalTitle}>Código QR do Quiz</Text>
+              <Text style={styles.modalTitle}>Compartilhe com seus amigos!</Text>
               {qrPayload ? (
                 <>
                   <QRCode value={qrPayload} size={220} />
-                  <Text style={{ marginTop: 12, textAlign: 'center' }}>{quizTitle}</Text>
+                  <Text style={{ marginTop: 12, fontSize: 16, fontWeight: 'bold', textAlign: 'center' }}>
+                    {quizTitle}
+                  </Text>
+                  <Text style={{ marginTop: 8, fontSize: 12, color: '#666', textAlign: 'center' }}>
+                    Escaneie o QR Code ou copie o link abaixo
+                  </Text>
                   <TouchableOpacity style={[styles.playButton, { marginTop: 12 }]} onPress={handleCopyQrText}>
-                    <Text style={styles.playButtonText}>Copiar código</Text>
+                    <Text style={styles.playButtonText}>📋 Copiar Link</Text>
                   </TouchableOpacity>
                 </>
               ) : (

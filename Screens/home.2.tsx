@@ -10,53 +10,53 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Home'>;
 
-// Definição dos temas
+// --- TEMAS ATUALIZADOS (gradient ao invés de background) ---
 const themes = {
   padrao: {
     name: 'Padrão',
-    background: '#0F172A',
+    gradient: ['#0F172A', '#1E293B'],
     text: '#FFFFFF',
     textSecondary: '#94A3B8',
     boxes: ['#731dca', '#4b843d', '#5c1dcb', '#2c3c92'],
   },
   roxo: {
     name: 'Roxo',
-    background: '#1d2033',
+    gradient: ['#1d2033', '#30345a'],
     text: '#FFFFFF',
     textSecondary: '#B4B7D6',
     boxes: ['#8B5CF6', '#9333EA', '#7C3AED', '#6D28D9'],
   },
   azulClaro: {
     name: 'Azul Claro',
-    background: '#5b6b85',
+    gradient: ['#5b6b85', '#93a5c5'],
     text: '#1e293b',
     textSecondary: '#475569',
     boxes: ['#3B82F6', '#06B6D4', '#0EA5E9', '#2563EB'],
   },
   altoContraste: {
     name: 'Alto Contraste',
-    background: '#000000',
+    gradient: ['#000000', '#1A1A1A'],
     text: '#FFFFFF',
     textSecondary: '#CCCCCC',
     boxes: ['#FFFF00', '#00FF00', '#FF00FF', '#00FFFF'],
   },
   deuteranopia: {
     name: 'Deuteranopia',
-    background: '#faf9f7',
+    gradient: ['#faf9f7', '#E8E6E0'],
     text: '#2c2c2c',
     textSecondary: '#666666',
     boxes: ['#0077b6', '#9d4edd', '#ff9500', '#0466c8'],
   },
   protanopia: {
     name: 'Protanopia',
-    background: '#f8f9fa',
+    gradient: ['#f8f9fa', '#D9DCE0'],
     text: '#212529',
     textSecondary: '#6c757d',
     boxes: ['#0466c8', '#7209b7', '#fb8500', '#0353a4'],
   },
   tritanopia: {
     name: 'Tritanopia',
-    background: '#fefefe',
+    gradient: ['#fefefe', '#F0F0F0'],
     text: '#1e1e1e',
     textSecondary: '#666666',
     boxes: ['#e63946', '#06ffa5', '#ff006e', '#d62828'],
@@ -84,7 +84,6 @@ const Home2Screen = () => {
     };
     fetchUsername();
 
-    // Carregar tema salvo
     const loadTheme = async () => {
       try {
         const savedTheme = await AsyncStorage.getItem('home_theme');
@@ -113,8 +112,9 @@ const Home2Screen = () => {
 
   return (
     <View style={{ flex: 1 }}>
+      {/* --- CORREÇÃO PRINCIPAL: Usando theme.gradient --- */}
       <LinearGradient
-        colors={['#242948', '#5C6494']}
+        colors={theme.gradient}
         locations={[0.65, 0.30]} 
         start={{ x: 1, y: 1 }}
         end={{ x: 0.85, y: 0.4 }}
@@ -135,7 +135,8 @@ const Home2Screen = () => {
             </TouchableOpacity>
           </View>
 
-          <Text style={[styles.prompt, { color: '#FFFFFF' }]}>
+          {/* Corrigido: usando theme.textSecondary */}
+          <Text style={[styles.prompt, { color: theme.textSecondary }]}>
             O que vamos aprender hoje, {username}?
           </Text>
 
@@ -230,7 +231,8 @@ const Home2Screen = () => {
             activeOpacity={1}
             onPress={() => setShowThemeModal(false)}
           >
-            <View style={[styles.modalContent, { backgroundColor: theme.background }]}>
+            {/* Corrigido: usando theme.gradient[0] */}
+            <View style={[styles.modalContent, { backgroundColor: theme.gradient[0] }]}>
               <Text style={[styles.modalTitle, { color: theme.text }]}>Escolha um Tema</Text>
 
               <ScrollView style={styles.themeList}>
@@ -240,7 +242,7 @@ const Home2Screen = () => {
                     style={[
                       styles.themeOption,
                       {
-                        backgroundColor: themeOption.background,
+                        backgroundColor: themeOption.gradient[0],
                         borderColor: currentTheme === key ? '#219d40' : 'transparent',
                       }
                     ]}
@@ -294,7 +296,6 @@ const styles = StyleSheet.create({
     width: '100%',
     marginBottom: 10,
   },
-
   title: {
     fontSize: 32,
     fontWeight: 'bold',
