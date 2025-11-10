@@ -179,6 +179,21 @@ const LessonScreen: React.FC<LessonScreenProps> = ({ route }) => {
     getSession();
   }, []);
 
+  useEffect(() => {
+    const markLessonViewed = async () => {
+      if (session?.user) {
+        const { error } = await supabase
+          .from('user_progress')
+          .upsert({
+            user_id: session.user.id,
+            lesson_title: lessonTitle,
+          });
+        if (error) console.log('Error marking lesson viewed:', error);
+      }
+    };
+    if (lessonData) markLessonViewed();
+  }, [session, lessonTitle, lessonData]);
+
   if (!lessonData) {
     return (
       <View style={styles.loadingContainer}>

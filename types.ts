@@ -22,7 +22,7 @@ export interface Quiz {
 }
 
 export type RootStackParamList = {
-  Home: undefined;
+  Home2: undefined;
   Ultramenu: { lessonTitle: string };
   Settings: { session: any };
   Friends: { session: any };
@@ -31,12 +31,18 @@ export type RootStackParamList = {
   Lesson: { lessonTitle: string; session: any; currentIndex: number };
   Lobby: { lessonTitle: string; lobbyId: string; session: any };
   GameScreen: { lobbyId: string; lessonTitle: string; session: any };
-  
+
+  // Lesson screens
+  GeometryLessons: undefined;
+  MathFincLessons: undefined;
+  MathBasicLessons: undefined;
+  AlgebraLessons: undefined;
+
   // ===== NOVAS ROTAS PARA QUIZ =====
   QuizScreen: { session: any; type?: string; quizId?: string; quiz?: Quiz };
   NovoQuizScreen: { session: any; quizToEdit?: Quiz | null };
-  GameQuizScreen: { 
-    quizData: Quiz; 
+  GameQuizScreen: {
+    quizData: Quiz;
     mode?: 'solo' | 'multiplayer';
     matchId?: string;
   };

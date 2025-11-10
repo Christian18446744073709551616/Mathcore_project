@@ -8,7 +8,7 @@ import { AntDesign, Entypo, FontAwesome5, Ionicons, MaterialCommunityIcons } fro
 import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Home'>;
+type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Home2'>;
 
 // --- TEMAS ATUALIZADOS (gradient ao invés de background) ---
 const themes = {
@@ -68,7 +68,41 @@ const Home2Screen = () => {
   const [username, setUsername] = useState('');
   const [currentTheme, setCurrentTheme] = useState('padrao');
   const [showThemeModal, setShowThemeModal] = useState(false);
+  const [progress, setProgress] = useState({
+    Geometria: 0,
+    'Matemática Básica': 0,
+    'Matemática Financeira': 0,
+    Álgebra: 0,
+  });
   const { width } = useWindowDimensions();
+
+  // Define lessons per subject
+  const subjects = {
+    Geometria: ['Quadrados', 'Triângulos', 'Retângulos', 'Losangos', 'Trapézios', 'Paralelogramos', 'Hexágonos', 'Ângulos', 'Polígonos'],
+    'Matemática Básica': ['Adição e Subtração', 'Multiplicação e Divisão', 'Expressões Numéricas', 'Frações', 'Sistema de Numeração Decimal', 'Sistema Métrico Decimal', 'MDC', 'MMC'],
+    'Matemática Financeira': ['Noções Básicas', 'Gráfico de Barras', 'Gráfico de Setores', 'Média, Moda e Mediana', 'Conceitos Básicos de Probabilidade', 'Cálculos de Probabilidade', 'Árvore de Probabilidades'],
+    Álgebra: ['Noções da função', 'Introdução da Função Afim'],
+  };
+
+  const fetchProgress = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      const { data, error } = await supabase
+        .from('user_progress')
+        .select('lesson_title')
+        .eq('user_id', user.id);
+      if (!error && data) {
+        const viewedLessons = data.map(item => item.lesson_title);
+        const newProgress = { ...progress };
+        Object.keys(subjects).forEach(subject => {
+          const totalLessons = subjects[subject as keyof typeof subjects].length;
+          const viewedCount = subjects[subject as keyof typeof subjects].filter(lesson => viewedLessons.includes(lesson)).length;
+          newProgress[subject as keyof typeof newProgress] = Math.round((viewedCount / totalLessons) * 100);
+        });
+        setProgress(newProgress);
+      }
+    }
+  };
 
   useEffect(() => {
     const fetchUsername = async () => {
@@ -95,7 +129,16 @@ const Home2Screen = () => {
       }
     };
     loadTheme();
+
+    fetchProgress();
   }, []);
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      fetchProgress();
+    });
+    return unsubscribe;
+  }, [navigation]);
 
   const changeTheme = async (themeKey: string) => {
     setCurrentTheme(themeKey);
@@ -151,12 +194,12 @@ const Home2Screen = () => {
               <View style={styles.progress}>
                 <LinearGradient
                   colors={['#219d40', '#FFFFFF']}
-                  locations={[0.25, 0.01]}
+                  locations={[progress.Geometria / 100, 0.01]}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 0 }}
                   style={StyleSheet.absoluteFill}
                 />
-                <Text style={styles.progressText}>25%</Text>
+                <Text style={styles.progressText}>{progress.Geometria}%</Text>
               </View>
             </TouchableOpacity>
 
@@ -170,12 +213,12 @@ const Home2Screen = () => {
               <View style={styles.progress}>
                 <LinearGradient
                   colors={['#219d40', '#FFFFFF']}
-                  locations={[1, 0.01]}
+                  locations={[progress['Matemática Financeira'] / 100, 0.01]}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 0 }}
                   style={StyleSheet.absoluteFill}
                 />
-                <Text style={styles.progressText}>100%</Text>
+                <Text style={styles.progressText}>{progress['Matemática Financeira']}%</Text>
               </View>
             </TouchableOpacity>
 
@@ -189,12 +232,12 @@ const Home2Screen = () => {
               <View style={styles.progress}>
                 <LinearGradient
                   colors={['#219d40', '#FFFFFF']}
-                  locations={[0.37, 0.01]}
+                  locations={[progress['Matemática Básica'] / 100, 0.01]}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 0 }}
                   style={StyleSheet.absoluteFill}
                 />
-                <Text style={styles.progressText}>37%</Text>
+                <Text style={styles.progressText}>{progress['Matemática Básica']}%</Text>
               </View>
             </TouchableOpacity>
 
@@ -208,12 +251,12 @@ const Home2Screen = () => {
               <View style={styles.progress}>
                 <LinearGradient
                   colors={['#219d40', '#FFFFFF']}
-                  locations={[0, 0.01]}
+                  locations={[progress.Álgebra / 100, 0.01]}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 0 }}
                   style={StyleSheet.absoluteFill}
                 />
-                <Text style={styles.progressText}>0%</Text>
+                <Text style={styles.progressText}>{progress.Álgebra}%</Text>
               </View>
             </TouchableOpacity>
           </View>
