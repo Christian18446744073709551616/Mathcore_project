@@ -170,7 +170,6 @@ const Account: React.FC<{ navigation: any }> = ({ navigation }) => {
       getProfile();
       getAllUsers();
       getFriendCount();
-      getProgress();
     }
   }, [session]);
 
@@ -258,30 +257,6 @@ const Account: React.FC<{ navigation: any }> = ({ navigation }) => {
     }
   };
 
-  async function getProgress() {
-    try {
-      const { data, error } = await supabase
-        .from('user_progress')
-        .select('lesson_title, progress_percentage')
-        .eq('user_id', session?.user.id);
-
-      if (error) {
-        console.error('Erro ao obter progresso:', error);
-        return;
-      }
-
-      if (data) {
-        setProgressData(
-          data.map((item) => ({
-            lessonTitle: item.lesson_title,
-            progressPercentage: item.progress_percentage,
-          }))
-        );
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  }
 
 
   return (
