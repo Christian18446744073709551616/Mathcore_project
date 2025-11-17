@@ -13,12 +13,40 @@ const themes = {
     text: '#ddddddff',
     primary: '#3B82F6',
   },
-  roxo: {
-    name: 'Roxo',
-    gradient: ['#1d2033', '#30345a'], // Antes era background: '#1d2033'
-    card: '#30345a',
+  altoContraste: {
+    name: 'Alto Contraste',
+    gradient: ['#000000', '#1a1a1a'], // Antes era background: '#000000'
+    card: '#2a2a2a',
     text: '#FFFFFF',
-    primary: '#8B5CF6',
+    primary: '#FFFF00',
+  },
+  Vermelho: {
+    name: 'Vermelho',
+    gradient: ['#482424ff', '#945c5cff'], // Antes era background: '#2E2F47'
+    card: '#704a4aff',
+    text: '#ddddddff',
+    primary: '#f63b3bff',
+  },
+  Laranja: {
+    name: 'Laranja',
+    gradient: ['#483724ff', '#94805cff'], // Antes era background: '#2E2F47'
+    card: '#70644aff',
+    text: '#ddddddff',
+    primary: '#f6ab3bff',
+  },
+  Amarelo: {
+    name: 'Amarelo',
+    gradient: ['#464824ff', '#93945cff'], // Antes era background: '#2E2F47'
+    card: '#6a704aff',
+    text: '#ddddddff',
+    primary: '#e3f63bff',
+  },
+  Verde: {
+    name: 'Verde',
+    gradient: ['#274824ff', '#5c945fff'], // Antes era background: '#2E2F47'
+    card: '#4a704cff',
+    text: '#ddddddff',
+    primary: '#4bf63bffff',
   },
   azulClaro: {
     name: 'Azul Claro',
@@ -27,33 +55,26 @@ const themes = {
     text: '#1e293b',
     primary: '#0EA5E9',
   },
-  altoContraste: {
-    name: 'Alto Contraste',
-    gradient: ['#000000', '#1a1a1a'], // Antes era background: '#000000'
-    card: '#2a2a2a',
-    text: '#FFFFFF',
-    primary: '#FFFF00',
+  azulEscuro: {
+    name: 'Azul Escuro',
+    gradient: ['#444dbeff', '#223a88ff'], // Antes era background: '#93a5c5'
+    card: '#1e4dbbff',
+    text: '#ffffffff',
+    primary: '#1d0ee9ff',
   },
-  deuteranopia: {
-    name: 'Deuteranopia',
-    gradient: ['#d0cec8', '#e8e6e0'], // Antes era background: '#e8e6e0'
-    card: '#0077b6',
+  roxo: {
+    name: 'Roxo',
+    gradient: ['#50265fff', '#753e7cff'], // Antes era background: '#1d2033'
+    card: '#8627acff',
     text: '#FFFFFF',
-    primary: '#0096c7',
+    primary: '#dc5cf6ff',
   },
-  protanopia: {
-    name: 'Protanopia',
-    gradient: ['#c1c4c8', '#d9dce0'], // Antes era background: '#d9dce0'
-    card: '#0466c8',
+  ciano: {
+    name: 'Ciano',
+    gradient: ['#808080', '#A9A9A9'], // Antes era background: '#1d2033'
+    card: '#313131ff',
     text: '#FFFFFF',
-    primary: '#0353a4',
-  },
-  tritanopia: {
-    name: 'Tritanopia',
-    gradient: ['#d8d8d8', '#f0f0f0'], // Antes era background: '#f0f0f0'
-    card: '#e63946',
-    text: '#1e1e1e',
-    primary: '#d62828',
+    primary: '#bbbbbbff',
   },
 }
 

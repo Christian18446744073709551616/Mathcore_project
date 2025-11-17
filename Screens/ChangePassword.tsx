@@ -30,15 +30,55 @@ const themes = {
         primary: '#48BB78',
         border: '#e5e7eb',
     },
-    roxo: {
-        name: 'Roxo',
-        gradient: ['#1d2033', '#30345a'], // Antes era background: '#1d2033'
-        card: '#30345a',
+    altoContraste: {
+        name: 'Alto Contraste',
+        gradient: ['#000000', '#1a1a1a'], // Antes era background: '#000000'
+        card: '#2a2a2a',
         text: '#FFFFFF',
-        textSecondary: '#a0a0a0',
-        inputBackground: '#1a1d35',
-        primary: '#8B5CF6',
-        border: '#4a4e7a',
+        textSecondary: '#CCCCCC',
+        inputBackground: '#1a1a1a',
+        primary: '#FFFF00',
+        border: '#FFFFFF',
+    },
+    Vermelho: {
+        name: 'Vermelho',
+        gradient: ['#542d2dff', '#6e4040ff'], // Antes era background: '#40466e'
+        card: '#bb8585ff',
+        text: '#000000ff',
+        textSecondary: '#666666',
+        inputBackground: '#fff5f5ff',
+        primary: '#bb4848ff',
+        border: '#ebe5e5ff',
+    },
+    Laranja: {
+        name: 'Laranja',
+        gradient: ['#54422dff', '#6e5840ff'], // Antes era background: '#40466e'
+        card: '#bba485ff',
+        text: '#000000ff',
+        textSecondary: '#666666',
+        inputBackground: '#f5f7ff',
+        primary: '#bb8548ff',
+        border: '#ebe8e5ff',
+    },
+    Amarelo: {
+        name: 'Amarelo',
+        gradient: ['#54532dff', '#6e6d40ff'], // Antes era background: '#40466e'
+        card: '#bbba85ff',
+        text: '#000000ff',
+        textSecondary: '#666666',
+        inputBackground: '#f5f7ff',
+        primary: '#bbaf48ff',
+        border: '#e5e7eb',
+    },
+    Verde: {
+        name: 'Verde',
+        gradient: ['#2d542fff', '#4b6e40ff'], // Antes era background: '#40466e'
+        card: '#85bb91ff',
+        text: '#000000ff',
+        textSecondary: '#666666',
+        inputBackground: '#f5f7ff',
+        primary: '#48BB78',
+        border: '#e5e7eb',
     },
     azulClaro: {
         name: 'Azul Claro',
@@ -50,45 +90,35 @@ const themes = {
         primary: '#3B82F6',
         border: '#cbd5e1',
     },
-    altoContraste: {
-        name: 'Alto Contraste',
-        gradient: ['#000000', '#1a1a1a'], // Antes era background: '#000000'
-        card: '#2a2a2a',
+    azulEscuro: {
+        name: 'Azul Escuro',
+        gradient: ['#233283ff', '#17226dff'], // Antes era background: '#40466e'
+        card: '#6679e7ff',
+        text: '#000000ff',
+        textSecondary: '#666666',
+        inputBackground: '#f5f7ff',
+        primary: '#4850bbff',
+        border: '#e5e7eb',
+    },
+    roxo: {
+        name: 'Roxo',
+        gradient: ['#2f1d33ff', '#55305aff'], // Antes era background: '#1d2033'
+        card: '#823da1ff',
         text: '#FFFFFF',
-        textSecondary: '#CCCCCC',
-        inputBackground: '#1a1a1a',
-        primary: '#FFFF00',
-        border: '#FFFFFF',
+        textSecondary: '#a0a0a0',
+        inputBackground: '#5d2f72ff',
+        primary: '#ca5cf6ff',
+        border: '#6f4a7aff',
     },
-    deuteranopia: {
-        name: 'Deuteranopia',
-        gradient: ['#d0cec8', '#e8e6e0'], // Antes era background: '#e8e6e0'
-        card: '#0077b6',
-        text: '#2c2c2c',
-        textSecondary: '#5a5a5a',
-        inputBackground: '#ffffff',
-        primary: '#0096c7',
-        border: '#90e0ef',
-    },
-    protanopia: {
-        name: 'Protanopia',
-        gradient: ['#c1c4c8', '#d9dce0'], // Antes era background: '#d9dce0'
-        card: '#0466c8',
-        text: '#212529',
-        textSecondary: '#495057',
-        inputBackground: '#ffffff',
-        primary: '#0353a4',
-        border: '#90e0ef',
-    },
-    tritanopia: {
-        name: 'Tritanopia',
-        gradient: ['#d8d8d8', '#f0f0f0'], // Antes era background: '#f0f0f0'
-        card: '#e63946',
-        text: '#1e1e1e',
-        textSecondary: '#4a4a4a',
-        inputBackground: '#ffffff',
-        primary: '#d62828',
-        border: '#f77f00',
+    cinza: {
+        name: 'Cinza',
+        gradient: ['#808080', '#A9A9A9'], // Antes era background: '#40466e'
+        card: '#8d8d8dff',
+        text: '#000000ff',
+        textSecondary: '#666666',
+        inputBackground: '#f5f7ff',
+        primary: '#383838ff',
+        border: '#e5e7eb',
     },
 }
 
