@@ -57,20 +57,6 @@ export default function AICreateFlashcardScreen() {
     setFavoriteCards(favs ? JSON.parse(favs) : [])
   }
 
-  const toggleFavorite = async () => {
-    if (!flashcard) return
-    const id = flashcard.front
-    let updated: string[]
-    if (favoriteCards.includes(id)) {
-      updated = favoriteCards.filter((f) => f !== id)
-    } else {
-      updated = [...favoriteCards, id]
-    }
-    setFavoriteCards(updated)
-    await AsyncStorage.setItem('favoriteFlashcards', JSON.stringify(updated))
-    Alert.alert('⭐ Favorito', favoriteCards.includes(id) ? 'Removido dos favoritos' : 'Adicionado aos favoritos')
-  }
-
   const fadeIn = () => {
     Animated.timing(fadeAnim, {
       toValue: 1,
@@ -314,43 +300,24 @@ Diretrizes:
                 <Feather name="copy" size={18} color="#FFF" />
                 <Text style={styles.smallButtonText}>Copiar</Text>
               </TouchableOpacity>
-
-              <TouchableOpacity style={styles.smallButton} onPress={toggleFavorite}>
-                <Feather
-                  name={favoriteCards.includes(flashcard.front) ? 'star' : 'star'}
-                  size={18}
-                  color={favoriteCards.includes(flashcard.front) ? '#FFD700' : '#FFF'}
-                />
-                <Text style={styles.smallButtonText}>
-                  {favoriteCards.includes(flashcard.front) ? 'Favorito' : 'Favoritar'}
-                </Text>
-              </TouchableOpacity>
-            
-              
             </View>
-
-            
-            
-
           </Animated.View>
-          
         )}
-          <View>
-                   <TouchableOpacity
-              style={[styles.saveButton, saving && { opacity: 0.7 }]}
-              onPress={handleSaveFlashcard}
-              disabled={saving}
-            >
-              {saving ? (
-                <ActivityIndicator color="#FFF" />
-              ) : (
-                <>
-                  <Feather name="save" size={20} color="#FFF" />
-                  <Text style={styles.saveText}>Salvar Flashcard</Text>
-                </>
-              )}
-            </TouchableOpacity>
-              </View>
+
+        <TouchableOpacity
+          style={[styles.saveButton, saving && { opacity: 0.7 }]}
+          onPress={handleSaveFlashcard}
+          disabled={saving}
+        >
+          {saving ? (
+            <ActivityIndicator color="#FFF" />
+          ) : (
+            <>
+              <Feather name="save" size={20} color="#FFF" />
+              <Text style={styles.saveText}>Salvar Flashcard</Text>
+            </>
+          )}
+        </TouchableOpacity>
         
          </ScrollView>
         
