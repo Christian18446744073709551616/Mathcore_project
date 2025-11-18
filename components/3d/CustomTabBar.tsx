@@ -64,7 +64,7 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigat
               style={styles.menuItem}
               onPress={() => handleMenuNavigation('Settings')}
             >
-              <PersonIcon size={24} color="#1f1f1fff" />
+              <PersonIcon size={24} color="#cfd8dc" />
               <Text style={styles.menuText}>Perfil</Text>
             </TouchableOpacity> 
 
@@ -74,7 +74,7 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigat
               style={styles.menuItem}
               onPress={() => handleMenuNavigation('Exercicios')}
             >
-              <ExerciciosIcon size={24} color="#1f1f1fff" />
+              <ExerciciosIcon size={24} color="#cfd8dc" />
               <Text style={styles.menuText}>Exercícios</Text>
             </TouchableOpacity>   
 
@@ -82,7 +82,7 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigat
               style={styles.menuItem}
               onPress={() => handleMenuNavigation('Quiz')}
             >
-              <QuizIconSecundario size={24} color="#1f1f1fff" />
+              <QuizIconSecundario size={24} color="#cfd8dc" />
               <Text style={styles.menuText}>Quiz</Text>
             </TouchableOpacity>          
             
@@ -92,7 +92,7 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigat
               style={styles.menuItem}
               onPress={() => handleMenuNavigation('Flashcards')}
             >
-              <FlashcardsIcon size={24} color="#1f1f1fff" />
+              <FlashcardsIcon size={24} color="#cfd8dc" />
               <Text style={styles.menuText}>Flashcards</Text>
             </TouchableOpacity>
             
@@ -100,7 +100,7 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigat
               style={styles.menuItem}
               onPress={() => handleMenuNavigation('Friends')}
             >
-              <PeopleIcon size={24} color="#1f1f1fff" />
+              <PeopleIcon size={24} color="#cfd8dc" />
               <Text style={styles.menuText}>Social</Text>
             </TouchableOpacity>
 
@@ -108,7 +108,7 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigat
               style={styles.menuItem}
               onPress={() => handleMenuNavigation('Configuracoes')}
             >
-              <ConfiguracoesIcon size={24} color="#1f1f1fff" />
+              <ConfiguracoesIcon size={24} color="#cfd8dc" />
               <Text style={styles.menuText}>Configurações</Text>
             </TouchableOpacity>
 
@@ -118,7 +118,7 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigat
               style={styles.menuItem}
               onPress={() => supabase.auth.signOut()}
             >
-              <SairIcon size={24} color="#1f1f1fff" />
+              <SairIcon size={24} color="#cfd8dc" />
               <Text style={styles.menuText}>Sair</Text>
             </TouchableOpacity>
           </View>
@@ -266,7 +266,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   menuText: {
-    color: '#000000ff',
+    color: '#cfd8dc',
     fontSize: 16,
     marginLeft: 10,
     fontWeight: '700',

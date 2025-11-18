@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert, Platform, Modal } from 'react-native'; // 🆕 Adicionado Modal
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert, Platform } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
@@ -7,9 +7,6 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { supabase, setupQuizMatchChannel } from '../../lib/supabase';
 import AvatarView from '../../components/AvatarView';
 import { RootStackParamList } from '../../types';
-import QRCode from 'react-native-qrcode-svg'; // 🆕 NOVO IMPORT
-import * as Clipboard from 'expo-clipboard'; // 🆕 NOVO IMPORT
-import { generateQRCodeContent } from '../../utils/qrCodeUtils'; // 🆕 NOVO IMPORT
 
 type QuizWaitingRoomRouteProp = RouteProp<RootStackParamList, 'QuizWaitingRoom'>;
 type QuizWaitingRoomNavigationProp = NativeStackNavigationProp<RootStackParamList, 'QuizWaitingRoom'>;
@@ -39,8 +36,7 @@ const QuizWaitingRoom = () => {
   const [session, setSession] = useState<any | null>(null);
   const [isHost, setIsHost] = useState(false);
   const [hostId, setHostId] = useState<string | null>(null);
-  const [showQRModal, setShowQRModal] = useState(false); // 🆕 NOVO STATE
-  const [qrUrl, setQrUrl] = useState<string>(''); // 🆕 NOVO STATE
+
 
   // Buscar sessão do usuário
   useEffect(() => {
@@ -336,28 +332,7 @@ const QuizWaitingRoom = () => {
     navigation.goBack();
   };
 
-  // 🆕 NOVA FUNÇÃO: Mostrar modal de QR Code
-  const handleShowQRCode = () => {
-    const url = generateQRCodeContent({
-      type: 'quiz_invite',
-      matchId: matchId,
-      quizId: quizId,
-      quizTitle: quizTitle,
-    }) || '';
-    setQrUrl(url);
-    setShowQRModal(true);
-  };
 
-  // 🆕 NOVA FUNÇÃO: Copiar link do QR Code
-  const handleCopyQRLink = async () => {
-    if (!qrUrl) return;
-    await Clipboard.setStringAsync(qrUrl);
-    if (Platform.OS === 'web') {
-      alert('Link copiado! Compartilhe com seus amigos.');
-    } else {
-      Alert.alert('Link Copiado', 'Compartilhe o link com seus amigos para entrarem no quiz!');
-    }
-  };
 
   return (
     <LinearGradient colors={['#242948', '#5C6494']} style={styles.container}>
@@ -393,14 +368,7 @@ const QuizWaitingRoom = () => {
           contentContainerStyle={styles.participantList}
         />
 
-        {/* 🆕 NOVO: Botão para mostrar QR Code */}
-        <TouchableOpacity
-          style={styles.qrButton}
-          onPress={handleShowQRCode}
-        >
-          <Ionicons name="qr-code" size={24} color="white" />
-          <Text style={styles.qrButtonText}>Mostrar QR Code</Text>
-        </TouchableOpacity>
+
 
         {/* 🆕 NOVO: Exibir código da sala */}
         <View style={styles.roomCodeContainer}>
@@ -429,50 +397,7 @@ const QuizWaitingRoom = () => {
         )}
       </View>
 
-      {/* 🆕 NOVO: Modal do QR Code */}
-      <Modal
-        visible={showQRModal}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setShowQRModal(false)}
-      >
-        <View style={styles.qrModalOverlay}>
-          <View style={styles.qrModalContent}>
-            <TouchableOpacity 
-              style={styles.qrCloseButton} 
-              onPress={() => setShowQRModal(false)}
-            >
-              <Ionicons name="close-circle" size={32} color="#333" />
-            </TouchableOpacity>
 
-            <Text style={styles.qrModalTitle}>Convide seus amigos!</Text>
-            
-            {qrUrl ? (
-              <>
-                <View style={styles.qrCodeContainer}>
-                  <QRCode value={qrUrl} size={240} />
-                </View>
-                
-                <Text style={styles.qrQuizTitle}>{quizTitle || 'Quiz'}</Text>
-                
-                <Text style={styles.qrInstruction}>
-                  Escaneie o QR Code ou copie o link para compartilhar
-                </Text>
-
-                <TouchableOpacity 
-                  style={styles.copyLinkButton}
-                  onPress={handleCopyQRLink}
-                >
-                  <Ionicons name="copy-outline" size={20} color="white" />
-                  <Text style={styles.copyLinkButtonText}>Copiar Link</Text>
-                </TouchableOpacity>
-              </>
-            ) : (
-              <Text>Gerando QR Code...</Text>
-            )}
-          </View>
-        </View>
-      </Modal>
     </LinearGradient>
   );
 };
@@ -538,22 +463,7 @@ const styles = StyleSheet.create({
     color: '#666',
     marginTop: 5,
   },
-  // 🆕 NOVOS ESTILOS: Botão de QR Code
-  qrButton: {
-    backgroundColor: '#9C27B0',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 16,
-    borderRadius: 15,
-    marginBottom: 12,
-    gap: 10,
-  },
-  qrButtonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
+
   readyButton: {
     backgroundColor: '#4CAF50',
     padding: 18,
@@ -602,66 +512,7 @@ const styles = StyleSheet.create({
     color: '#333',
     letterSpacing: 2,
   },
-  // 🆕 NOVOS ESTILOS: Modal de QR Code
-  qrModalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.75)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  qrModalContent: {
-    backgroundColor: '#FFF9E0',
-    borderRadius: 20,
-    padding: 30,
-    width: '90%',
-    maxWidth: 400,
-    alignItems: 'center',
-  },
-  qrCloseButton: {
-    position: 'absolute',
-    top: 10,
-    right: 10,
-    zIndex: 10,
-  },
-  qrModalTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 20,
-  },
-  qrCodeContainer: {
-    backgroundColor: 'white',
-    padding: 20,
-    borderRadius: 15,
-    marginBottom: 20,
-  },
-  qrQuizTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 10,
-    textAlign: 'center',
-  },
-  qrInstruction: {
-    fontSize: 14,
-    color: '#666',
-    textAlign: 'center',
-    marginBottom: 20,
-  },
-  copyLinkButton: {
-    backgroundColor: '#707DCB',
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    paddingVertical: 14,
-    paddingHorizontal: 28,
-    borderRadius: 12,
-  },
-  copyLinkButtonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
+
 });
 
 export default QuizWaitingRoom;

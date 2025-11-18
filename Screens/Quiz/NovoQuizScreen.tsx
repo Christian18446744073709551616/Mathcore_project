@@ -6,14 +6,275 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import { supabase } from '../../lib/supabase';
 import FriendInvitePopup from '../../components/FriendInvitePopup';
 import { createQuiz, updateQuiz, deleteQuiz } from '../../services/QuizService';
-import QRCode from 'react-native-qrcode-svg';
 import * as Clipboard from 'expo-clipboard';
-import { generateQRCodeContent } from '../../utils/qrCodeUtils'; // 🆕 NOVO IMPORT
+import { generateQRCodeContent } from '../../utils/qrCodeUtils';
+
 
 // --- ESTRUTURA DE DADOS ---
 interface QuizOption { id: string; text: string; }
 interface QuizQuestion { id: number; questionText: string; options: QuizOption[]; correctOptionId: string; }
 interface Quiz { id: string; title: string; questions: QuizQuestion[]; }
+
+// --- ESTILOS ---
+const styles = StyleSheet.create({
+  gradient: {
+    flex: 1,
+    padding: 20,
+  },
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 20,
+    paddingHorizontal: 10,
+  },
+  title: {
+    fontSize: 42,
+    fontWeight: 'bold',
+    color: '#ffffffff',
+    flex: 1,
+  },
+  backButton: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: '#D9D9D9',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  workspace: {
+    flex: 1,
+    flexDirection: 'row',
+    backgroundColor: '#4d547cff',
+    borderRadius: 20,
+    padding: 20,
+    overflow: 'hidden',
+  },
+  sidebar: {
+    width: 80,
+    marginRight: 20,
+    alignItems: 'center',
+  },
+  saveButton: {
+    width: 70,
+    height: 70,
+    paddingVertical: 10,
+    backgroundColor: '#e0dbc7ff',
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  saveButtonText: {
+    color: 'black',
+    fontWeight: 'bold',
+    fontSize: 17,
+  },
+  socialButtonsContainer: {
+    flexDirection: 'column',
+    alignItems: 'center',
+    width: '100%',
+    marginBottom: 10,
+  },
+  socialButton: {
+    backgroundColor: '#D9D9D9',
+    width: 50,
+    height: 50,
+    borderRadius: 15,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  playButton: {
+    marginTop: 20,
+    backgroundColor: '#4CAF50',
+    paddingVertical: 12,
+    paddingHorizontal: 50,
+    borderRadius: 25,
+  },
+  playButtonText: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  inviteModalContainer: {
+    width: '80%',
+    maxWidth: 400,
+    backgroundColor: '#e0dbc7ff',
+    borderRadius: 20,
+    padding: 20,
+    alignItems: 'center',
+  },
+  qrModalContainer: {
+    width: '80%',
+    maxWidth: 400,
+    backgroundColor: '#e0dbc7ff',
+    borderRadius: 20,
+    padding: 20,
+    alignItems: 'center',
+  },
+  closeModalButton: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+  },
+  modalTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: 'black',
+    marginBottom: 20,
+  },
+  qrCodePlaceholder: {
+    width: 200,
+    height: 200,
+    backgroundColor: '#E0E0E0',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 10,
+    marginVertical: 20,
+  },
+  qrInstruction: {
+    fontSize: 14,
+    color: '#333',
+    textAlign: 'center',
+  },
+  questionNavItem: {
+    width: 50,
+    height: 50,
+    borderRadius: 20,
+    backgroundColor: '#D9D9D9',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 20,
+    borderWidth: 3,
+    borderColor: 'transparent',
+  },
+  questionNavItemActive: {
+    borderColor: 'black',
+  },
+  questionNavText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: 'black',
+  },
+  addQuestionButton: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: '#D9D9D9',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  addQuestionButtonText: {
+    fontSize: 40,
+    color: 'black',
+    fontWeight: 'bold',
+    lineHeight: 40,
+    textAlign: 'center',
+  },
+  editorArea: {
+    borderRadius: 20,
+    flex: 1,
+  },
+  editorBackground: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: '#8287a8ff',
+    borderRadius: 20,
+  },
+  editorContent: {
+    padding: 20,
+  },
+  inputTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: 'black',
+    borderBottomWidth: 2,
+    borderBottomColor: 'black',
+    marginBottom: 20,
+    padding: 10,
+  },
+  input: {
+    borderRadius: 10,
+    padding: 15,
+    fontSize: 16,
+    color: 'black',
+    marginBottom: 15,
+    backgroundColor: 'rgba(255,255,255,0.5)',
+  },
+  inputQuestion: {
+    minHeight: 250,
+    textAlignVertical: 'top',
+  },
+  optionContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  optionSelector: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    borderWidth: 3,
+    borderColor: '#4CAF50',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 10,
+    backgroundColor: 'transparent',
+  },
+  optionSelectorCorrect: {
+    backgroundColor: '#4CAF50',
+  },
+  optionSelectorText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: 'black',
+  },
+  optionSelectorTextCorrect: {
+    color: 'white',
+  },
+  inputOption: {
+    flex: 1,
+    borderRadius: 10,
+    padding: 15,
+    fontSize: 16,
+    color: 'black',
+    backgroundColor: 'rgba(255,255,255,0.5)',
+  },
+  deleteButtonsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginTop: 30,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(0,0,0,0.1)',
+    paddingTop: 20,
+  },
+  deleteButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 8,
+  },
+  deleteQuestionButton: {
+    backgroundColor: '#f44336',
+  },
+  deleteQuizButton: {
+    backgroundColor: '#b71c1c',
+  },
+  deleteButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    marginLeft: 8,
+    fontSize: 16,
+  },
+});
 
 // --- COMPONENTE PRINCIPAL ---
 const QuizCreatorScreen = () => {
@@ -26,11 +287,11 @@ const QuizCreatorScreen = () => {
   const [questions, setQuestions] = useState<QuizQuestion[]>([]);
   const [activeQuestionId, setActiveQuestionId] = useState(1);
   const [isInviteModalVisible, setInviteModalVisible] = useState(false);
-  const [isQrModalVisible, setQrModalVisible] = useState(false);
   const [session, setSession] = useState<any | null>(null);
   const [isInvitePopupVisible, setIsInvitePopupVisible] = useState(false);
+  const [isQrModalVisible, setQrModalVisible] = useState(false);
+  const [qrPayload, setQrPayload] = useState<string | null>(null);
   const [qrModalMatchId, setQrModalMatchId] = useState<string | null>(null);
-  const [qrPayload, setQrPayload] = useState<string>('');
 
   // Buscar sessão do usuário
   useEffect(() => {
@@ -42,7 +303,7 @@ const QuizCreatorScreen = () => {
   }, []);
 
   useEffect(() => {
-    const quizToEdit = route.params?.quizToEdit as Quiz | null;
+    const quizToEdit = (route.params as { quizToEdit?: Quiz })?.quizToEdit;
     if (quizToEdit) {
       setIsEditMode(true);
       setQuizId(quizToEdit.id);
@@ -55,20 +316,20 @@ const QuizCreatorScreen = () => {
       setIsEditMode(false);
       setQuizId(null);
       setQuestions([{
-        id: 1, 
+        id: 1,
         questionText: '',
         options: [
-          { id: 'A', text: '' }, 
-          { id: 'B', text: '' }, 
-          { id: 'C', text: '' }, 
-          { id: 'D', text: '' }, 
+          { id: 'A', text: '' },
+          { id: 'B', text: '' },
+          { id: 'C', text: '' },
+          { id: 'D', text: '' },
           { id: 'E', text: '' }
         ],
         correctOptionId: '',
       }]);
       setActiveQuestionId(1);
     }
-  }, [route.params?.quizToEdit]);
+  }, [route.params]);
 
   const handleAddQuestion = useCallback(() => {
     const newQuestion: QuizQuestion = {
@@ -515,7 +776,7 @@ const QuizCreatorScreen = () => {
           match_id: matchData.id,
           user_id: session.user.id,
           is_ready: false,
-        }, { onConflict: ['match_id', 'user_id'] });
+        }, { onConflict: 'match_id,user_id' });
 
       if (participantError) {
         console.error('Erro ao adicionar host aos participantes:', participantError);
@@ -606,42 +867,6 @@ const QuizCreatorScreen = () => {
           onClose={() => setIsInvitePopupVisible(false)}
           onInvite={handleInviteFriend}
         />
-
-        {/* 🆕 MODIFICADO: Modal de QR com textos atualizados */}
-        <Modal
-          transparent={true}
-          visible={isQrModalVisible}
-          animationType="fade"
-          onRequestClose={() => setQrModalVisible(false)}
-        >
-          <View style={styles.modalOverlay}>
-            <View style={styles.qrModalContainer}>
-              <TouchableOpacity style={styles.closeModalButton} onPress={() => setQrModalVisible(false)}>
-                <Ionicons name="close-circle" size={30} color="#333" />
-              </TouchableOpacity>
-              <Text style={styles.modalTitle}>Compartilhe com seus amigos!</Text>
-              {qrPayload ? (
-                <>
-                  <QRCode value={qrPayload} size={220} />
-                  <Text style={{ marginTop: 12, fontSize: 16, fontWeight: 'bold', textAlign: 'center' }}>
-                    {quizTitle}
-                  </Text>
-                  <Text style={{ marginTop: 8, fontSize: 12, color: '#666', textAlign: 'center' }}>
-                    Escaneie o QR Code ou copie o link abaixo
-                  </Text>
-                  <TouchableOpacity style={[styles.playButton, { marginTop: 12 }]} onPress={handleCopyQrText}>
-                    <Text style={styles.playButtonText}>📋 Copiar Link</Text>
-                  </TouchableOpacity>
-                </>
-              ) : (
-                <View style={styles.qrCodePlaceholder}>
-                  <Ionicons name="qr-code" size={150} color="#333" />
-                </View>
-              )}
-            </View>
-          </View>
-        </Modal>
-
         <View style={styles.headerRow}>
           <Text style={styles.title} numberOfLines={1} ellipsizeMode="tail">
             {isEditMode ? quizTitle : 'Novo Quiz'}
@@ -756,265 +981,5 @@ const QuizCreatorScreen = () => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  gradient: {
-    flex: 1,
-    padding: 20,
-  },
-  headerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 20,
-    paddingHorizontal: 10,
-  },
-  title: {
-    fontSize: 42,
-    fontWeight: 'bold',
-    color: '#ffffffff',
-    flex: 1,
-  },
-  backButton: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: '#D9D9D9',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  workspace: {
-    flex: 1,
-    flexDirection: 'row',
-    backgroundColor: '#4d547cff',
-    borderRadius: 20,
-    padding: 20,
-    overflow: 'hidden',
-  },
-  sidebar: {
-    width: 80,
-    marginRight: 20,
-    alignItems: 'center',
-  },
-  saveButton: {
-    width: 70,
-    height: 70,
-    paddingVertical: 10,
-    backgroundColor: '#e0dbc7ff',
-    borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  saveButtonText: {
-    color: 'black',
-    fontWeight: 'bold',
-    fontSize: 17,
-  },
-  socialButtonsContainer: {
-    flexDirection: 'column',
-    alignItems: 'center',
-    width: '100%',
-    marginBottom: 10,
-  },
-  socialButton: {
-    backgroundColor: '#D9D9D9',
-    width: 50,
-    height: 50,
-    borderRadius: 15,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  playButton: {
-    marginTop: 20,
-    backgroundColor: '#4CAF50',
-    paddingVertical: 12,
-    paddingHorizontal: 50,
-    borderRadius: 25,
-  },
-  playButtonText: {
-    color: 'white',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  inviteModalContainer: {
-    width: '80%',
-    maxWidth: 400,
-    backgroundColor: '#e0dbc7ff',
-    borderRadius: 20,
-    padding: 20,
-    alignItems: 'center',
-  },
-  qrModalContainer: {
-    width: '80%',
-    maxWidth: 400,
-    backgroundColor: '#e0dbc7ff',
-    borderRadius: 20,
-    padding: 20,
-    alignItems: 'center',
-  },
-  closeModalButton: {
-    position: 'absolute',
-    top: 10,
-    right: 10,
-  },
-  modalTitle: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: 'black',
-    marginBottom: 20,
-  },
-  qrCodePlaceholder: {
-    width: 200,
-    height: 200,
-    backgroundColor: '#E0E0E0',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 10,
-    marginVertical: 20,
-  },
-  qrInstruction: {
-    fontSize: 14,
-    color: '#333',
-    textAlign: 'center',
-  },
-  questionNavItem: {
-    width: 50,
-    height: 50,
-    borderRadius: 20,
-    backgroundColor: '#D9D9D9',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 20,
-    borderWidth: 3,
-    borderColor: 'transparent',
-  },
-  questionNavItemActive: {
-    borderColor: 'black',
-  },
-  questionNavText: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: 'black',
-  },
-  addQuestionButton: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: '#D9D9D9',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 10,
-  },
-  addQuestionButtonText: {
-    fontSize: 40,
-    color: 'black',
-    fontWeight: 'bold',
-    lineHeight: 40,
-    textAlign: 'center',
-  },
-  editorArea: {
-    borderRadius: 20,
-    flex: 1,
-  },
-  editorBackground: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: '#8287a8ff',
-    borderRadius: 20,
-  },
-  editorContent: {
-    padding: 20,
-  },
-  inputTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: 'black',
-    borderBottomWidth: 2,
-    borderBottomColor: 'black',
-    marginBottom: 20,
-    padding: 10,
-  },
-  input: {
-    borderRadius: 10,
-    padding: 15,
-    fontSize: 16,
-    color: 'black',
-    marginBottom: 15,
-    backgroundColor: 'rgba(255,255,255,0.5)',
-  },
-  inputQuestion: {
-    minHeight: 250,
-    textAlignVertical: 'top',
-  },
-  optionContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 15,
-  },
-  optionSelector: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    borderWidth: 3,
-    borderColor: '#4CAF50',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 10,
-    backgroundColor: 'transparent',
-  },
-  optionSelectorCorrect: {
-    backgroundColor: '#4CAF50',
-  },
-  optionSelectorText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: 'black',
-  },
-  optionSelectorTextCorrect: {
-    color: 'white',
-  },
-  inputOption: {
-    flex: 1,
-    borderRadius: 10,
-    padding: 15,
-    fontSize: 16,
-    color: 'black',
-    backgroundColor: 'rgba(255,255,255,0.5)',
-  },
-  deleteButtonsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginTop: 30,
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(0,0,0,0.1)',
-    paddingTop: 20,
-  },
-  deleteButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    borderRadius: 8,
-  },
-  deleteQuestionButton: {
-    backgroundColor: '#f44336',
-  },
-  deleteQuizButton: {
-    backgroundColor: '#b71c1c',
-  },
-  deleteButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
-    marginLeft: 8,
-    fontSize: 16,
-  },
-});
 
 export default QuizCreatorScreen;

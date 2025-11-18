@@ -371,7 +371,7 @@ const Account: React.FC<{ navigation: any }> = ({ navigation }) => {
             disabled={loading}
           >
             <Text style={styles.buttonText}>
-              {loading ? 'Loading...' : 'Update'}
+              {loading ? 'Carregando...' : 'Atualizar'}
             </Text>
           </TouchableOpacity>
 
@@ -379,7 +379,7 @@ const Account: React.FC<{ navigation: any }> = ({ navigation }) => {
             style={[styles.signOutButton, { backgroundColor: theme.secondary }]}
             onPress={() => supabase.auth.signOut()}
           >
-            <Text style={styles.buttonText}>Sign Out</Text>
+            <Text style={styles.buttonText}>Sair</Text>
           </TouchableOpacity>
         </View>
 

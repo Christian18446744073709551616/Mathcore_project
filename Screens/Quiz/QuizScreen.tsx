@@ -265,9 +265,8 @@ const QuizScreen = () => {
             ]}
             onPress={() => (navigation as any).navigate('QRScanner')}
           >
-            <Ionicons name="qr-code-outline" size={32} color={theme.buttonText} />
             <Text style={[styles.scanQRButtonText, { color: theme.buttonText }]}>
-              📷 Escanear QR Code
+              Entrar em uma Sala
             </Text>
           </TouchableOpacity>
 
