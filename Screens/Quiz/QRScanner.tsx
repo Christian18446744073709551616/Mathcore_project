@@ -149,7 +149,7 @@ const QRScanner = () => {
               style={styles.manualSubmitButton}
               onPress={() => handleCodeEntered(manualInput.trim())}
             >
-              <Text style={styles.manualSubmitButtonText}>✅ Entrar no Quiz</Text>
+              <Text style={styles.manualSubmitButtonText}>Entrar no Quiz</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.manualCancelButton}
@@ -157,7 +157,7 @@ const QRScanner = () => {
                 setManualInput('');
               }}
             >
-              <Text style={styles.manualCancelButtonText}>❌ Limpar</Text>
+              <Text style={styles.manualCancelButtonText}>Limpar</Text>
             </TouchableOpacity>
           </View>
         </View>

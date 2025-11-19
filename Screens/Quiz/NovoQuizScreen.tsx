@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, FlatList, Alert, Modal, Platform } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, FlatList, Alert, Modal, Platform, Pressable } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -8,6 +8,9 @@ import FriendInvitePopup from '../../components/FriendInvitePopup';
 import { createQuiz, updateQuiz, deleteQuiz } from '../../services/QuizService';
 import * as Clipboard from 'expo-clipboard';
 import { generateQRCodeContent } from '../../utils/qrCodeUtils';
+import { PanGestureHandler } from 'react-native-gesture-handler';
+import Animated, { useSharedValue, useAnimatedStyle, withDecay } from 'react-native-reanimated';
+
 
 
 // --- ESTRUTURA DE DADOS ---
@@ -44,47 +47,50 @@ const styles = StyleSheet.create({
   },
   workspace: {
     flex: 1,
-    flexDirection: 'row',
-    backgroundColor: '#4d547cff',
-    borderRadius: 20,
-    padding: 20,
-    overflow: 'hidden',
+    flexDirection: 'column',
   },
   sidebar: {
-    width: 80,
-    marginRight: 20,
+    width: '100%',
+    minHeight: 80,
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'flex-start',
+    backgroundColor: '#4d547cff',
+    paddingHorizontal: 15,
+    borderRadius: 20,
+    marginBottom: 20,
+    gap: 15,
   },
+
+
   saveButton: {
-    width: 70,
-    height: 70,
-    paddingVertical: 10,
+    width: 60,
+    aspectRatio: 1,
     backgroundColor: '#e0dbc7ff',
     borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 10,
   },
+
   saveButtonText: {
     color: 'black',
     fontWeight: 'bold',
     fontSize: 17,
   },
   socialButtonsContainer: {
-    flexDirection: 'column',
+    flexDirection: 'row',
     alignItems: 'center',
-    width: '100%',
-    marginBottom: 10,
+    gap: 10,
   },
   socialButton: {
-    backgroundColor: '#D9D9D9',
     width: 50,
-    height: 50,
+    aspectRatio: 1,
+    backgroundColor: '#D9D9D9',
     borderRadius: 15,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 10,
   },
+
   playButton: {
     marginTop: 20,
     backgroundColor: '#4CAF50',
@@ -146,12 +152,12 @@ const styles = StyleSheet.create({
   },
   questionNavItem: {
     width: 50,
-    height: 50,
+    aspectRatio: 1,
     borderRadius: 20,
     backgroundColor: '#D9D9D9',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 20,
+    marginRight: 10,
     borderWidth: 3,
     borderColor: 'transparent',
   },
@@ -165,12 +171,11 @@ const styles = StyleSheet.create({
   },
   addQuestionButton: {
     width: 50,
-    height: 50,
+    aspectRatio: 1,
     borderRadius: 25,
     backgroundColor: '#D9D9D9',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 10,
   },
   addQuestionButtonText: {
     fontSize: 40,
@@ -180,17 +185,21 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   editorArea: {
-    borderRadius: 20,
     flex: 1,
+    borderRadius: 20,
+    overflow: 'hidden',
   },
+
   editorBackground: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: '#8287a8ff',
+    backgroundColor: '#8287a87c',
     borderRadius: 20,
   },
   editorContent: {
-    padding: 20,
+    padding: 15,
+    gap: 15,
   },
+
   inputTitle: {
     fontSize: 24,
     fontWeight: 'bold',
@@ -336,10 +345,10 @@ const QuizCreatorScreen = () => {
       id: questions.length > 0 ? Math.max(...questions.map(q => q.id)) + 1 : 1,
       questionText: '',
       options: [
-        { id: 'A', text: '' }, 
-        { id: 'B', text: '' }, 
-        { id: 'C', text: '' }, 
-        { id: 'D', text: '' }, 
+        { id: 'A', text: '' },
+        { id: 'B', text: '' },
+        { id: 'C', text: '' },
+        { id: 'D', text: '' },
         { id: 'E', text: '' }
       ],
       correctOptionId: '',
@@ -413,7 +422,7 @@ const QuizCreatorScreen = () => {
 
   const handleDeleteQuestion = () => {
     console.log('🗑️ handleDeleteQuestion chamado');
-    
+
     if (questions.length <= 1) {
       if (Platform.OS === 'web') {
         alert('Um quiz deve ter pelo menos uma questão.');
@@ -425,13 +434,13 @@ const QuizCreatorScreen = () => {
 
     if (Platform.OS === 'web') {
       const confirmar = window.confirm(`Tem certeza de que deseja excluir a questão ${activeQuestionId}?`);
-      
+
       if (!confirmar) {
-        console.log('❌ Usuário cancelou a exclusão da questão');
+        console.log(' Usuário cancelou a exclusão da questão');
         return;
       }
 
-      console.log('🔴 Usuário confirmou exclusão da questão');
+      console.log(' Usuário confirmou exclusão da questão');
 
       setQuestions(prevQuestions => {
         const currentIndex = prevQuestions.findIndex(q => q.id === activeQuestionId);
@@ -485,7 +494,7 @@ const QuizCreatorScreen = () => {
 
     if (Platform.OS === 'web') {
       const confirmar = window.confirm(`Tem certeza de que deseja excluir o quiz "${quizTitle}" permanentemente?`);
-      
+
       if (!confirmar) {
         console.log('❌ Usuário cancelou a exclusão');
         return;
@@ -497,7 +506,7 @@ const QuizCreatorScreen = () => {
         console.log('📤 Chamando deleteQuiz com ID:', quizId);
         const success = await deleteQuiz(quizId);
         console.log('📥 Resultado do deleteQuiz:', success);
-        
+
         if (success) {
           console.log('✅ Quiz excluído com sucesso!');
           alert('Quiz excluído com sucesso!');
@@ -553,7 +562,7 @@ const QuizCreatorScreen = () => {
           const optionId = field.split('_')[1];
           return {
             ...q,
-            options: q.options.map(opt => 
+            options: q.options.map(opt =>
               opt.id === optionId ? { ...opt, text: value } : opt
             ),
           };
@@ -590,7 +599,7 @@ const QuizCreatorScreen = () => {
     }
 
     let currentQuizId = quizId;
-    
+
     if (!currentQuizId) {
       console.log('💾 Quiz não salvo, salvando primeiro...');
       const newQuiz = await createQuiz(session.user.id, quizTitle, questions);
@@ -610,7 +619,7 @@ const QuizCreatorScreen = () => {
 
     try {
       console.log('📤 Criando quiz_match...');
-      
+
       const { data: matchData, error: matchError } = await supabase
         .from('quiz_matches')
         .insert({
@@ -678,9 +687,9 @@ const QuizCreatorScreen = () => {
       } else {
         Alert.alert('Sucesso', 'Convite enviado!');
       }
-      
+
       setIsInvitePopupVisible(false);
-      
+
       (navigation as any).navigate('QuizWaitingRoom', {
         matchId: matchData.id,
         quizId: currentQuizId,
@@ -825,7 +834,7 @@ const QuizCreatorScreen = () => {
     <View style={{ flex: 1 }}>
       <LinearGradient
         colors={['#242948', '#5C6494']}
-        locations={[0.65, 0.30]} 
+        locations={[0.65, 0.30]}
         start={{ x: 1, y: 1 }}
         end={{ x: 0.85, y: 0.4 }}
         style={styles.gradient}
@@ -847,8 +856,8 @@ const QuizCreatorScreen = () => {
                 <Text style={styles.playButtonText}>Jogar Solo</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity 
-                style={[styles.playButton, { backgroundColor: '#707DCB' }]} 
+              <TouchableOpacity
+                style={[styles.playButton, { backgroundColor: '#707DCB' }]}
                 onPress={() => {
                   setInviteModalVisible(false);
                   setTimeout(() => {
@@ -889,28 +898,58 @@ const QuizCreatorScreen = () => {
                 <Ionicons name="qr-code" size={30} color="black" />
               </TouchableOpacity>
             </View>
-            <FlatList
-              data={questions}
-              keyExtractor={item => item.id.toString()}
-              renderItem={({ item }) => (
+            <View style={{ flex: 1 }}>
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={{
+                  paddingHorizontal: 10,
+                  alignItems: 'center',
+                }}
+              >
+                {questions.map((question) => (
+                  <TouchableOpacity
+                    key={question.id}
+                    style={{
+                      width: 50, // largura fixa para que a scroll funcione
+                      height: 50,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      marginRight: 10,
+                      backgroundColor: question.id === activeQuestionId ? '#007AFF' : '#EEE',
+                      borderRadius: 25,
+                    }}
+                    onPress={() => setActiveQuestionId(question.id)}
+                  >
+                    <Text style={{ color: question.id === activeQuestionId ? '#FFF' : '#000' }}>
+                      {question.id}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+
                 <TouchableOpacity
-                  style={[
-                    styles.questionNavItem,
-                    item.id === activeQuestionId && styles.questionNavItemActive,
-                  ]}
-                  onPress={() => setActiveQuestionId(item.id)}
+                  style={{
+                    width: 50,
+                    height: 50,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    backgroundColor: '#0A0',
+                    borderRadius: 25,
+                  }}
+                  onPress={handleAddQuestion}
                 >
-                  <Text style={styles.questionNavText}>{item.id}</Text>
+                  <Text style={{ color: '#FFF', fontSize: 24 }}>+</Text>
                 </TouchableOpacity>
-              )}
-              showsVerticalScrollIndicator={false}
-            />
+              </ScrollView>
+
+            </View>
+
             <TouchableOpacity style={styles.addQuestionButton} onPress={handleAddQuestion}>
               <Text style={styles.addQuestionButtonText}>+</Text>
             </TouchableOpacity>
           </View>
 
-          <ScrollView 
+          <ScrollView
             style={styles.editorArea}
             contentContainerStyle={{ flexGrow: 1 }}
             showsVerticalScrollIndicator={false}
@@ -977,8 +1016,8 @@ const QuizCreatorScreen = () => {
             </View>
           </ScrollView>
         </View>
-      </LinearGradient>
-    </View>
+      </LinearGradient >
+    </View >
   );
 };
 

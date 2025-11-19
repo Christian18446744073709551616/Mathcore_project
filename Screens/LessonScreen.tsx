@@ -214,7 +214,7 @@ const LessonScreen: React.FC<LessonScreenProps> = ({ route }) => {
           end={{ x: 0.85, y: 0.4 }}
           style={{ flex: 1, padding: 20 }}
       >
-        <View style={{ paddingBottom: height * 0.05 }}>
+        <View style={{ paddingBottom: height * 2 * 0.05 }}>
         <TouchableOpacity style={[styles.returnButton, { left: width * 0.9, top: height * 0.02 }]} onPress={() => navigation.goBack()}>
           <Ionicons name="arrow-back-circle-outline" size={width * 0.03} color="#ffffffff" />
         </TouchableOpacity>
@@ -253,7 +253,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#242948',
   },
   sectionBox: {
-    backgroundColor: '#3B3C59',
+    backgroundColor: '#4c4d74a8',
     width: '95%',
     alignSelf: 'center',
     marginVertical: 10,
@@ -262,7 +262,7 @@ const styles = StyleSheet.create({
   },
   subTitle: {
     fontWeight: 'bold',
-    color: '#03f0fc',
+    color: '#e7e5e5ff',
     marginBottom: 8,
     textAlign: 'center',
   },
@@ -271,12 +271,12 @@ const styles = StyleSheet.create({
     textAlign: 'justify',
   },
   formulaName: {
-    color: '#f0a500',
+    color: '#7d8ef3ff',
     fontWeight: 'bold',
     marginBottom: 4,
   },
   lessonBox: {
-    backgroundColor: '#BDC4EE',
+    backgroundColor: '#707DCB',
     borderRadius: 40,
     marginBottom: 20,
     shadowColor: '#000',
@@ -286,7 +286,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontWeight: 'bold',
-    color: '#000',
+    color: '#faf7f7ff',
     textAlign: 'center',
   },
   returnButton: {
@@ -302,7 +302,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     width: '95%',
     alignSelf: 'center',
-    backgroundColor: '#fff1',
+    backgroundColor: '#8b87b40a',
   },
   lessonImage: {
     width: '100%',

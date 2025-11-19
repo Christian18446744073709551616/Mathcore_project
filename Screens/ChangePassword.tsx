@@ -23,8 +23,8 @@ const themes = {
     padrao: {
         name: 'Padrão',
         gradient: ['#2d3354', '#40466e'], // Antes era background: '#40466e'
-        card: '#858dbbff',
-        text: '#000000ff',
+        card: '#5b649bff',
+        text: '#ffffffff',
         textSecondary: '#666666',
         inputBackground: '#f5f7ff',
         primary: '#48BB78',
@@ -472,7 +472,7 @@ const styles = StyleSheet.create({
         zIndex: 10,
         padding: 8,
         borderRadius: 25,
-        backgroundColor: 'rgba(42, 46, 77, 0.7)',
+        backgroundColor: 'rgba(94, 92, 119, 0.7)',
     },
     themeButton: {
         position: 'absolute',
@@ -519,8 +519,8 @@ const styles = StyleSheet.create({
         height: 48,
     },
     inputStyle: { fontSize: 15 },
-    errorText: { color: '#ff6b6b', marginLeft: 8, marginTop: 5, fontSize: 12 },
-    errorBorder: { borderColor: '#ff6b6b', borderWidth: 1 },
+    errorText: { color: '#f54646ff', marginLeft: 8, marginTop: 5, fontSize: 12 },
+    errorBorder: { borderColor: '#f54646ff', borderWidth: 1 },
     buttonBlock: { marginTop: 18, alignItems: 'center' },
     primaryButton: {
         width: '100%',

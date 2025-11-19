@@ -424,6 +424,7 @@ const OnlineChat = () => {
           }}
         />
 
+<View style={styles.bottomBar}>
         <View style={styles.inputContainer}>
           <TextInput
             style={[styles.input, { outlineStyle: 'none' }]}
@@ -435,12 +436,16 @@ const OnlineChat = () => {
             returnKeyType="send"
             onSubmitEditing={handleSendMessage}
           />
-          <TouchableOpacity onPress={handleSendMessage} style={styles.sendButton}>
-            <Ionicons name="send" size={24} color="#fff" />
-          </TouchableOpacity>
+            
+        
         </View>
+         <TouchableOpacity onPress={handleSendMessage} style={styles.sendButton}>
+            <Ionicons name="send" size={29} color="#fff" />
+          </TouchableOpacity>
+       </View>
       </View>
     </KeyboardAvoidingView>
+    
   );
 };
 
@@ -519,27 +524,42 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   inputContainer: {
+     flex: 1,        
     flexDirection: 'row',
     alignItems: 'center',
+   
     backgroundColor: '#fff',
     borderRadius: 26,
     paddingHorizontal: 20,
-    paddingVertical: 10,
+ 
     marginBottom: 10,
     marginLeft: 5,
+    
     marginRight: 5,
-    height: 55,
+    height: 45,
   },
   input: {
     flex: 1,
     color: '#000',
   },
-  sendButton: {
-    backgroundColor: '#242948',
-    padding: 12,
-    borderRadius: 25,
-    marginLeft: 8,
-  },
+sendButton: {
+  backgroundColor: '#242948',
+  padding: 0,
+  borderRadius: 20,
+  marginLeft: 8,
+  height: 45,            // ← mesma altura
+},
+bottomBar: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'space-between',  // ✅ CORRETO
+  paddingHorizontal: 10,
+  paddingBottom: 10,
+  width: '100%',
+  height: 'auto',                   // ✅ ALTURA DINÂMICA
+},
+
+
 });
 
 export default OnlineChat;

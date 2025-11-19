@@ -31,8 +31,8 @@ const themes = {
     name: 'Padrão',
     gradient: ['#242948', '#5C6494'],
     title: '#ffffffff',
-    container: '#4d547cff',
-    button: '#e0dbc7ff',
+    container: '#FFFFFF22',
+    button: '#ffffffff',
     buttonBorder: '#000000',
     buttonText: '#000000',
   },
@@ -251,7 +251,7 @@ const QuizScreen = () => {
           showsHorizontalScrollIndicator={false}
         >
           <View style={styles.headerRow}>
-            <Text style={[styles.title, { color: theme.title }]}>Quiz</Text>
+            <Text style={[styles.title, { color: theme.title }]}>QUIZ</Text>
           </View>
 
           {/* 🆕 NOVO: Botão para escanear QR Code */}
@@ -277,6 +277,7 @@ const QuizScreen = () => {
                 numColumns={2}
                 keyExtractor={(item) => item.id}
                 extraData={quizzes}
+                
                 renderItem={({ item }) => {
                   if (item.id === 'new_quiz_button') {
                     return (
@@ -385,6 +386,7 @@ const styles = StyleSheet.create({
     flex: 1,
     borderRadius: 20,
   },
+
   themeButton: {
     position: 'absolute',
     top: 50,
@@ -392,139 +394,197 @@ const styles = StyleSheet.create({
     zIndex: 10,
     padding: 8,
   },
+
   headerRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 20,
-  },
-  title: {
-    fontSize: 50,
-    fontWeight: 'bold',
-  },
-  // 🆕 NOVO: Estilos do botão de escanear QR
-  scanQRButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 16,
-    paddingHorizontal: 24,
-    borderRadius: 12,
-    borderWidth: 2,
-    marginBottom: 20,
-    gap: 12,
+    marginBottom: 25,
   },
+
+  title: {
+    fontSize: 36,
+    fontWeight: '900',
+    letterSpacing: 1,
+  },
+
+  scanQRButton: {
+    alignSelf: 'center',
+    paddingVertical: 18,
+    paddingHorizontal: 25,
+    borderRadius: 16,
+    borderWidth: 0,
+    marginBottom: 25,
+    width: '90%',
+
+    // ▸ CARTÃO LIMPO
+    shadowColor: '#000',
+    shadowOpacity: 0.12,
+    shadowRadius: 6,
+    elevation: 4,
+  },
+
   scanQRButtonText: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: '600',
   },
+
   bottomContainer: {
     flex: 1,
     justifyContent: 'flex-end',
   },
+
   expandingRectangle: {
-    borderRadius: 12,
+    borderRadius: 20,
     padding: 20,
-    minHeight: 700,
+    minHeight: 650,
     flexGrow: 1,
+
+    // ▸ SOMBRA
+    shadowColor: '#000',
+    shadowOpacity: 0.10,
+    shadowRadius: 10,
+    elevation: 4,
   },
+
   quizListContainer: {
-    alignItems: 'flex-start',
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
   },
+
   newQuizButton: {
-    borderWidth: 2,
-    borderRadius: 8,
+    borderWidth: 0,
+    borderRadius: 18,
     width: 150,
     height: 200,
     alignItems: 'center',
     justifyContent: 'center',
     margin: 10,
+
+    // ▸ CARTÃO MODERNO
+    shadowColor: '#000',
+    shadowOpacity: 0.12,
+    shadowRadius: 6,
+    elevation: 4,
   },
+
   buttonContent: {
     alignItems: 'center',
     justifyContent: 'center',
   },
+
   novoText: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    fontSize: 22,
+    fontWeight: '600',
   },
+
   quizText: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    fontSize: 22,
+    fontWeight: '600',
   },
+
   plusSymbol: {
-    fontSize: 48,
+    fontSize: 50,
     fontWeight: 'bold',
+    marginTop: 5,
   },
+
   savedQuizButton: {
-    borderWidth: 2,
-    borderRadius: 8,
+    borderWidth: 0,
+    borderRadius: 18,
     width: 150,
     height: 200,
     alignItems: 'center',
     justifyContent: 'center',
     margin: 10,
     padding: 10,
+
+    shadowColor: '#000',
+    shadowOpacity: 0.12,
+    shadowRadius: 6,
+    elevation: 4,
   },
+
   savedQuizTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
+    fontSize: 19,
+    fontWeight: '600',
     textAlign: 'center',
   },
+
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    backgroundColor: 'rgba(0, 0, 0, 0.65)',
     justifyContent: 'center',
     alignItems: 'center',
   },
+
   modalContent: {
     width: '85%',
     maxHeight: '70%',
     borderRadius: 20,
     padding: 20,
+
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
+    elevation: 8,
   },
+
   modalTitle: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: '700',
     marginBottom: 20,
     textAlign: 'center',
   },
+
   themeList: {
     maxHeight: 350,
   },
+
   themeOption: {
     padding: 16,
-    borderRadius: 12,
+    borderRadius: 15,
     marginBottom: 12,
-    borderWidth: 3,
+    borderWidth: 2,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+
+    shadowColor: '#000',
+    shadowOpacity: 0.07,
+    shadowRadius: 4,
+    elevation: 2,
   },
+
   themeName: {
     fontSize: 16,
     fontWeight: '600',
     flex: 1,
   },
+
   colorPreview: {
     flexDirection: 'row',
     gap: 6,
     marginRight: 10,
   },
+
   colorSwatch: {
     width: 20,
     height: 20,
     borderRadius: 4,
   },
+
   closeButton: {
     padding: 16,
     borderRadius: 12,
     marginTop: 16,
     borderWidth: 2,
   },
+
   closeButtonText: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: '700',
     textAlign: 'center',
   },
 });

@@ -20,7 +20,48 @@ const CONTENTS = [
   { name: 'Álgebra Elementar', topics: ['Noções de Função', 'Função Afim'] },
 ]
 
+function Popup({ visible, message, onClose }) {
+  return (
+    <Modal visible={visible} transparent animationType="fade">
+      <View style={{
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0,0,0,0.6)'
+      }}>
+        <View style={{
+          width: '25%',
+          backgroundColor: '#2b2e4a',
+          padding: 20,
+          borderRadius: 15,
+          elevation: 1,
+          borderWidth: 1,
+          borderColor: '#5c6bc0'
+        }}>
+          <Text style={{ color: '#fff', fontSize: 16, marginBottom: 20 }}>
+            {message}
+          </Text>
+
+          <TouchableOpacity
+            onPress={onClose}
+            style={{
+              backgroundColor: '#00AEEF',
+              paddingVertical: 10,
+              borderRadius: 10
+            }}
+          >
+            <Text style={{ color: '#fff', textAlign: 'center', fontWeight: 'bold' }}>
+              OK
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </Modal>
+  );
+}
 export default function QuestionGenerator() {
+  const [popupVisible, setPopupVisible] = useState(false);
+const [popupMessage, setPopupMessage] = useState('');
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [drawerAnim] = useState(new Animated.Value(0))
   const [loading, setLoading] = useState(false)
@@ -46,6 +87,11 @@ export default function QuestionGenerator() {
     else setSelectedTopics([...selectedTopics, topic])
   }
 
+  const showPopup = (msg: string) => {
+  setPopupMessage(msg);
+  setPopupVisible(true);
+};
+
   const toggleDrawer = () => {
     if (drawerOpen) {
       Animated.timing(drawerAnim, { toValue: 0, duration: 200, useNativeDriver: true }).start(() => setDrawerOpen(false))
@@ -57,13 +103,15 @@ export default function QuestionGenerator() {
 
   const generateQuestion = async (similarPrompt: boolean = false) => {
     if (similarPrompt && !question) {
-      alert('Não há questão anterior para gerar uma similar.')
+      showPopup('Não há questão anterior para gerar uma similar.');
+
       return
     }
 
     try {
       if (!selectedContent || selectedTopics.length === 0) {
-        alert('Selecione um conteúdo e ao menos um tópico.')
+        showPopup('Selecione um conteúdo e ao menos um tópico.');
+
         return
       }
 
@@ -74,21 +122,53 @@ export default function QuestionGenerator() {
       setExplanation(null)
 
       const prompt = similarPrompt
-        ? `Crie uma nova questão parecida com esta: "${question.question}", mantendo o mesmo nível de dificuldade e temas. Responda apenas em JSON.`
-        : `Gere uma questão de múltipla escolha sobre os seguintes tópicos: ${selectedTopics.join(', ')}. 
-          O conteúdo geral é: ${selectedContent}.
-          A dificuldade deve ser "${difficulty}".
-          Responda APENAS em JSON no formato:
-          {
-            "question": "string",
-            "option_a": "string",
-            "option_b": "string",
-            "option_c": "string",
-            "option_d": "string",
-            "correct_option": "A",
-            "difficulty": "${difficulty}"
-          }`
+        ? `
+Crie uma nova questão de múltipla escolha  SIMILAR DA ANTERIOR: "${question.question}".
 
+Regras:
+- mantenha apenas o mesmo tema e o mesmo nível de dificuldade: "${difficulty}"
+- não repita palavras-chave específicas do enunciado anterior
+- não repita o formato das alternativas anteriores
+- Escreva alternativas boas, e que fazem sentido mesmo não sendo a correta.
+- ofereça somente uma alternativa correta
+
+Responda APENAS em JSON neste formato:
+
+{
+  "question": "string",
+  "option_a": "string",
+  "option_b": "string",
+  "option_c": "string",
+  "option_d": "string",
+  "correct_option": "A",
+  "difficulty": "${difficulty}"
+}
+`
+        : `
+Gere uma questão de múltipla escolha totalmente original sobre os seguintes tópicos: ${selectedTopics.join(', ')}.
+O conteúdo geral é: ${selectedContent}.
+A dificuldade deve ser "${difficulty}".
+
+A questão deve ser:
+- diferente de qualquer questão gerada anteriormente, sempre bem diferente
+- Aborde bem os topicos selecionados, saindo da mesmice.
+- escrita com enunciado novo (mesmo que o tema seja igual)
+- objetiva, clara e com apenas uma alternativa correta
+- com enunciado de no máximo 3 linhas
+- com alternativas curtas e bem distintas entre si
+
+Responda APENAS em JSON exatamente neste formato:
+
+{
+  "question": "string",
+  "option_a": "string",
+  "option_b": "string",
+  "option_c": "string",
+  "option_d": "string",
+  "correct_option": "A",
+  "difficulty": "${difficulty}"
+}
+`;
       const response = await fetch('https://api.openai.com/v1/responses', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${process.env.EXPO_PUBLIC_OPENAI_KEY}` },
@@ -105,7 +185,8 @@ export default function QuestionGenerator() {
       setQuestion(parsed)
     } catch (err: any) {
       console.error(err)
-      alert('Erro ao gerar questão. Verifique o console.')
+      showPopup('Erro ao gerar questão. Verifique o console.');
+
     } finally {
       setLoading(false)
     }
@@ -154,7 +235,7 @@ export default function QuestionGenerator() {
     if (!question) return
     setLoading(true)
     try {
-      const prompt = `Explique de forma sucinta a alternativa correta desta questão: "${question.question}". Responda em texto simples.`
+      const prompt = `Explique de forma sucinta e sem emoji a alternativa correta desta questão: "${question.question}". Responda em texto simples.`
       const response = await fetch('https://api.openai.com/v1/responses', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${process.env.EXPO_PUBLIC_OPENAI_KEY}` },
@@ -181,7 +262,7 @@ export default function QuestionGenerator() {
         end={{ x: 0.85, y: 0.4 }}
         style={{ flex: 1 }}
       >
-        <ScrollView 
+        <ScrollView
           style={styles.container}
           showsVerticalScrollIndicator={false}
           showsHorizontalScrollIndicator={false}
@@ -261,7 +342,7 @@ export default function QuestionGenerator() {
               {renderOption('C', question.option_c)}
               {renderOption('D', question.option_d)}
               {showResult && (
-                <Text style={styles.resultText}>{selectedOption === question.correct_option ? '✔️ Acertou!' : `❌ Errou! A correta é ${question.correct_option}`}</Text>
+                <Text style={styles.resultText}>{selectedOption === question.correct_option ? ' Acertou!' : ` Errou! A correta é ${question.correct_option}`}</Text>
               )}
             </View>
           )}
@@ -290,7 +371,7 @@ export default function QuestionGenerator() {
           <TouchableWithoutFeedback onPress={() => setExplanationModal(false)}>
             <View style={styles.modalOverlay}>
               <View style={styles.explanationModal}>
-                <Text style={styles.modalTitle}>💡 Explicação</Text>
+                <Text style={styles.modalTitle}> Explicação</Text>
                 <ScrollView>
                   <Text style={{ color: '#fff' }}>{explanation}</Text>
                 </ScrollView>
@@ -333,26 +414,32 @@ export default function QuestionGenerator() {
             </View>
           </TouchableWithoutFeedback>
         )}
+        <Popup
+  visible={popupVisible}
+  message={popupMessage}
+  onClose={() => setPopupVisible(false)}
+/>
+
       </LinearGradient>
     </View>
   )
 }
 
 const styles = StyleSheet.create({
-  container: { 
-    flex: 1, 
-    padding: 20, 
-    paddingBottom: 90 
+  container: {
+    flex: 1,
+    padding: 20,
+    paddingBottom: 90
   },
   title: { fontSize: 22, color: '#fff', fontWeight: 'bold', marginBottom: 15 },
   chipContainer: { flexDirection: 'row', flexWrap: 'wrap' },
-  section: { 
+  section: {
     backgroundColor: 'rgba(59, 60, 89, 0.8)', // Mais transparente para combinar com o gradiente
-    borderRadius: 12, 
-    padding: 12, 
-    marginBottom: 20, 
-    borderWidth: 1, 
-    borderColor: '#4C4D70' 
+    borderRadius: 12,
+    padding: 12,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: '#4C4D70'
   },
   sectionTitle: { fontWeight: 'bold', fontSize: 16, color: '#fff', marginBottom: 6 },
   chip: { backgroundColor: '#4A4C70', borderRadius: 20, paddingVertical: 6, paddingHorizontal: 12, margin: 4 },
@@ -360,7 +447,7 @@ const styles = StyleSheet.create({
   chipText: { color: '#fff', fontWeight: '600' },
   chipTextActive: { color: '#fff' },
   chipSmall: { backgroundColor: '#4A4C70', borderRadius: 20, paddingVertical: 10, paddingHorizontal: 16, margin: 6 },
-  chipSmallActive: { backgroundColor: '#FFD700' },
+  chipSmallActive: { backgroundColor: '#00AEEF' },
   chipSmallText: { color: '#fff', fontSize: 14, fontWeight: '600' },
   chipSmallTextActive: { color: '#000', fontWeight: 'bold' },
   filterButton: { backgroundColor: '#00AEEF', padding: 10, borderRadius: 12, alignSelf: 'flex-start', marginTop: 10 },
@@ -369,23 +456,23 @@ const styles = StyleSheet.create({
   drawer: { width: '90%', backgroundColor: '#3B3C59', borderRadius: 15, padding: 12, marginTop: 60, shadowColor: '#000', shadowOpacity: 0.3, shadowOffset: { width: 0, height: 5 }, shadowRadius: 10, elevation: 10 },
   drawerTitle: { color: '#fff', fontWeight: 'bold', marginBottom: 10 },
   selectedFilters: { flexDirection: 'row', flexWrap: 'wrap', marginTop: 10 },
-  filterChip: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#FFD700', borderRadius: 15, paddingVertical: 4, paddingHorizontal: 8, margin: 3 },
+  filterChip: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#00AEEF', borderRadius: 15, paddingVertical: 4, paddingHorizontal: 8, margin: 3 },
   filterText: { color: '#000', marginRight: 4, fontWeight: 'bold', fontSize: 12 },
   filterRemove: { color: '#000', fontWeight: 'bold', fontSize: 12 },
-  button: { 
+  button: {
     backgroundColor: '#00AEEF',
-    padding: 12, 
-    borderRadius: 15, 
-    minWidth: '22%', 
-    alignItems: 'center', 
-    marginBottom: 10 
+    padding: 12,
+    borderRadius: 15,
+    minWidth: '22%',
+    alignItems: 'center',
+    marginBottom: 10
   },
   buttonText: { color: '#fff', fontSize: 14, fontWeight: 'bold', textAlign: 'center' },
-  card: { 
+  card: {
     backgroundColor: 'rgba(31, 33, 51, 0.9)', // Mais transparente para combinar com o gradiente
-    padding: 15, 
-    borderRadius: 15, 
-    marginBottom: 15 
+    padding: 15,
+    borderRadius: 15,
+    marginBottom: 15
   },
   qText: { color: '#fff', fontSize: 16, marginBottom: 15 },
   optionButton: { padding: 12, borderRadius: 12, marginVertical: 5 },
@@ -395,23 +482,24 @@ const styles = StyleSheet.create({
   tagText: { color: '#fff', fontSize: 12, fontWeight: 'bold' },
   resultText: { marginTop: 15, fontSize: 16, fontWeight: 'bold', color: '#fff' },
 
-  modalOverlay: { 
-    flex: 1, 
-    backgroundColor: 'rgba(0,0,0,0.7)', 
-    justifyContent: 'center', 
-    alignItems: 'center' 
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.7)',
+    justifyContent: 'center',
+    alignItems: 'center'
   },
-  historyModal: { 
-    width: '85%', 
-    backgroundColor: '#30345a', 
-    borderRadius: 15, 
-    padding: 20 
+  historyModal: {
+    width: '85%',
+    backgroundColor: '#30345a',
+    borderRadius: 15,
+    padding: 20
   },
-  explanationModal: { 
-    width: '85%', 
-    backgroundColor: '#242948', 
-    borderRadius: 15, 
-    padding: 20, 
-    maxHeight: '60%' 
+  explanationModal: {
+    width: '35%',
+    backgroundColor: '#242948',
+    borderRadius: 15,
+    padding: 20,
+    maxHeight: '60%'
   },
+  modalTitle: { fontSize: 18, fontWeight: 'bold', color: '#fff', marginBottom: 10 },
 })

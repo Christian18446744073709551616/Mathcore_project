@@ -27,6 +27,9 @@ export default function Auth() {
   const [isSignUp, setIsSignUp] = useState<boolean>(false)
 
   // Login states
+  const [emailValid, setEmailValid] = useState<boolean | null>(null)
+  const [passwordValid, setPasswordValid] = useState<boolean | null>(null)
+  const [nameAvailable, setNameAvailable] = useState<boolean | null>(null)
   const [email, setEmail] = useState<string>('')
   const [password, setPassword] = useState<string>('')
   const [loading, setLoading] = useState<boolean>(false)
@@ -38,6 +41,67 @@ export default function Auth() {
   const [name, setName] = useState<string>('')
   const [nameError, setNameError] = useState<string>('')
   const [hasTEA, setHasTEA] = useState<boolean | null>(null)
+
+  function validateEmailRealtime(text: string) {
+    setEmail(text)
+
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!regex.test(text)) {
+      setEmailValid(false)
+      setEmailError("E-mail inválido")
+    } else {
+      setEmailValid(true)
+      setEmailError("")
+    }
+  }
+  function validatePasswordRealtime(text: string) {
+    setPassword(text)
+
+    const strong =
+      text.length >= 8 &&
+      /[A-Z]/.test(text) &&
+      /[a-z]/.test(text) &&
+      /[0-9]/.test(text) &&
+      /[^A-Za-z0-9]/.test(text)
+
+    if (!strong) {
+      setPasswordValid(false)
+      setPasswordError(
+        "A senha deve ter 8+ caracteres, maiúscula, minúscula, número e símbolo."
+      )
+    } else {
+      setPasswordValid(true)
+      setPasswordError("")
+    }
+  }
+  async function checkNameExists(text: string) {
+    setName(text)
+
+    if (!text.trim()) {
+      setNameAvailable(null)
+      setNameError("Digite seu nome")
+      return
+    }
+
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("username")
+      .eq("username", text.trim())
+
+    if (error) {
+      console.log("Erro ao validar nome:", error)
+      return
+    }
+
+    if (data.length > 0) {
+      setNameAvailable(false)
+      setNameError("Este nome já está em uso")
+    } else {
+      setNameAvailable(true)
+      setNameError("")
+    }
+  }
+
 
   async function signInWithEmail() {
     setLoading(true)
@@ -73,21 +137,26 @@ export default function Auth() {
     setPasswordError('')
 
     // Validações
-    if (!name.trim()) {
-      setNameError('Digite seu nome')
+    if (nameAvailable === false) {
+      setNameError("Este nome já está em uso")
       setLoading(false)
       return
     }
-    if (!email.trim()) {
-      setEmailError('Digite seu e-mail')
+
+    if (emailValid === false) {
+      setEmailError("E-mail inválido")
       setLoading(false)
       return
     }
-    if (!password) {
-      setPasswordError('Digite sua senha')
+
+    if (passwordValid === false) {
+      setPasswordError(
+        "A senha deve ter 8+ caracteres, maiúscula, minúscula, número e símbolo."
+      )
       setLoading(false)
       return
     }
+
     if (hasTEA === null) {
       Alert.alert('Atenção', 'Por favor, selecione se você tem TEA')
       setLoading(false)
@@ -286,9 +355,18 @@ export default function Auth() {
                   <Input
                     style={{ outlineStyle: 'none' }}
                     onChangeText={(text) => {
-                      setName(text)
+                      checkNameExists(text)
+
                       if (nameError) setNameError('')
                     }}
+                    rightIcon={
+                      nameError
+                        ? { type: "font-awesome", name: "exclamation-circle", color: "red", size: 20 }
+                        : nameAvailable === true
+                          ? { type: "font-awesome", name: "check", color: "green", size: 20 }
+                          : undefined
+                    }
+
                     value={name}
                     placeholder="Qual seu nome?"
                     autoCapitalize="words"
@@ -310,10 +388,8 @@ export default function Auth() {
                   <Text style={styles.inputLabel}>Email</Text>
                   <Input
                     style={{ outlineStyle: 'none' }}
-                    onChangeText={(text) => {
-                      setEmail(text)
-                      if (emailError) setEmailError('')
-                    }}
+                    onChangeText={(text) => validateEmailRealtime(text)}
+
                     value={email}
                     placeholder="Qual seu e-mail?"
                     autoCapitalize="none"
@@ -326,14 +402,12 @@ export default function Auth() {
                     placeholderTextColor="#999"
                     rightIcon={
                       emailError
-                        ? {
-                          type: 'font-awesome',
-                          name: 'exclamation-circle',
-                          color: 'red',
-                          size: 20,
-                        }
-                        : undefined
+                        ? { type: "font-awesome", name: "exclamation-circle", color: "red", size: 20 }
+                        : emailValid === true
+                          ? { type: "font-awesome", name: "check", color: "green", size: 20 }
+                          : undefined
                     }
+
                   />
                   {emailError ? (
                     <Text style={{ color: 'red', marginLeft: 10 }}>{emailError}</Text>
@@ -346,9 +420,9 @@ export default function Auth() {
                   <Input
                     style={{ outlineStyle: 'none' }}
                     onChangeText={(text) => {
-                      setPassword(text)
-                      if (passwordError) setPasswordError('')
-                    }}
+                      validatePasswordRealtime(text)
+                    }
+                    }
                     value={password}
                     secureTextEntry={!showPassword}
                     placeholder="Escolha uma senha"
@@ -363,7 +437,13 @@ export default function Auth() {
                     rightIcon={{
                       type: 'font-awesome',
                       name: showPassword ? 'eye-slash' : 'eye',
-                      color: passwordError ? 'red' : '#666',
+                      color:
+                        passwordError
+                          ? 'red'                   // senha fraca → vermelho
+                          : passwordValid === true
+                            ? 'green'                 // senha forte → verde
+                            : '#666',                 // padrão
+
                       size: 16,
                       onPress: () => setShowPassword(!showPassword),
                     }}
