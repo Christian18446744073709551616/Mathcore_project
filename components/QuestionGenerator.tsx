@@ -30,7 +30,8 @@ function Popup({ visible, message, onClose }) {
         backgroundColor: 'rgba(0,0,0,0.6)'
       }}>
         <View style={{
-          width: '25%',
+          width: '80%',
+          maxWidth: 400,
           backgroundColor: '#2b2e4a',
           padding: 20,
           borderRadius: 15,
@@ -59,6 +60,7 @@ function Popup({ visible, message, onClose }) {
     </Modal>
   );
 }
+
 export default function QuestionGenerator() {
   const [popupVisible, setPopupVisible] = useState(false);
 const [popupMessage, setPopupMessage] = useState('');

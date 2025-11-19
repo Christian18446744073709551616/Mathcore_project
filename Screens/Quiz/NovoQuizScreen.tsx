@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, FlatList, Alert, Modal, Platform, Pressable } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert, Modal, Platform, useWindowDimensions } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -8,74 +8,64 @@ import FriendInvitePopup from '../../components/FriendInvitePopup';
 import { createQuiz, updateQuiz, deleteQuiz } from '../../services/QuizService';
 import * as Clipboard from 'expo-clipboard';
 import { generateQRCodeContent } from '../../utils/qrCodeUtils';
-import { PanGestureHandler } from 'react-native-gesture-handler';
-import Animated, { useSharedValue, useAnimatedStyle, withDecay } from 'react-native-reanimated';
-
-
 
 // --- ESTRUTURA DE DADOS ---
 interface QuizOption { id: string; text: string; }
 interface QuizQuestion { id: number; questionText: string; options: QuizOption[]; correctOptionId: string; }
 interface Quiz { id: string; title: string; questions: QuizQuestion[]; }
 
-// --- ESTILOS ---
-const styles = StyleSheet.create({
+// --- ESTILOS BASE ---
+const baseStyles = StyleSheet.create({
   gradient: {
     flex: 1,
     padding: 20,
   },
   headerRow: {
-    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 20,
+    marginBottom: 12,
     paddingHorizontal: 10,
   },
   title: {
-    fontSize: 42,
-    fontWeight: 'bold',
+    fontWeight: '700',
     color: '#ffffffff',
     flex: 1,
   },
   backButton: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
     backgroundColor: '#D9D9D9',
     justifyContent: 'center',
     alignItems: 'center',
+    marginLeft: 10,
   },
   workspace: {
     flex: 1,
-    flexDirection: 'column',
   },
   sidebar: {
-    width: '100%',
     minHeight: 80,
-    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'flex-start',
     backgroundColor: '#4d547cff',
-    paddingHorizontal: 15,
-    borderRadius: 20,
-    marginBottom: 20,
-    gap: 15,
+    paddingHorizontal: 12,
+    borderRadius: 16,
+    marginBottom: 16,
+    gap: 12,
   },
-
-
   saveButton: {
-    width: 60,
-    aspectRatio: 1,
+    minWidth: 58,
+    minHeight: 44,
     backgroundColor: '#e0dbc7ff',
-    borderRadius: 20,
+    borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
   },
-
   saveButtonText: {
     color: 'black',
-    fontWeight: 'bold',
-    fontSize: 17,
+    fontWeight: '700',
   },
   socialButtonsContainer: {
     flexDirection: 'row',
@@ -83,25 +73,25 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   socialButton: {
-    width: 50,
-    aspectRatio: 1,
+    width: 46,
+    height: 46,
     backgroundColor: '#D9D9D9',
-    borderRadius: 15,
+    borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
+    marginHorizontal: 6,
   },
-
   playButton: {
-    marginTop: 20,
+    marginTop: 10,
     backgroundColor: '#4CAF50',
     paddingVertical: 12,
-    paddingHorizontal: 50,
-    borderRadius: 25,
+    paddingHorizontal: 28,
+    borderRadius: 20,
   },
   playButtonText: {
     color: 'white',
-    fontSize: 18,
-    fontWeight: 'bold',
+    fontSize: 16,
+    fontWeight: '700',
   },
   modalOverlay: {
     flex: 1,
@@ -110,19 +100,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   inviteModalContainer: {
-    width: '80%',
-    maxWidth: 400,
+    width: '86%',
+    maxWidth: 560,
     backgroundColor: '#e0dbc7ff',
-    borderRadius: 20,
-    padding: 20,
+    borderRadius: 16,
+    padding: 18,
     alignItems: 'center',
   },
   qrModalContainer: {
-    width: '80%',
-    maxWidth: 400,
+    width: '86%',
+    maxWidth: 560,
     backgroundColor: '#e0dbc7ff',
-    borderRadius: 20,
-    padding: 20,
+    borderRadius: 16,
+    padding: 18,
     alignItems: 'center',
   },
   closeModalButton: {
@@ -131,106 +121,82 @@ const styles = StyleSheet.create({
     right: 10,
   },
   modalTitle: {
-    fontSize: 22,
-    fontWeight: 'bold',
+    fontSize: 20,
+    fontWeight: '700',
     color: 'black',
-    marginBottom: 20,
-  },
-  qrCodePlaceholder: {
-    width: 200,
-    height: 200,
-    backgroundColor: '#E0E0E0',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 10,
-    marginVertical: 20,
-  },
-  qrInstruction: {
-    fontSize: 14,
-    color: '#333',
-    textAlign: 'center',
+    marginBottom: 14,
   },
   questionNavItem: {
-    width: 50,
-    aspectRatio: 1,
-    borderRadius: 20,
+    minWidth: 44,
+    minHeight: 44,
+    borderRadius: 12,
     backgroundColor: '#D9D9D9',
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 10,
-    borderWidth: 3,
+    marginRight: 8,
+    borderWidth: 2,
     borderColor: 'transparent',
   },
-  questionNavItemActive: {
-    borderColor: 'black',
-  },
   questionNavText: {
-    fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: '700',
     color: 'black',
   },
   addQuestionButton: {
-    width: 50,
-    aspectRatio: 1,
-    borderRadius: 25,
+    minWidth: 48,
+    minHeight: 48,
+    borderRadius: 24,
     backgroundColor: '#D9D9D9',
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  addQuestionButtonText: {
-    fontSize: 40,
-    color: 'black',
-    fontWeight: 'bold',
-    lineHeight: 40,
-    textAlign: 'center',
+    marginLeft: 8,
   },
   editorArea: {
     flex: 1,
-    borderRadius: 20,
+    borderRadius: 16,
     overflow: 'hidden',
   },
-
   editorBackground: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: '#8287a87c',
-    borderRadius: 20,
+    borderRadius: 16,
   },
   editorContent: {
-    padding: 15,
-    gap: 15,
+    padding: 14,
+    gap: 12,
   },
-
   inputTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: '700',
     color: 'black',
-    borderBottomWidth: 2,
-    borderBottomColor: 'black',
-    marginBottom: 20,
-    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(0,0,0,0.12)',
+    marginBottom: 10,
+    paddingVertical: 8,
+    paddingHorizontal: 10,
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    borderRadius: 8,
   },
   input: {
     borderRadius: 10,
-    padding: 15,
-    fontSize: 16,
+    padding: 12,
+    fontSize: 15,
     color: 'black',
-    marginBottom: 15,
-    backgroundColor: 'rgba(255,255,255,0.5)',
+    marginBottom: 12,
+    backgroundColor: 'rgba(255,255,255,0.45)',
   },
   inputQuestion: {
-    minHeight: 250,
+    minHeight: 160,
     textAlignVertical: 'top',
   },
   optionContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 15,
+    marginBottom: 10,
   },
   optionSelector: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    borderWidth: 3,
+    borderWidth: 2,
     borderColor: '#4CAF50',
     justifyContent: 'center',
     alignItems: 'center',
@@ -241,8 +207,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#4CAF50',
   },
   optionSelectorText: {
-    fontSize: 18,
-    fontWeight: 'bold',
+    fontSize: 16,
+    fontWeight: '700',
     color: 'black',
   },
   optionSelectorTextCorrect: {
@@ -251,24 +217,24 @@ const styles = StyleSheet.create({
   inputOption: {
     flex: 1,
     borderRadius: 10,
-    padding: 15,
-    fontSize: 16,
+    padding: 12,
+    fontSize: 15,
     color: 'black',
-    backgroundColor: 'rgba(255,255,255,0.5)',
+    backgroundColor: 'rgba(255,255,255,0.45)',
   },
   deleteButtonsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    marginTop: 30,
+    marginTop: 18,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(0,0,0,0.1)',
-    paddingTop: 20,
+    borderTopColor: 'rgba(0,0,0,0.06)',
+    paddingTop: 14,
   },
   deleteButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 10,
-    paddingHorizontal: 15,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
     borderRadius: 8,
   },
   deleteQuestionButton: {
@@ -279,17 +245,22 @@ const styles = StyleSheet.create({
   },
   deleteButtonText: {
     color: 'white',
-    fontWeight: 'bold',
+    fontWeight: '700',
     marginLeft: 8,
-    fontSize: 16,
+    fontSize: 14,
   },
 });
 
-// --- COMPONENTE PRINCIPAL ---
+// --- COMPONENTE PRINCIPAL (sem alteração de lógica) ---
 const QuizCreatorScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
+  const { width } = useWindowDimensions();
+  // breakpoint simples para "PC"
+  const isDesktop = width >= 900;
+  const isTablet = width >= 600 && width < 900;
 
+  // estados e lógica (sem alterações)
   const [isEditMode, setIsEditMode] = useState(false);
   const [quizId, setQuizId] = useState<string | null>(null);
   const [quizTitle, setQuizTitle] = useState('');
@@ -302,7 +273,6 @@ const QuizCreatorScreen = () => {
   const [qrPayload, setQrPayload] = useState<string | null>(null);
   const [qrModalMatchId, setQrModalMatchId] = useState<string | null>(null);
 
-  // Buscar sessão do usuário
   useEffect(() => {
     const fetchSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
@@ -735,7 +705,6 @@ const QuizCreatorScreen = () => {
 
   const activeQuestion = questions.find(q => q.id === activeQuestionId);
 
-  // 🆕 MODIFICADO: Função para abrir modal de QR com URL real
   const handleOpenQrModal = async () => {
     if (!session?.user?.id) {
       if (Platform.OS === 'web') alert('Você precisa estar logado para gerar QR.');
@@ -791,7 +760,6 @@ const QuizCreatorScreen = () => {
         console.error('Erro ao adicionar host aos participantes:', participantError);
       }
 
-      // ✅ CORREÇÃO PRINCIPAL: Gera URL ao invés de JSON
       const qrUrl = generateQRCodeContent({
         type: 'quiz_invite',
         matchId: matchData.id,
@@ -799,13 +767,10 @@ const QuizCreatorScreen = () => {
         quizTitle: quizTitle,
       });
 
-      console.log('✅ QR Code URL gerada:', qrUrl);
-
       setQrModalMatchId(matchData.id);
       setQrPayload(qrUrl);
       setQrModalVisible(true);
 
-      // 🆕 Redireciona automaticamente para WaitingRoom após gerar QR
       setTimeout(() => {
         (navigation as any).navigate('QuizWaitingRoom', {
           matchId: matchData.id,
@@ -822,12 +787,24 @@ const QuizCreatorScreen = () => {
     }
   };
 
-  // 🆕 MODIFICADO: Texto atualizado
   const handleCopyQrText = async () => {
     if (!qrPayload) return;
     await Clipboard.setStringAsync(qrPayload);
     if (Platform.OS === 'web') alert('Link copiado! Cole no navegador para entrar na sala.');
     else Alert.alert('Link Copiado', 'Cole o link no navegador para entrar na sala do quiz.');
+  };
+
+  // estilos dinâmicos com base na largura (apenas apresentação)
+  const dynamic = {
+    containerDirection: isDesktop ? 'row' : 'column',
+    headerDirection: isDesktop ? 'row' : 'row',
+    titleFontSize: isDesktop ? 36 : isTablet ? 30 : 28,
+    titleAlign: isDesktop ? 'left' : 'left',
+    sidebarWidth: isDesktop ? 260 : '100%',
+    sidebarPadding: isDesktop ? 18 : 12,
+    editorPadding: isDesktop ? 22 : 14,
+    questionButtonSize: isDesktop ? 52 : 44,
+    inputQuestionMinHeight: isDesktop ? 220 : 160,
   };
 
   return (
@@ -837,7 +814,7 @@ const QuizCreatorScreen = () => {
         locations={[0.65, 0.30]}
         start={{ x: 1, y: 1 }}
         end={{ x: 0.85, y: 0.4 }}
-        style={styles.gradient}
+        style={[baseStyles.gradient]}
       >
         <Modal
           transparent={true}
@@ -845,19 +822,19 @@ const QuizCreatorScreen = () => {
           animationType="fade"
           onRequestClose={() => setInviteModalVisible(false)}
         >
-          <View style={styles.modalOverlay}>
-            <View style={styles.inviteModalContainer}>
-              <TouchableOpacity style={styles.closeModalButton} onPress={() => setInviteModalVisible(false)}>
-                <Ionicons name="close-circle" size={30} color="#333" />
+          <View style={baseStyles.modalOverlay}>
+            <View style={baseStyles.inviteModalContainer}>
+              <TouchableOpacity style={baseStyles.closeModalButton} onPress={() => setInviteModalVisible(false)}>
+                <Ionicons name="close-circle" size={28} color="#333" />
               </TouchableOpacity>
-              <Text style={styles.modalTitle}>Escolha uma opção</Text>
+              <Text style={baseStyles.modalTitle}>Escolha uma opção</Text>
 
-              <TouchableOpacity style={styles.playButton} onPress={handleStartGame}>
-                <Text style={styles.playButtonText}>Jogar Solo</Text>
+              <TouchableOpacity style={baseStyles.playButton} onPress={handleStartGame}>
+                <Text style={baseStyles.playButtonText}>Jogar Solo</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
-                style={[styles.playButton, { backgroundColor: '#707DCB' }]}
+                style={[baseStyles.playButton, { backgroundColor: '#707DCB', marginTop: 12 }]}
                 onPress={() => {
                   setInviteModalVisible(false);
                   setTimeout(() => {
@@ -865,7 +842,7 @@ const QuizCreatorScreen = () => {
                   }, 300);
                 }}
               >
-                <Text style={styles.playButtonText}>Convidar Amigos</Text>
+                <Text style={baseStyles.playButtonText}>Convidar Amigos</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -876,123 +853,189 @@ const QuizCreatorScreen = () => {
           onClose={() => setIsInvitePopupVisible(false)}
           onInvite={handleInviteFriend}
         />
-        <View style={styles.headerRow}>
-          <Text style={styles.title} numberOfLines={1} ellipsizeMode="tail">
-            {isEditMode ? quizTitle : 'Novo Quiz'}
+
+        {/* Header */}
+        <View style={[baseStyles.headerRow, { flexDirection: dynamic.headerDirection }]}>
+          <Text
+            style={[
+              baseStyles.title,
+              {
+                fontSize: dynamic.titleFontSize,
+                textAlign: dynamic.titleAlign,
+                marginRight: 10,
+              },
+            ]}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >
+            {isEditMode ? quizTitle || 'Quiz (sem título)' : 'Novo Quiz'}
           </Text>
-          <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-            <Ionicons name="arrow-back-circle-outline" size={50} color="black" />
+
+          <TouchableOpacity style={baseStyles.backButton} onPress={() => navigation.goBack()}>
+            <Ionicons name="arrow-back-circle-outline" size={44} color="black" />
           </TouchableOpacity>
         </View>
 
-        <View style={styles.workspace}>
-          <View style={styles.sidebar}>
-            <TouchableOpacity style={styles.saveButton} onPress={handleSaveQuiz}>
-              <Text style={styles.saveButtonText}>Salvar</Text>
-            </TouchableOpacity>
-            <View style={styles.socialButtonsContainer}>
-              <TouchableOpacity style={styles.socialButton} onPress={() => setInviteModalVisible(true)}>
-                <Ionicons name="play" size={30} color="black" />
+        {/* Workspace: sidebar + editor */}
+        <View style={[baseStyles.workspace, { flexDirection: dynamic.containerDirection, columnGap: 12 }]}>
+          {/* Sidebar */}
+          <View
+            style={[
+              baseStyles.sidebar,
+              {
+                width: dynamic.sidebarWidth,
+                paddingHorizontal: dynamic.sidebarPadding,
+                
+                flexDirection: isDesktop ? 'column' : 'row',
+                alignItems: isDesktop ? 'stretch' : 'center',
+                justifyContent: isDesktop ? 'flex-start' : 'flex-start',
+                marginRight: isDesktop ? 12 : 0,
+                paddingVertical: isDesktop ? 12 : 4,
+                   height: isDesktop ? 'auto' : 72,
+
+              },
+            ]}
+          >
+            <View style={{ flexDirection: isDesktop ? 'row' : 'row', alignItems: 'center', justifyContent: 'flex-start', marginBottom: isDesktop ? 12 : 0 }}>
+              <TouchableOpacity style={baseStyles.saveButton} onPress={handleSaveQuiz}>
+                <Text style={baseStyles.saveButtonText}>Salvar</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.socialButton} onPress={handleOpenQrModal}>
-                <Ionicons name="qr-code" size={30} color="black" />
-              </TouchableOpacity>
+
+              <View style={{ width: 8 }} />
+
+              <View style={baseStyles.socialButtonsContainer}>
+                <TouchableOpacity style={baseStyles.socialButton} onPress={() => setInviteModalVisible(true)}>
+                  <Ionicons name="play" size={26} color="black" />
+                </TouchableOpacity>
+                <TouchableOpacity style={baseStyles.socialButton} onPress={handleOpenQrModal}>
+                  <Ionicons name="qr-code" size={26} color="black" />
+                </TouchableOpacity>
+              </View>
             </View>
-            <View style={{ flex: 1 }}>
+
+            {/* Question navigator */}
+            <View style={{ flex: 1, marginTop: isDesktop ? 6 : 0 }}>
               <ScrollView
-                horizontal
+                horizontal={!isDesktop}
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={{
-                  paddingHorizontal: 10,
-                  alignItems: 'center',
+                  paddingVertical: 6,
+                  alignItems: isDesktop ? 'flex-start' : 'center',
+                  flexDirection: isDesktop ? 'row' : 'row',
+                  flexWrap: isDesktop ? 'wrap' : 'nowrap',
+                  width: isDesktop ? 220 : 'auto',
+             
+
+                  // opcional (mas deixa bonito)
+                  columnGap: isDesktop ? 10 : 0,
+                  rowGap: isDesktop ? 10 : 0,
                 }}
               >
-                {questions.map((question) => (
-                  <TouchableOpacity
-                    key={question.id}
-                    style={{
-                      width: 50, // largura fixa para que a scroll funcione
-                      height: 50,
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      marginRight: 10,
-                      backgroundColor: question.id === activeQuestionId ? '#007AFF' : '#EEE',
-                      borderRadius: 25,
-                    }}
-                    onPress={() => setActiveQuestionId(question.id)}
-                  >
-                    <Text style={{ color: question.id === activeQuestionId ? '#FFF' : '#000' }}>
-                      {question.id}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
+                {questions.map((question) => {
+                  const active = question.id === activeQuestionId;
+                  return (
+                    <TouchableOpacity
+                      key={question.id}
+                      style={[
+                        baseStyles.questionNavItem,
+                        {
+                          width: dynamic.questionButtonSize,
+                          height: dynamic.questionButtonSize,
+                          borderRadius: dynamic.questionButtonSize / 2,
+                          backgroundColor: active ? '#007AFF' : '#EEE',
+                          borderColor: active ? '#000' : 'transparent',
+                        },
+                      ]}
+                      onPress={() => setActiveQuestionId(question.id)}
+                    >
+                      <Text style={[baseStyles.questionNavText, { color: active ? '#fff' : '#000' }]}>{question.id}</Text>
+                    </TouchableOpacity>
+                  );
+                })}
 
-                <TouchableOpacity
-                  style={{
-                    width: 50,
-                    height: 50,
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    backgroundColor: '#0A0',
-                    borderRadius: 25,
-                  }}
-                  onPress={handleAddQuestion}
-                >
-                  <Text style={{ color: '#FFF', fontSize: 24 }}>+</Text>
-                </TouchableOpacity>
+
               </ScrollView>
-
             </View>
 
-            <TouchableOpacity style={styles.addQuestionButton} onPress={handleAddQuestion}>
-              <Text style={styles.addQuestionButtonText}>+</Text>
+            {/* On desktop, place add button also bottom */}
+
+            <TouchableOpacity
+              style={[
+                baseStyles.addQuestionButton,
+                {
+                  marginTop: 12,
+                  alignSelf: 'center',
+                  width: dynamic.questionButtonSize,
+                  height: dynamic.questionButtonSize,
+                  borderRadius: dynamic.questionButtonSize / 2,
+                  backgroundColor: 'rgba(220, 226, 220, 1)',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }
+              ]}
+              onPress={handleAddQuestion}
+            >
+              <Text
+                style={{
+                  color: '#000000ff',
+                  fontSize: isDesktop ? 28 : 24,
+                  fontWeight: '700',
+                  textAlign: 'center'
+                }}
+              >
+                +
+              </Text>
             </TouchableOpacity>
+
+
           </View>
 
+          {/* Editor area */}
           <ScrollView
-            style={styles.editorArea}
-            contentContainerStyle={{ flexGrow: 1 }}
+            style={[baseStyles.editorArea, { flex: 1 }]}
+            contentContainerStyle={{ flexGrow: 1, padding: dynamic.editorPadding }}
             showsVerticalScrollIndicator={false}
           >
-            <View style={styles.editorBackground} />
-            <View style={styles.editorContent}>
+            <View style={baseStyles.editorBackground} />
+            <View style={[baseStyles.editorContent, { padding: dynamic.editorPadding }]}>
               {activeQuestion && (
                 <>
                   <TextInput
-                    style={styles.inputTitle}
+                    style={[baseStyles.inputTitle, { outlineStyle: 'none', fontSize: isDesktop ? 20 : 18 }]}
                     placeholder="Nome do Quiz"
-                    placeholderTextColor="rgba(255, 255, 255, 0.5)"
+                    placeholderTextColor="rgba(0,0,0,0.45)"
                     value={quizTitle}
                     onChangeText={setQuizTitle}
                   />
+
                   <TextInput
-                    style={[styles.input, styles.inputQuestion]}
+                    style={[baseStyles.input, baseStyles.inputQuestion, { minHeight: dynamic.inputQuestionMinHeight, outlineStyle: 'none', }]}
                     placeholder="Comece a digitar a pergunta..."
                     placeholderTextColor="#787878"
                     multiline
                     value={activeQuestion.questionText}
                     onChangeText={text => handleUpdateQuestion(activeQuestion.id, 'questionText', text)}
                   />
+
                   {activeQuestion.options.map((option) => {
                     const isCorrect = activeQuestion.correctOptionId === option.id;
                     return (
-                      <View key={option.id} style={styles.optionContainer}>
+                      <View key={option.id} style={baseStyles.optionContainer}>
                         <TouchableOpacity
                           style={[
-                            styles.optionSelector,
-                            isCorrect && styles.optionSelectorCorrect,
+                            baseStyles.optionSelector,
+                            isCorrect && baseStyles.optionSelectorCorrect,
+                            { width: isDesktop ? 48 : 40, height: isDesktop ? 48 : 40, borderRadius: isDesktop ? 24 : 20 },
                           ]}
                           onPress={() => handleSelectCorrectOption(activeQuestion.id, option.id)}
                         >
-                          <Text style={[
-                            styles.optionSelectorText,
-                            isCorrect && styles.optionSelectorTextCorrect
-                          ]}>
+                          <Text style={[baseStyles.optionSelectorText, isCorrect && baseStyles.optionSelectorTextCorrect]}>
                             {option.id}
                           </Text>
                         </TouchableOpacity>
+
                         <TextInput
-                          style={styles.inputOption}
+                          style={[baseStyles.inputOption, { fontSize: isDesktop ? 16 : 15, outlineStyle: 'none', }]}
                           placeholder={`Alternativa ${option.id}`}
                           placeholderTextColor="#787878"
                           value={option.text}
@@ -1001,14 +1044,15 @@ const QuizCreatorScreen = () => {
                       </View>
                     );
                   })}
-                  <View style={styles.deleteButtonsContainer}>
-                    <TouchableOpacity style={[styles.deleteButton, styles.deleteQuestionButton]} onPress={handleDeleteQuestion}>
-                      <Ionicons name="trash-bin-outline" size={24} color="white" />
-                      <Text style={styles.deleteButtonText}>Excluir Questão</Text>
+
+                  <View style={baseStyles.deleteButtonsContainer}>
+                    <TouchableOpacity style={[baseStyles.deleteButton, baseStyles.deleteQuestionButton]} onPress={handleDeleteQuestion}>
+                      <Ionicons name="trash-bin-outline" size={18} color="white" />
+                      <Text style={baseStyles.deleteButtonText}>Excluir Questão</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={[styles.deleteButton, styles.deleteQuizButton]} onPress={handleDeleteQuiz}>
-                      <Ionicons name="trash-outline" size={24} color="white" />
-                      <Text style={styles.deleteButtonText}>Excluir Quiz</Text>
+                    <TouchableOpacity style={[baseStyles.deleteButton, baseStyles.deleteQuizButton]} onPress={handleDeleteQuiz}>
+                      <Ionicons name="trash-outline" size={18} color="white" />
+                      <Text style={baseStyles.deleteButtonText}>Excluir Quiz</Text>
                     </TouchableOpacity>
                   </View>
                 </>
@@ -1016,8 +1060,8 @@ const QuizCreatorScreen = () => {
             </View>
           </ScrollView>
         </View>
-      </LinearGradient >
-    </View >
+      </LinearGradient>
+    </View>
   );
 };
 
